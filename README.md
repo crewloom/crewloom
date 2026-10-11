@@ -127,7 +127,7 @@ Crewloom does not include a hosted orchestration server or a model provider. It 
 
 ## Documentation and contribution
 
-Start with [Getting started](documentation/GETTING_STARTED.md), [Architecture](documentation/ARCHITECTURE.md), and [Workflow recipes](documentation/WORKFLOWS.md). Read [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and [the changelog](CHANGELOG.md) before proposing changes.
+Start with [Getting started](documentation/GETTING_STARTED.md), [Architecture](documentation/ARCHITECTURE.md), [Workflow recipes](documentation/WORKFLOWS.md), and [OpenCode/local models](documentation/LOCAL_MODELS.md). Read [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and [the changelog](CHANGELOG.md) before proposing changes.
 
 Derived from RUMUZE Agency's first-party procedures, with clean public memory and filtered operational references. Client records, private infrastructure, and internal history are excluded. See [provenance](documentation/PROVENANCE.json).
 

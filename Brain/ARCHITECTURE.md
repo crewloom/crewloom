@@ -56,3 +56,19 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - Understanding offline verification now audits each generated prompt against independently declared required record IDs and exact source/scope data; grading expectations remain excluded from prompts. Live collection must reuse this preflight.
 
 - 2026-10-11 | The understanding collector binds canonical project identity and records a shuffled fixed paired plan before generation. Output is restricted to new private evaluation directories; each trial is preserved, failures stop repeated transport attempts, and model identity is explicitly requested.
+
+- 2026-10-11 | Concurrent example generation now declares reused helper implementations as prompt inputs for billing, planning and report. Acceptance tools remain excluded from generation.
+
+- 2026-10-11 | Planning acceptance enforces declared exception types without fixture-specific wording. Cycle representation is explicitly closed in the public generation contract.
+
+- 2026-10-11 | Report titles are explicit bilingual contract resources. Invalid payload acceptance checks required ValueError and named unknown key, rather than fixture-specific messages.
+
+- 2026-10-11 | Model repair_from references source failure state in the same bound checkout, exact candidate copies and unchanged producer/verifier scope; original sources/static verifier dependencies remain frozen. Failure diagnostics are bounded input data. Maximum two repair ancestors and existing request/admission budgets apply. Explicit plan preparation/dispatch remains pending.
+
+- 2026-10-11 | Repair preparation and execution reuse workflow.py through prepare-repair/repair. Owner-only candidate copies and plans live under /.crewloom-repairs/; privacy.py ignores and rejects this namespace in staged indexes. Unchanged verifier argv/dependencies/image digest, recorded criteria inputs, source hashes and two-repair ancestry bound the cycle; ordinary run does not automatically spend on repair.
+
+- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
+
+- 2026-10-11 | OpenCode model IDs remain explicit provider/model values. Optional opencode_provider references a bounded project-private five-field loopback provider contract; fixed OpenAI-compatible SDK and deny-all host profile remain. Hash enters prompt/generation evidence; changed profiles reject repair, publication and reuse. Byte budgets are not tokenizer or context-capacity estimates.
+
+- 2026-10-11 | Private local-provider readers now reject foreign ownership and any group/other permission bits on POSIX, matching the documented chmod600 contract. Non-POSIX ACL ownership remains unverified.

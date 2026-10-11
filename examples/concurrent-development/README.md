@@ -53,7 +53,7 @@ planning  (independent) ─┘
 
 `report` is declared with `src/billing.py` and `src/planning.py` as inputs of its generation
 step, so the ancestor modules are merged into its worktree and are part of the prompt it
-actually receives.
+actually receives. Generation also receives the reused `src/money.py` and `src/scheduling_support.py` implementations where needed; contract prose alone does not replace actual helper input.
 
 ## 1. Setup
 
