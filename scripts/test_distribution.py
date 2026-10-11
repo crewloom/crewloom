@@ -169,6 +169,15 @@ class InstalledDistributionTests(unittest.TestCase):
         self.assertNotIn(str(ROOT), report['root'])
         self.assertTrue(report['root'].endswith('crewloom_data'))
 
+    def test_installed_understanding_contracts_verify_without_model_calls(self):
+        result = self.crewloom('evaluate-bilingual', '--verify-understanding')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report['cases'], 9)
+        self.assertEqual(report['model_trials'], 0)
+        self.assertFalse(report['model_improvement_measured'])
+        self.assertEqual(len(report['fixture_sha256']), 64)
+
     def test_all_42_roles_discover_validate_and_show(self):
         listed = self.crewloom('list')
         self.assertEqual(listed.returncode, 0, listed.stderr)

@@ -274,3 +274,7 @@
 - 2026-10-11 | Next dependency retained PostCSS 8.4.31 with known source-map file-disclosure advisories | Pin patched 8.5.29 without a Next major upgrade; known-violation regression, all dashboard tests/build and clean audit verify compatibility.
 
 - 2026-10-11 | Replacing shared hooksPath from each linked worktree could chain owned guards into a cycle | Validate common Git directory/project/wrapper ownership, reuse the inherited guard and retain worktree-local source registrations.
+
+- 2026-10-11 | Memory plumbing alone cannot prove better understanding | Prepare paired synthetic correction/scope/assumption/ambiguity cases using the actual production selector and a held-out strict grader. Requested publication is classified separately from real execution permission; no benchmark safety shortcut grants authority.
+
+- 2026-10-11 | One latest-record stream let operator hypotheses hide user quotes; known regressions failed with supersedes=1 and selected IDs=[2] | Separate revision/selection streams by kind, preserve both in actual payloads, and retain source checks. Pretrial rubric audit also separates publication request from permission and asks for missing language only when the task requires it.

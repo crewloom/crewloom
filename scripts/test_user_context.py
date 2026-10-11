@@ -74,6 +74,39 @@ class UserContextTests(unittest.TestCase):
         self.contract()
         self.assertEqual(len(uc.load(self.root)['contracts']['understand-task']['history']), 1)
 
+    def test_later_assumption_preserves_the_quoted_statement(self):
+        first = self.record()
+        hypothesis = self.record('English replies inferred from foundation language',
+                                 quote='Keep the foundation English.', kind='assumption')
+        self.contract()
+        self.assertIsNone(hypothesis['supersedes'])
+        records = uc.select(self.root, 'understand-task')['memories']
+        self.assertEqual([record['id'] for record in records], [first['id'], hypothesis['id']])
+        self.assertEqual([record['kind'] for record in records], ['statement', 'assumption'])
+        pb.enter(self.root, 'sample-project', 'understand-task', ROLE, seeds=['request.txt'])
+        frozen = pc.load(self.root, {'task_id': 'understand-task'})
+        payload = model_host.project_context_payload(self.root, 'understand-task', {'inputs': ['request.txt']}, frozen)
+        self.assertEqual([item['kind'] for item in payload['user_context']['memories']], ['statement', 'assumption'])
+        native = hl.injected_context(self.root, pb.load_binding(self.root),
+                                     {'host': 'codex', 'host_version': 'fixture', 'project_id': 'sample-project',
+                                      'role': ROLE, 'declared_outputs': [], 'marker': 'test-receipt',
+                                      'additional_context_limit': 65536}, frozen)
+        self.assertIn(first['value'], native['additionalContext'])
+        self.assertIn(hypothesis['value'], native['additionalContext'])
+        correction = self.record('Keep the foundation English.')
+        self.assertEqual(correction['supersedes'], first['id'])
+        records = uc.select(self.root, 'understand-task')['memories']
+        self.assertEqual([record['id'] for record in records], [correction['id'], hypothesis['id']])
+
+    def test_task_hypothesis_does_not_erase_project_wide_quoted_statement(self):
+        pb.cancel(self.root, 'sample-project', 'understand-task', 'fixture')
+        first = uc.record(self.root, 'owner', 'response-language', 'الرد بالعربي.',
+                          'request.txt', 'الرد بالعربي.')
+        hypothesis = self.record('Maybe English replies', quote='Keep the foundation English.', kind='assumption')
+        self.contract()
+        records = uc.select(self.root, 'understand-task')['memories']
+        self.assertEqual([record['id'] for record in records], [first['id'], hypothesis['id']])
+
     def test_user_and_task_are_not_inferred(self):
         self.record(); self.contract(user='other-user')
         self.assertEqual(uc.select(self.root, 'understand-task')['memories'], [])
