@@ -233,6 +233,50 @@ def init(root, task_id=None):
         return {'status': 'enabled', 'findings': check(root, role_memory=policy['private_role_memory']), 'existing_hooks_preserved': True}
 
 
+def relocation_plan(root, binding):
+    """Validate an owned guard before rebind changes project metadata."""
+    policy = read_private(root, POLICY, None)
+    if policy is None:
+        return None
+    if binding is None or policy.get('scope') != binding:
+        raise ValueError('Privacy relocation ownership is unknown')
+    old_root = Path(binding['project_root'])
+    configured = git(root, 'config', '--get', 'core.hooksPath').decode().strip()
+    if configured != str(old_root / '.crewloom/private/hooks'):
+        raise ValueError('Privacy hook configuration changed; restore it before rebinding')
+    wrapper = w.safe_path(root, '.crewloom/private/hooks/pre-commit', internal=True)
+    if not wrapper.is_file() or wrapper.is_symlink() or w.digest(wrapper.read_bytes()) != policy.get('wrapper_sha256'):
+        raise ValueError('Privacy hook changed; restore it before rebinding')
+    def remap(name):
+        path = Path(name)
+        return str(root / path.relative_to(old_root)) if path.is_relative_to(old_root) else str(path)
+    policy['previous_hooks'] = remap(policy['previous_hooks'])
+    if policy.get('previous_pre_commit'):
+        policy['previous_pre_commit'] = remap(policy['previous_pre_commit'])
+        previous = Path(policy['previous_pre_commit'])
+        if not previous.is_file() or not os.access(previous, os.X_OK):
+            raise ValueError('Previous pre-commit is unavailable after relocation')
+    links = []
+    for path in wrapper.parent.iterdir():
+        if path.name != 'pre-commit' and path.is_symlink():
+            links.append((path, remap(os.readlink(path))))
+    return {'policy': policy, 'links': links}
+
+
+def relocate_guard(root, binding, plan):
+    """Re-home owned hooks while preserving existing hook sources."""
+    policy = plan['policy']
+    wrapper = '#!/bin/sh\nexec ' + shlex.quote(sys.executable) + ' ' + shlex.quote(str(Path(__file__).resolve())) + ' hook --project ' + shlex.quote(str(root)) + '\n'
+    private_write(root, '.crewloom/private/hooks/pre-commit', wrapper)
+    os.chmod(root / '.crewloom/private/hooks/pre-commit', 0o700)
+    for path, target in plan['links']:
+        path.unlink()
+        path.symlink_to(target)
+    policy.update(scope=binding, wrapper_sha256=w.digest(wrapper.encode()))
+    private_write(root, POLICY, json.dumps(policy).encode())
+    git(root, 'config', 'core.hooksPath', str(root / '.crewloom/private/hooks'))
+
+
 def hook(root):
     policy = read_private(root, POLICY, None)
     if not policy or policy.get('scope') != pb.load_binding(root):

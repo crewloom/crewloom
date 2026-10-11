@@ -506,7 +506,10 @@ def ignore_local_state(root):
     """Machine-local runtime state stays out of version control; existing ignore rules are preserved."""
     path = writable(root, '.gitignore')
     original = path.read_text(encoding='utf-8') if path.exists() else ''
-    if original.splitlines() and original.splitlines()[-1].strip() == '/.crewloom/':
+    lines = original.splitlines()
+    position = max((i for i, line in enumerate(lines) if line.strip() == '/.crewloom/'), default=-1)
+    last_exception = max((i for i, line in enumerate(lines) if line.lstrip().startswith('!')), default=-1)
+    if position >= 0 and position > last_exception:
         return None
     candidate = (original.rstrip('\n') + '\n' if original.strip() else '') + '/.crewloom/' + '\n'
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=root, delete=False) as stream:
@@ -958,6 +961,8 @@ def rebind(root, project_id, reason):
         if binding is not None and project_id and binding['project_id'] != project_id:
             raise ValueError('Relocation cannot change project identity; create a new project instead')
         preflight(root, list(METADATA_PATHS))
+        import privacy
+        guard_plan = privacy.relocation_plan(root, binding)
         if binding is None:
             moved = bootstrap(root, binding_project_id(project_id, config))['binding']
             previous_root = None
@@ -969,6 +974,8 @@ def rebind(root, project_id, reason):
                 relocations=[*(binding.get('relocations') or []),
                              {'from': previous_root, 'to': str(root), 'at': now()}][-8:]))
             moved = load_binding(root, required=False)
+        if guard_plan:
+            privacy.relocate_guard(root, moved, guard_plan)
         removed = []
         for name in ('.crewloom/index', '.crewloom/context'):
             folder = root / name

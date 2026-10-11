@@ -52,3 +52,5 @@ Hook configuration lives in local Git config and ignored metadata. Each cloned c
 New coordinator worktrees initialize missing role memory from public templates and empty project entries. Existing guides and local lessons are preserved. Private root lessons are not automatically copied into parallel tasks.
 
 Linked worktrees inherit Git hook configuration. The guard verifies their shared Git directory and project binding, then checks the committing worktree’s index and runs the previous hook there. A worktree from another project is refused.
+
+After moving a checkout, use `crewloom project rebind` before committing. Rebind validates and re-homes an existing owned privacy guard and project-local previous hooks; changed guard ownership or unavailable previous pre-commit is refused.

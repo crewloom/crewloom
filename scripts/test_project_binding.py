@@ -92,7 +92,7 @@ class ProjectBindingTests(unittest.TestCase):
 
     def test_first_entry_creates_a_complete_and_idempotent_footprint(self):
         first = self.enter()
-        self.assertEqual(sorted(first['created']), sorted([pb.CONFIG_NAME, pb.BINDING_RELATIVE, '.gitignore']))
+        self.assertEqual(sorted(first['created']), sorted([pb.CONFIG_NAME, pb.BINDING_RELATIVE]))
         binding = json.loads((self.root / pb.BINDING_RELATIVE).read_text())
         self.assertEqual(binding['project_root'], str(self.root))
         self.assertEqual(len(binding['checkout_id']), 32)

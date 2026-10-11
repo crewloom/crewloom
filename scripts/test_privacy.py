@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -73,6 +74,37 @@ class PrivacyTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('private path', result.stdout + result.stderr)
         self.assertFalse((self.root / 'second.py').exists())
+
+    def test_rebind_rehomes_guard_and_previous_hooks(self):
+        previous = self.root / '.githooks'; previous.mkdir()
+        (previous / 'pre-commit').write_text('#!/bin/sh\nexit 0\n')
+        (previous / 'pre-commit').chmod(0o700)
+        (previous / 'pre-push').write_text('#!/bin/sh\nexit 0\n')
+        (previous / 'pre-push').chmod(0o700)
+        self.git('config', 'core.hooksPath', '.githooks')
+        p.init(self.root)
+        moved = self.root.parent / (self.root.name + '-moved')
+        shutil.move(str(self.root), str(moved)); self.root = moved.resolve()
+        self.addCleanup(shutil.rmtree, self.root)
+        pb.rebind(self.root, 'privacy-fixture', 'move fixture')
+        self.assertEqual(self.git('config', '--get', 'core.hooksPath').stdout.strip(),
+                         str(self.root / '.crewloom/private/hooks'))
+        self.assertEqual((self.root / '.crewloom/private/hooks/pre-push').resolve(), self.root / '.githooks/pre-push')
+        self.git('add', 'code.py')
+        clean = self.git('commit', '-m', 'clean after move', check=False)
+        self.assertEqual(clean.returncode, 0, clean.stdout + clean.stderr)
+        p.private_write(self.root, '.crewloom/private/note.txt', b'private after move')
+        self.git('add', '-f', '.crewloom/private/note.txt')
+        bad = self.git('commit', '-m', 'reject after move', check=False)
+        self.assertNotEqual(bad.returncode, 0)
+        self.assertIn('private path', bad.stdout + bad.stderr)
+
+    def test_ordinary_ignore_additions_do_not_duplicate_runtime_rule(self):
+        path = self.root / '.gitignore'
+        path.write_text('/.crewloom/\n*.log\n')
+        before = path.read_bytes()
+        self.assertIsNone(pb.ignore_local_state(self.root))
+        self.assertEqual(path.read_bytes(), before)
 
     def test_existing_pre_commit_and_other_hooks_are_preserved(self):
         hooks = self.root / '.githooks'; hooks.mkdir()
