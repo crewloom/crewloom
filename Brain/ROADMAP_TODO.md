@@ -161,3 +161,7 @@
 - [x] Source-linked project/user memory, correction history, explicit task interpretation and prompt delivery.
 - [ ] Measure real model misunderstanding and correction rates on a frozen bilingual conversation benchmark.
 - [ ] Evaluate optional extraction adapters after provenance/isolation checks; automatic chat capture is not implemented.
+
+### 2026-10-11 — Privacy and publication
+- [x] Private source copies, installed-role memory ignores, chained index guard and explicit file-selection packets.
+- [ ] Audit any pre-existing uploaded private history only for an explicitly selected repository; no history rewriting or automatic credential rotation.

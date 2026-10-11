@@ -176,3 +176,5 @@ See [scheduling and shared budgets](documentation/SCHEDULING_AND_BUDGETS.md) for
 See the [Arabic/English developer pilot](examples/bilingual-evaluation/README.md) for the actual generated code, 40 held-out cases, passing Codex trials, and preserved provider failures. Cross-provider evaluation remains incomplete.
 
 [Source-linked user context](documentation/USER_CONTEXT.md) adds project-local quoted statements, labelled assumptions and explicit task interpretations to frozen model context. Corrections retain history; changed sources invalidate reuse. This is provenance checking, not proof of speaker identity or model accuracy.
+
+[Private customization and selected publication](documentation/PRIVACY.md) keeps conversation inputs and project memory local, chains commit guards and builds reviewed file-selection packets. Known-pattern scanning does not prove content is safe to publish.

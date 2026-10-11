@@ -1021,6 +1021,15 @@ def _bind_worktree(meta, path, log):
     """
     with w.project_lock(w.safe_path(path, '.crewloom', internal=True), reentrant=True):
         pb.bootstrap(path, project_id=meta['binding']['project_id'])
+        # Ignored role memory is absent in new Git worktrees. Seed independent blank
+        # memory from public templates, preserving committed guides and local lessons.
+        import crewloom
+        for host in ('.agents', '.claude'):
+            folder = path / host / 'skills'
+            if folder.is_dir():
+                for role in folder.iterdir():
+                    if (role / 'SKILL.md').is_file():
+                        crewloom.initialize_role_memory(path, role)
     binding = pb.load_binding(path)
     if binding['project_id'] != meta['binding']['project_id']:
         raise CoordinatorError('Worktree ' + str(path) + ' did not inherit the portable project '

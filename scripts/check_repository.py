@@ -298,6 +298,17 @@ def main(argv=None, root=ROOT):
         print(error, file=sys.stderr)
     if errors:
         return 1
+    if (root / '.git').exists():
+        import privacy
+        try:
+            findings = privacy.check(root, role_memory=False)
+        except (ValueError, OSError, subprocess.SubprocessError) as exc:
+            print('Privacy index check refused: ' + str(exc), file=sys.stderr)
+            return 1
+        if findings:
+            for item in findings:
+                print('Privacy rejection: ' + item['path'] + ': ' + item['reason'], file=sys.stderr)
+            return 1
     if not args.skip_tests:
         code = run_suites(root)
         if code:

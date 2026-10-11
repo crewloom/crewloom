@@ -506,9 +506,12 @@ def ignore_local_state(root):
     """Machine-local runtime state stays out of version control; existing ignore rules are preserved."""
     path = writable(root, '.gitignore')
     original = path.read_text(encoding='utf-8') if path.exists() else ''
-    if any(line.strip().rstrip('/') == '.crewloom' for line in original.splitlines()):
+    lines = original.splitlines()
+    position = max((i for i, line in enumerate(lines) if line.strip() == '/.crewloom/'), default=-1)
+    last_exception = max((i for i, line in enumerate(lines) if line.lstrip().startswith('!')), default=-1)
+    if position >= 0 and position > last_exception:
         return None
-    candidate = (original.rstrip('\n') + '\n' if original.strip() else '') + LOCAL_IGNORE + '\n'
+    candidate = (original.rstrip('\n') + '\n' if original.strip() else '') + '/.crewloom/' + '\n'
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=root, delete=False) as stream:
         temporary = Path(stream.name)
         stream.write(candidate)
@@ -637,7 +640,7 @@ def instruction_block(config, binding):
     Every command is one runnable shell line: the exit evidence is a real shell-quoted
     JSON argument, not text that loses its double quotes or swallows the next line.
     """
-    command = shutil.which('crewloom') or 'crewloom'
+    command = 'crewloom'
     evidence = shlex.quote(json.dumps([{'workflow': '<managed-workflow-id>',
                                         'step': '<acceptance-step-id>',
                                         'scope': '<acceptance command step>'}]))
@@ -645,7 +648,7 @@ def instruction_block(config, binding):
         MARKER_START + '\n'
         '## Crewloom managed project context\n\n'
         'This project enables Crewloom project context (' + config['policy']['mode'] + ' mode).\n'
-        '- Project ID: `' + binding['project_id'] + '`; checkout ID: `' + binding['checkout_id'] + '`.\n'
+        '- Project ID: `' + binding['project_id'] + '`. Checkout identity stays in private local context.\n'
         '- Entry: `' + command + ' project enter --project <project-root> --project-id '
         + binding['project_id'] + ' --task-id <task-id> --role <installed-role> '
         '--criteria <criteria.md> --seed <seed-path> --source <source-path>`.\n'
@@ -958,6 +961,8 @@ def rebind(root, project_id, reason):
         if binding is not None and project_id and binding['project_id'] != project_id:
             raise ValueError('Relocation cannot change project identity; create a new project instead')
         preflight(root, list(METADATA_PATHS))
+        import privacy
+        guard_plan = privacy.relocation_plan(root, binding)
         if binding is None:
             moved = bootstrap(root, binding_project_id(project_id, config))['binding']
             previous_root = None
@@ -969,6 +974,8 @@ def rebind(root, project_id, reason):
                 relocations=[*(binding.get('relocations') or []),
                              {'from': previous_root, 'to': str(root), 'at': now()}][-8:]))
             moved = load_binding(root, required=False)
+        if guard_plan:
+            privacy.relocate_guard(root, moved, guard_plan)
         removed = []
         for name in ('.crewloom/index', '.crewloom/context'):
             folder = root / name
