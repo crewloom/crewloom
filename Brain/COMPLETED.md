@@ -284,3 +284,11 @@
 - 2026-10-11 | Report contract exposes exact bilingual title resources. Report refusal grading accepts legitimate wording but requires unknown-field naming; regression accepts alternate messages and rejects missing field name. Full Docker example suite passes 40 tests. Separate actual report-fix batch started; previous failures preserved.
 
 - 2026-10-11 | Combined unknown-field check now requires actual offending key extra rather than hidden phrase. Alternate error wording accepted; missing key name rejected. Full Docker example suite passes 41 tests. Actual generated integration bytes separately reverified with corrected grader in network-free read-only container: combined 13/13 and helpers 16/16. Original failed prepare unchanged; coordinator publication not yet approved.
+
+- 2026-10-11 | Initial evidence-driven repair runtime added in existing workflow runner. Twenty-nine workflow cases pass locally (five optional Docker cases skipped in that run); regression rejects altered candidate, changed original input, foreign checkout and substituted verifier. Full Docker workflow run pending; no live repair-quality claim.
+
+- 2026-10-11 | Evidence-driven repair workflow Docker suite passed all 29 cases; producer-before-verifier guard added and final Docker rerun initiated under exec66482. Actual provider repair payload/chain acceptance and publication still pending.
+
+- 2026-10-11 | Added one-command private repair preparation/execution, full-prompt budget and verifier-image checks. Workflow 31 cases passed in Docker; privacy 19 cases passed including real forced private commit rejection and clean commit acceptance. Separate bound live Codex pilot (requested gpt-5.5, reported identity unavailable) repaired an intentionally seeded broken Unicode slug; actual isolated bilingual acceptance passed 5/5 and original failed journal stayed byte-identical. This is transport/repair evidence, not a weak-model or Claude comparison.
+
+- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.

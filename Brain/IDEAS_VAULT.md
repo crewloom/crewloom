@@ -105,3 +105,7 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | Public copy resources and semantic refusal checks make failures actionable without weakening required invalid-input or unknown-field behavior.
 
 - 2026-10-11 | Compare equivalent per-task and integration contracts to catch duplicate hidden wording requirements; retain separately identified re-verification rather than rewriting failed prepare.
+
+- 2026-10-11 | A repair is a new recorded attempt against unchanged verification, with an immutable prior candidate and diagnostic; it is not replacement history or permission to weaken tests.
+
+- 2026-10-11 | Measure weaker-model benefit with frozen unseen tasks and the same verifier, reporting raw execution versus bounded repair, token/cost/time totals and user interventions. Preserve seeded repair demonstrations separately from real model-error baselines; do not turn a transport success into a quality claim.

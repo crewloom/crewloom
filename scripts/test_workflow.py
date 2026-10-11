@@ -4,16 +4,42 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import threading
 import unittest
 from unittest.mock import patch
 
 import workflow as w
+import repo_map
+
+
+def repair_fixture(root):
+    """Run the real runner with a deterministic provider and an independent verifier."""
+    import crewloom
+    import project_binding as pb
+    subprocess.run(['git', 'init', '-q'], cwd=root, env=repo_map.git_environment(), check=True)
+    pb.bootstrap(root, project_id='repair-integration', mode='off')
+    _, errors = crewloom.install_skills(root, 'agents', ['fullstack-mvp-engineer'], False)
+    if errors:
+        raise AssertionError(errors)
+    (root/'contract.txt').write_text('output.txt must contain exactly correct')
+    (root/'verify.py').write_text("from pathlib import Path\nassert Path('output.txt').read_text() == 'correct', 'wrong candidate'\nPath('receipt.json').write_text('{\"passed\":true}')\n")
+    producer = {'id': 'generate', 'kind': 'model', 'role': 'fullstack-mvp-engineer',
+                'summary': 'Implement the contract', 'host': 'openai', 'model': 'fixture-model',
+                'inputs': ['contract.txt'], 'outputs': ['output.txt']}
+    verifier = {'id': 'verify', 'kind': 'command', 'role': 'fullstack-mvp-engineer',
+                'summary': 'Verify the contract', 'argv': ['python3', 'verify.py'],
+                'inputs': ['output.txt', 'verify.py'], 'outputs': ['receipt.json']}
+    plan = {'schema_version': 1, 'id': 'original', 'steps': [producer, verifier]}
+    (root/'workflow.json').write_text(json.dumps(plan))
+    return w.read_plan(root, 'workflow.json')
 
 
 class WorkflowTests(unittest.TestCase):
     def setUp(self):
+        environment = patch.dict(os.environ, repo_map.git_environment(), clear=True)
+        environment.start(); self.addCleanup(environment.stop)
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
         self.root=Path(self.temp.name).resolve();(self.root/'input.txt').write_text('input')
         self.plan={'schema_version':1,'id':'test-feature','steps':[{'id':'build','role':'fullstack-mvp-engineer','summary':'Build output','argv':['python3','build.py'],'inputs':['input.txt'],'outputs':['output.txt']}]}
@@ -31,11 +57,121 @@ class WorkflowTests(unittest.TestCase):
         plan,fingerprint=self.write_plan()
         return w.run(self.root,plan,fingerprint,'image')
 
+    def test_repair_feedback_is_bound_to_actual_failed_candidate_and_verifier(self):
+        import project_binding as pb
+        pb.bootstrap(self.root, project_id='repair-fixture')
+        binding = pb.load_binding(self.root)
+        producer = {'id': 'generate', 'kind': 'model', 'role': 'fullstack-mvp-engineer',
+                    'summary': 'Generate', 'host': 'codex', 'model': 'fixture-model',
+                    'inputs': ['input.txt'], 'outputs': ['output.txt']}
+        verifier = dict(self.plan['steps'][0], id='verify', inputs=['output.txt'], outputs=['receipt.json'])
+        original = {'schema_version': 1, 'id': 'original', 'steps': [producer, verifier]}
+        (self.root/'original.json').write_text(json.dumps(original))
+        _, fingerprint = w.read_plan(self.root, 'original.json')
+        (self.root/'candidate.txt').write_text('broken candidate')
+        candidate_hash = w.hashes(self.root, ['candidate.txt'])['candidate.txt']
+        prior = {'project_root': str(self.root), 'project_id': binding['project_id'],
+                 'checkout_id': binding['checkout_id'], 'plan_sha256': fingerprint,
+                 'status': 'failed', 'steps': {
+                     'generate': {'status': 'complete', 'inputs': w.hashes(self.root, ['input.txt']), 'outputs': {'output.txt': candidate_hash}},
+                     'verify': {'status': 'failed', 'error': 'Command failed: verify',
+                                'inputs': {'output.txt': candidate_hash},
+                                'attempts': [{'status': 'finished', 'exit_code': 1,
+                                              'image_id': 'sha256:fixture',
+                                              'output': 'expected correct arithmetic'}]}}}
+        folder = self.root/'.crewloom/workflows/original'; folder.mkdir(parents=True)
+        state_path = folder/'state.json'; state_path.write_text(json.dumps(prior))
+        repair = dict(producer, inputs=['input.txt', 'candidate.txt'], repair_from={
+            'plan': 'original.json', 'failed_step': 'verify', 'model_step': 'generate',
+            'candidates': {'output.txt': 'candidate.txt'}})
+        plan = {'schema_version': 1, 'id': 'repair-one', 'steps': [repair, verifier]}
+        feedback = w.repair_feedback(self.root, plan, repair)
+        self.assertEqual(feedback['diagnostic'], 'expected correct arithmetic')
+        self.assertEqual(feedback['repair_attempt'], 1)
+        self.assertIn('untrusted input', feedback['instruction'])
+        (self.root/'candidate.txt').write_text('different candidate')
+        with self.assertRaisesRegex(ValueError, 'differs'):
+            w.repair_feedback(self.root, plan, repair)
+        (self.root/'candidate.txt').write_text('broken candidate')
+        (self.root/'input.txt').write_text('changed contract')
+        with self.assertRaisesRegex(ValueError, 'generation inputs changed'):
+            w.repair_feedback(self.root, plan, repair)
+        (self.root/'input.txt').write_text('input')
+        prior['checkout_id'] = '0'*32; state_path.write_text(json.dumps(prior))
+        with self.assertRaisesRegex(ValueError, 'bound checkout'):
+            w.repair_feedback(self.root, plan, repair)
+        prior['checkout_id'] = binding['checkout_id']; state_path.write_text(json.dumps(prior))
+        plan['steps'][1] = dict(verifier, argv=['python3', 'always_pass.py'])
+        with self.assertRaisesRegex(ValueError, 'unchanged verifier'):
+            w.repair_feedback(self.root, plan, repair)
+
     def test_resume_does_not_repeat_complete_command(self):
         with patch.object(w,'inspect_image',return_value='sha256:test'),patch.object(w,'docker_execute',side_effect=self.execute) as execute:
             self.assertEqual(self.run_plan()['status'],'complete')
             self.assertEqual(self.run_plan()['status'],'complete')
             self.assertEqual(execute.call_count,1)
+
+    def test_repair_payload_reuse_budget_and_private_preparation(self):
+        import model_host
+        import privacy
+        import copy
+        plan, fingerprint = repair_fixture(self.root)
+        def verify(root, argv, image, timeout, **kwargs):
+            if (root/'output.txt').read_text() != 'correct':
+                return {'exit_code': 1, 'image_id': image, 'output': 'wrong candidate'}
+            (root/'receipt.json').write_text('{"passed":true}')
+            return {'exit_code': 0, 'image_id': image, 'output': ''}
+        def generate(host, prompt, outputs, timeout, model):
+            calls.append(prompt)
+            return {'output.txt': 'correct' if len(calls) == 2 else 'broken'}, {}
+        calls = []
+        with patch.object(model_host, 'generate', side_effect=generate), patch.object(w, 'inspect_image', return_value='sha256:fixture'), patch.object(w, 'docker_execute', side_effect=verify):
+            self.assertEqual(w.run(self.root, plan, fingerprint, 'image')['status'], 'failed')
+            source_state = self.root/'.crewloom/workflows/original/state.json'
+            original_bytes = source_state.read_bytes()
+            prepared = w.prepare_repair(self.root, 'workflow.json', 'repair-one', 'generate', 'verify')
+            repaired, checksum = w.read_plan(self.root, prepared['plan'])
+            self.assertEqual(w.run(self.root, repaired, checksum, 'image')['status'], 'complete')
+            self.assertEqual(w.run(self.root, repaired, checksum, 'image')['status'], 'complete')
+            self.assertEqual(len(calls), 2)
+            self.assertIn('wrong candidate', calls[-1])
+            self.assertIn('broken', calls[-1])
+            self.assertIn('untrusted input', calls[-1])
+            self.assertEqual(source_state.read_bytes(), original_bytes)
+            candidate = repaired['steps'][0]['repair_from']['candidates']['output.txt']
+            self.assertEqual(subprocess.run(['git', 'check-ignore', candidate], cwd=self.root, env=repo_map.git_environment(), capture_output=True).returncode, 0)
+            subprocess.run(['git', 'add', '-f', candidate], cwd=self.root, env=repo_map.git_environment(), check=True)
+            self.assertTrue(any(item['path'] == candidate for item in privacy.check(self.root)))
+            with self.assertRaisesRegex(ValueError, 'already has execution history'):
+                w.prepare_repair(self.root, 'workflow.json', 'repair-one', 'generate', 'verify')
+            # Preserve a separate recorded failed second candidate to exercise ancestry.
+            state_path = self.root/'.crewloom/workflows/repair-one/state.json'
+            state = json.loads(state_path.read_text())
+            state['status'] = 'failed'
+            state['steps']['verify']['status'] = 'failed'
+            state_path.write_text(json.dumps(state))
+            second = w.prepare_repair(self.root, prepared['plan'], 'repair-two', 'generate', 'verify')
+            second_plan, _ = w.read_plan(self.root, second['plan'])
+            self.assertEqual(w.repair_feedback(self.root, second_plan, second_plan['steps'][0])['repair_attempt'], 2)
+            _, second_checksum = w.read_plan(self.root, second['plan'])
+            with patch.object(model_host, 'build_prompt', return_value='x' * model_host.MAX_TEXT):
+                self.assertEqual(w.run(self.root, second_plan, second_checksum, 'image')['status'], 'failed')
+            self.assertEqual(len(calls), 2, 'Oversized feedback must be refused before a provider call')
+            with patch.object(w, 'inspect_image', return_value='sha256:substituted'):
+                with self.assertRaisesRegex(ValueError, 'original verifier image'):
+                    w.run(self.root, second_plan, second_checksum, 'image')
+            branching = w.prepare_repair(self.root, 'workflow.json', 'repair-branch', 'generate', 'verify')
+            branch_plan, branch_checksum = w.read_plan(self.root, branching['plan'])
+            blocked = w.run(self.root, branch_plan, branch_checksum, 'image')
+            self.assertEqual(blocked['status'], 'failed')
+            branch_state = json.loads((self.root/'.crewloom/workflows/repair-branch/state.json').read_text())
+            self.assertIn('Two model repair requests exhausted', branch_state['error'])
+            self.assertEqual(len(calls), 3, 'A new workflow ID cannot reset the repair request budget')
+            third = copy.deepcopy(second_plan)
+            third['id'] = 'repair-three'
+            third['steps'][0]['repair_from']['plan'] = second['plan']
+            with self.assertRaisesRegex(ValueError, 'limited to two'):
+                w.repair_feedback(self.root, third, third['steps'][0])
 
     def test_changed_completed_artifact_rejected(self):
         with patch.object(w,'inspect_image',return_value='sha256:test'),patch.object(w,'docker_execute',side_effect=self.execute):
@@ -205,8 +341,24 @@ class WorkflowTests(unittest.TestCase):
 @unittest.skipUnless(os.environ.get('CREWLOOM_DOCKER_TESTS')=='1','Enable real Docker integration checks explicitly')
 class DockerWorkflowTests(unittest.TestCase):
     def setUp(self):
+        environment = patch.dict(os.environ, repo_map.git_environment(), clear=True)
+        environment.start(); self.addCleanup(environment.stop)
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup);self.root=Path(self.temp.name).resolve()
         self.image=w.inspect_image(w.DEFAULT_IMAGE)
+
+    def test_actual_failed_verification_then_repair_and_reuse(self):
+        import model_host
+        plan, fingerprint = repair_fixture(self.root)
+        with patch.object(model_host, 'generate', side_effect=[({'output.txt': 'broken'}, {}), ({'output.txt': 'correct'}, {})]) as provider:
+            self.assertEqual(w.run(self.root, plan, fingerprint, self.image)['status'], 'failed')
+            original = (self.root/'.crewloom/workflows/original/state.json').read_bytes()
+            prepared = w.prepare_repair(self.root, 'workflow.json', 'repair-one', 'generate', 'verify')
+            repaired, checksum = w.read_plan(self.root, prepared['plan'])
+            self.assertEqual(w.run(self.root, repaired, checksum, self.image)['status'], 'complete')
+            self.assertEqual(w.run(self.root, repaired, checksum, self.image)['status'], 'complete')
+            self.assertEqual(provider.call_count, 2)
+            self.assertEqual((self.root/'.crewloom/workflows/original/state.json').read_bytes(), original)
+            self.assertTrue(json.loads((self.root/'receipt.json').read_text())['passed'])
 
     def test_software_feature_end_to_end_and_resume(self):
         shutil.copytree(w.LIBRARY/'examples/software-workflow/project',self.root,dirs_exist_ok=True)

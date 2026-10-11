@@ -62,3 +62,9 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-11 | Planning acceptance enforces declared exception types without fixture-specific wording. Cycle representation is explicitly closed in the public generation contract.
 
 - 2026-10-11 | Report titles are explicit bilingual contract resources. Invalid payload acceptance checks required ValueError and named unknown key, rather than fixture-specific messages.
+
+- 2026-10-11 | Model repair_from references source failure state in the same bound checkout, exact candidate copies and unchanged producer/verifier scope; original sources/static verifier dependencies remain frozen. Failure diagnostics are bounded input data. Maximum two repair ancestors and existing request/admission budgets apply. Explicit plan preparation/dispatch remains pending.
+
+- 2026-10-11 | Repair preparation and execution reuse workflow.py through prepare-repair/repair. Owner-only candidate copies and plans live under /.crewloom-repairs/; privacy.py ignores and rejects this namespace in staged indexes. Unchanged verifier argv/dependencies/image digest, recorded criteria inputs, source hashes and two-repair ancestry bound the cycle; ordinary run does not automatically spend on repair.
+
+- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
