@@ -170,3 +170,6 @@ The public context acceptance checker consumes `crewloom-hook-pilot/{context.jso
 
 | [scripts/user_context.py](../scripts/user_context.py) | Project-local source-linked statements, assumptions and task interpretations; context-guardian | `crewloom user-context inspect --project /path/to/project --task-id task` |
 | [scripts/test_user_context.py](../scripts/test_user_context.py) | Source integrity, corrections, isolation and model prompt delivery; QA | `python3 -m unittest discover -s scripts -p test_user_context.py` |
+
+| [scripts/privacy.py](../scripts/privacy.py) | Private data layout, chained Git index guard and selected publication ZIP; context-guardian | `crewloom privacy check --project /path/to/project` |
+| [scripts/test_privacy.py](../scripts/test_privacy.py) | Real private-commit rejection, clean acceptance and publication boundaries; QA | `python3 -m unittest discover -s scripts -p test_privacy.py` |

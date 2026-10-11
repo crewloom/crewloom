@@ -97,7 +97,10 @@ def save(root, value):
 
 
 def evidence(root, source, quote):
-    path = w.safe_path(root, source)
+    is_private = isinstance(source, str) and source.startswith('.crewloom/private/inputs/')
+    path = w.safe_path(root, source, internal=is_private)
+    if is_private and not path.is_relative_to(root / '.crewloom/private/inputs'):
+        raise ValueError('Private source must stay inside private inputs')
     if not path.is_file() or path.is_symlink() or path.stat().st_nlink != 1 or path.stat().st_size > MAX_BYTES:
         raise ValueError('Source requires a bounded regular project file without hardlinks')
     w.safe_path(root, source, internal=True)  # Reject every symlink component before reading.
@@ -127,7 +130,10 @@ def record(root, user_id, key, value, source, quote, kind='statement', task_id=N
     with w.project_lock(w.safe_path(root, '.crewloom', internal=True), reentrant=True):
         pb.preflight_ownership(root, task_id)
         store = load(root)
-        source = evidence(root, source, quote)
+        original = evidence(root, source, quote)
+        import privacy
+        snapshot = privacy.source_snapshot(root, source, w.safe_path(root, source, internal=source.startswith('.crewloom/private/inputs/')).read_bytes(), task_id=task_id)
+        source = dict(original, private_copy=snapshot)
         if len(store['records']) >= MAX_RECORDS:
             raise ValueError('User context record limit reached')
         previous = next((item for item in reversed(store['records'])
@@ -154,8 +160,11 @@ def contract(root, task_id, user_id, goal, constraints, acceptance, questions, s
         store = load(root)
         if len(store['contracts']) >= MAX_RECORDS and task_id not in store['contracts']:
             raise ValueError('Task contract limit reached')
+        original = evidence(root, source, quote)
+        import privacy
+        snapshot = privacy.source_snapshot(root, source, w.safe_path(root, source, internal=source.startswith('.crewloom/private/inputs/')).read_bytes(), task_id=task_id)
         item = {'task_id': task_id, 'user_id': user_id, 'goal': goal, 'constraints': constraints,
-                'acceptance': acceptance, 'questions': questions, 'source': evidence(root, source, quote),
+                'acceptance': acceptance, 'questions': questions, 'source': dict(original, private_copy=snapshot),
                 'interpretation': 'operator-recorded interpretation; not user confirmation',
                 'recorded_at': pl.now()}
         # Retain prior interpretations rather than erasing corrections.

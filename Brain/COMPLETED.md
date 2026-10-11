@@ -246,3 +246,9 @@
 - Artifact: `scripts/user_context.py`, frozen-context/model-prompt integration and `documentation/USER_CONTEXT.md`.
 - Impact: Explicit user/task selection, preserved corrections, quoted statements versus assumptions, stale-source and ambiguity rejection.
 - Evidence: 14 regressions pass, including Arabic managed/native payload delivery and owner-only frozen copies, copied-project rejection and source changes. General model-quality improvement remains unmeasured.
+
+### 2026-10-11 — Private data and selected publication
+- Artifacts: `scripts/privacy.py`, automatic user-source hook setup, role-memory ignore rules and `documentation/PRIVACY.md`.
+- Impact: Forced private additions blocked, original sources registered, prior hooks preserved and selected ZIP packets owner-only.
+- Evidence: Real bad commit rejected and clean commit accepted; user-context 14 cases, installation 6 cases, binding 38 cases and repository-gate 20 cases pass. Privacy-specific regressions: 14 cases cover the private commit/publication boundaries. No history rewrite, repository-visibility change or universal secret detection claimed.
+- 2026-10-11 | Coordinator privacy compatibility: isolated task worktrees seed missing role memory without copying private root lessons; real scope-hook fixture includes privacy dependencies.

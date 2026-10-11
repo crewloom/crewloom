@@ -60,3 +60,6 @@ Adds `project setup`, `projects add/list/remove/cancel-task`, catalog overlap gu
 
 ### 2026-10-11 — Source-linked user context
 Added `crewloom user-context` for project-local quoted statements, assumptions, retained corrections and task interpretations. Frozen managed prompts carry selected records and reject stale sources or explicitly unresolved questions. No mandatory external dependency or model-quality gain is claimed.
+
+### 2026-10-11 — Private customization and publication
+Added private source copies, automatic chained Git protection for new user context, private installed-role memory ignores and `crewloom privacy` setup/check/export. Selected export packets are local and owner-readable; existing tracked files and history are retained for explicit review.

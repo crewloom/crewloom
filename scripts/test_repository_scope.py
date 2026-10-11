@@ -32,7 +32,8 @@ ROOT = SOURCE.parent
 # hook runs the same code this repository runs rather than a re-implementation of it. `crewloom`
 # resolves the real role validator out of the checkout, and `workflow` supplies the one name
 # comparison both the gate and the managed boundary use.
-GATE_MODULES = ('check_repository.py', 'crewloom.py', 'crewloom_resources.py', 'workflow.py')
+GATE_MODULES = ('check_repository.py', 'crewloom.py', 'crewloom_resources.py', 'workflow.py',
+                'privacy.py', 'project_binding.py', 'repo_map.py', 'js_syntax.py')
 VALIDATOR = '.agents/skills/skill-forge-recruiter/scripts/validate_skill.py'
 HOOK = '.githooks/pre-commit'
 

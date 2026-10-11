@@ -42,3 +42,7 @@ Changed source hashes, interpretation or selected memory invalidate reuse of the
 An exact quote and hash establish provenance in an operator-recorded source file. They do **not** authenticate the speaker, prove a statement true, confirm a goal interpretation, confer tool permissions or prove task completion. Memory is project input data, never executable instructions or a replacement for the constitution. Assumptions stay labelled in the model prompt. Existing executor-verified lessons retain their separate evidence rules.
 
 Projects without a contract continue using the existing context workflow. Recording is explicit; hosts are not claimed to automatically capture all chat messages. Automatic extraction, automatic clarification and measured improvements in model task quality remain future work. The regression suite verifies source integrity, corrections, project/user isolation, stale-context rejection and actual prompt delivery; it does not establish a general reduction in hallucinations.
+
+## Private sources and commits
+
+Prefer `.crewloom/private/inputs/message.txt` for source excerpts. New records also copy external project sources privately, register the original path as non-publishable and enable the chained commit guard. See [privacy and publication](PRIVACY.md). Run `crewloom privacy init` to register older recorded sources; source copies do not erase existing files or Git history.

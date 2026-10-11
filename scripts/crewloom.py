@@ -58,6 +58,28 @@ HOST_DIRS = {'claude': Path('.claude') / 'skills', 'agents': Path('.agents') / '
 SKILL_ID = re.compile(r'[a-z0-9]+(?:-[a-z0-9]+)*')
 
 
+def initialize_role_memory(target, role):
+    """Create missing local memory without replacing guides or existing project lessons."""
+    import project_binding
+    names = ('ARCHITECTURE', 'COMPLETED', 'CHALLENGES', 'IDEAS_VAULT', 'ROADMAP_TODO')
+    destinations = [project_binding.writable(target, (role / 'brain' / (name + '.md')).relative_to(target).as_posix())
+                    for name in names]
+    brain = role / 'brain'
+    brain.mkdir(exist_ok=True)
+    os.chmod(brain, 0o700)
+    for name, destination in zip(names, destinations):
+        if destination.exists():
+            continue
+        template = resources.roles_dir() / role.name / 'brain' / 'ARCHITECTURE.md'
+        if name == 'ARCHITECTURE' and template.is_file():
+            data = template.read_bytes()
+        else:
+            data = ('# ' + name.replace('_', ' ').title() + '\n\nNo project-specific entries recorded yet.\n').encode()
+        with destination.open('xb') as stream:
+            os.chmod(destination, 0o600)
+            stream.write(data)
+
+
 def install_skills(target, host, names, force):
     """Copy role folders into a project's host skill directory; returns (installed, errors)."""
     source_root = resources.roles_dir()
@@ -68,6 +90,11 @@ def install_skills(target, host, names, force):
         return [], errors
     if not target.is_dir():
         return [], [f'Target directory does not exist: {target}']
+    import project_binding
+    try:
+        project_binding.writable(target, '.gitignore')
+    except (ValueError, OSError) as exc:
+        return [], [str(exc)]
     destination = target / HOST_DIRS[host]
     clashes = [n for n in wanted if (destination / n).exists()]
     if clashes and not force:
@@ -89,16 +116,9 @@ def install_skills(target, host, names, force):
         role = destination / name
         shutil.copytree(source_root / name, role, dirs_exist_ok=True,
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc', 'brain'))
-        brain = role / 'brain'
-        brain.mkdir(exist_ok=True)
-        for filename in ('ARCHITECTURE', 'COMPLETED', 'CHALLENGES', 'IDEAS_VAULT', 'ROADMAP_TODO'):
-            memory = brain / (filename + '.md')
-            if memory.exists():
-                continue
-            if filename == 'ARCHITECTURE':
-                shutil.copyfile(source_root / name / 'brain' / 'ARCHITECTURE.md', memory)
-            else:
-                memory.write_text(f'# {filename.replace("_", " ").title()}\n\nNo project-specific entries recorded yet.\n', encoding='utf-8')
+        initialize_role_memory(target, role)
+    import privacy
+    privacy.ignores(target, HOST_DIRS[host])
     return wanted, []
 
 
@@ -291,6 +311,8 @@ def main():
     catalog.add_argument('catalog_arguments', nargs=argparse.REMAINDER)
     project = commands.add_parser('project', help='Enter, inspect, finish, cancel or relink a bound project context')
     project.add_argument('project_arguments', nargs=argparse.REMAINDER)
+    privacy = commands.add_parser('privacy', help='Private data guards and selected publication packets')
+    privacy.add_argument('privacy_arguments', nargs=argparse.REMAINDER)
     user_context = commands.add_parser('user-context', help='Source-linked user memory and task interpretation')
     user_context.add_argument('user_context_arguments', nargs=argparse.REMAINDER)
     lesson = commands.add_parser('lesson', help='Record, verify, retrieve or review project lessons')
@@ -357,6 +379,9 @@ def main():
     if args.command == 'project':
         from project_binding import main as project_main
         return project_main(args.project_arguments)
+    if args.command == 'privacy':
+        from privacy import main as privacy_main
+        return privacy_main(args.privacy_arguments)
     if args.command == 'user-context':
         from user_context import main as user_context_main
         return user_context_main(args.user_context_arguments)

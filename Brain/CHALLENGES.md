@@ -262,3 +262,9 @@
 - 2026-10-11 compatibility: Python 3.9 CI rejected the new hardlink test fixture because `Path.hardlink_to` is newer. Use `os.link` in the fixture; the runtime hardlink guard is unchanged.
 
 - 2026-10-11 review: Native lifecycle serialization initially omitted selected user context, and frozen/history copies inherited permissive file modes. Include the block as mandatory native payload and reuse the existing atomic owner-only writer for current, archived and invalidated contexts; 14 regressions pass.
+
+### 2026-10-11 — Ignore rules alone cannot protect publication
+- Cause: Tracked files bypass ignores; conversation sources and installed role memory previously remained addable. Normal and temporary indexes may differ from the working files.
+- Fix: Private source snapshots/registrations, role-memory ignores, chained index-object guard and explicit export selection. Batched object scanning avoids per-file subprocess overhead.
+- Boundary: Existing uploaded history and unknown secrets require separate review; private edits to tracked public code must be separated into local input/override data rather than hidden with Git flags.
+- 2026-10-11 | Ignored role memory vanished in new coordinator worktrees, blocking model execution | Initialize independent local memory from public templates while preserving guides/existing lessons; root private lessons are not copied. Regression uses a private root marker.

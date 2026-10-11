@@ -695,9 +695,14 @@ class ModelWorkflowBoundaries(ModelWorkflowFixture):
 
     def test_the_explicit_operator_flag_is_carried_to_the_generation_and_no_further(self):
         self.declare_native_cli('left')
+        private_memory = self.root / '.agents/skills/context-guardian/brain/COMPLETED.md'
+        private_memory.write_text('Private root lesson, never copied to a task.\n')
         requests = []
         with mock.patch.object(model_host, 'generate', _stand_in_provider(requests)):
             report = self.call('run', allow_host_cli=True)
+        seeded = self.worktree('left') / '.agents/skills/context-guardian/brain/COMPLETED.md'
+        self.assertTrue(seeded.is_file())
+        self.assertNotIn('Private root lesson', seeded.read_text())
         states = {item['id']: item for item in report['tasks']}
         self.assertEqual({item['id'] for item in report['tasks'] if item['native_host_cli']},
                          {'left'}, 'only the declared task may use an installed CLI host')

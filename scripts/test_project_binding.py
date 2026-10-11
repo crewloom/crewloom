@@ -98,7 +98,7 @@ class ProjectBindingTests(unittest.TestCase):
         self.assertEqual(len(binding['checkout_id']), 32)
         self.assertEqual(binding['project_id'], 'sample-project')
         self.assertEqual(binding['config_path'], pb.CONFIG_NAME)
-        self.assertEqual((self.root / '.gitignore').read_text(), '.crewloom/\n')
+        self.assertIn('/.crewloom/\n', (self.root / '.gitignore').read_text())
         for name in ('index', 'context', 'tasks', 'lessons'):
             self.assertTrue((self.root / '.crewloom' / name).is_dir())
         second = self.enter()
@@ -376,6 +376,8 @@ class ProjectBindingTests(unittest.TestCase):
         self.assertTrue(agents.startswith('# Customer rules\nNever rewrite this line.'))
         self.assertIn(pb.MARKER_START, agents)
         self.assertIn('instruction-assisted', agents)
+        self.assertNotIn(pb.load_binding(self.root)['checkout_id'], agents)
+        self.assertNotIn(str(Path.home()), agents)
         self.assertEqual(agents.count(pb.MARKER_START), 1)
         snapshot = (self.root / 'CLAUDE.md').read_text()
         second = self.enter()
@@ -512,9 +514,9 @@ class ProjectBindingTests(unittest.TestCase):
         (self.root / '.gitignore').write_text('build/\n*.log\n', encoding='utf-8')
         first = self.enter()
         self.assertIn('.gitignore', first['created'])
-        self.assertEqual((self.root / '.gitignore').read_text(), 'build/\n*.log\n.crewloom/\n')
+        self.assertEqual((self.root / '.gitignore').read_text(), 'build/\n*.log\n/.crewloom/\n')
         self.assertEqual(self.enter()['created'], [])
-        self.assertEqual((self.root / '.gitignore').read_text(), 'build/\n*.log\n.crewloom/\n')
+        self.assertEqual((self.root / '.gitignore').read_text(), 'build/\n*.log\n/.crewloom/\n')
         with tempfile.TemporaryDirectory() as folder:
             relocated = Path(folder).resolve() / 'relocated'
             shutil.copytree(self.root, relocated, symlinks=True,
@@ -523,7 +525,7 @@ class ProjectBindingTests(unittest.TestCase):
             again = pb.enter(relocated, 'sample-project', 'login-fix', ROLE, seeds=['auth.py'])
             self.assertNotIn('.gitignore', again['created'])
             self.assertEqual(again['created'], [pb.BINDING_RELATIVE])
-            self.assertEqual((relocated / '.gitignore').read_text(), 'build/\n*.log\n.crewloom/\n')
+            self.assertEqual((relocated / '.gitignore').read_text(), 'build/\n*.log\n/.crewloom/\n')
 
     def test_claimed_failure_fails_closed_and_cannot_be_relabelled(self):
         self.enter()

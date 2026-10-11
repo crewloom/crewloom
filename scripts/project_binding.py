@@ -506,9 +506,9 @@ def ignore_local_state(root):
     """Machine-local runtime state stays out of version control; existing ignore rules are preserved."""
     path = writable(root, '.gitignore')
     original = path.read_text(encoding='utf-8') if path.exists() else ''
-    if any(line.strip().rstrip('/') == '.crewloom' for line in original.splitlines()):
+    if original.splitlines() and original.splitlines()[-1].strip() == '/.crewloom/':
         return None
-    candidate = (original.rstrip('\n') + '\n' if original.strip() else '') + LOCAL_IGNORE + '\n'
+    candidate = (original.rstrip('\n') + '\n' if original.strip() else '') + '/.crewloom/' + '\n'
     with tempfile.NamedTemporaryFile(mode='w', encoding='utf-8', dir=root, delete=False) as stream:
         temporary = Path(stream.name)
         stream.write(candidate)
@@ -637,7 +637,7 @@ def instruction_block(config, binding):
     Every command is one runnable shell line: the exit evidence is a real shell-quoted
     JSON argument, not text that loses its double quotes or swallows the next line.
     """
-    command = shutil.which('crewloom') or 'crewloom'
+    command = 'crewloom'
     evidence = shlex.quote(json.dumps([{'workflow': '<managed-workflow-id>',
                                         'step': '<acceptance-step-id>',
                                         'scope': '<acceptance command step>'}]))
@@ -645,7 +645,7 @@ def instruction_block(config, binding):
         MARKER_START + '\n'
         '## Crewloom managed project context\n\n'
         'This project enables Crewloom project context (' + config['policy']['mode'] + ' mode).\n'
-        '- Project ID: `' + binding['project_id'] + '`; checkout ID: `' + binding['checkout_id'] + '`.\n'
+        '- Project ID: `' + binding['project_id'] + '`. Checkout identity stays in private local context.\n'
         '- Entry: `' + command + ' project enter --project <project-root> --project-id '
         + binding['project_id'] + ' --task-id <task-id> --role <installed-role> '
         '--criteria <criteria.md> --seed <seed-path> --source <source-path>`.\n'

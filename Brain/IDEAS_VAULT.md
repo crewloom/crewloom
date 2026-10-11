@@ -76,3 +76,6 @@ Choose local access on the server, rather than passing a hidden shared password 
 
 ### 2026-10-11 — Evaluate understanding before automatic extraction
 Compare the same model on frozen Arabic/English correction and ambiguous-request conversations, with and without source-linked context. Score wrong-project selection, invented preferences, missed corrections and unnecessary questions separately. Do not promote extracted preferences to facts merely because an LLM produced them.
+
+### 2026-10-11 — Separate local customization from publication
+Keep personal preferences as scoped private input data instead of editing distributed role guides. Future publication review can compare selected-file hashes and provenance, but must not convert a clean pattern scan into a claim that arbitrary content is public-safe.

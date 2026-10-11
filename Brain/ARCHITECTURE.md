@@ -40,3 +40,6 @@ The launcher explicitly enables loopback-only local access. Local URLs and exact
 
 ### 2026-10-11 — Source-linked user understanding
 The existing frozen context owns delivery of optional project-local user statements, labelled assumptions and explicit task interpretations. `user_context.py` records exact source quotes and hashes under the selected project/checkout, uses the existing lock and reservation protocol, retains correction history and fails on unresolved questions or stale sources. Provenance is not speaker authentication, factual truth, user confirmation or execution authority. No external memory runtime is required.
+
+### 2026-10-11 — Private customization and publication boundary
+Personal data uses `.crewloom/private/` and ignored installed-role memory. User-context sources get private copies and canonical publication-deny registrations; recording enables a chained project hook under the existing lock. The guard scans index objects, including checked temporary indexes, while preserving prior hooks. Publication packets contain explicit files only and never upload. Known-pattern checks do not prove confidentiality.
