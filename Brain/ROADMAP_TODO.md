@@ -186,7 +186,21 @@
 
 - 2026-10-11 [ ] Execute practical agency acceptance in documentation/AGENCY_ACCEPTANCE.md: bound concurrent projects, source-linked discovery, multi-file implementation, independent specialist QA, correction/resumption and reviewed private/public delivery.
 
+- 2026-10-11 | [x] Reproduce actual planning failure and correct example generation input closure; [ ] inspect independent closure run, combined verification, exact diff review and reviewed delivery. No delivery success claimed.
 
+- 2026-10-11 | [ ] Poll live contract-aligned attempt session 31486, inspect combined acceptance and exact diff; gate/publish source closure and contract alignment separately after PR #16 review fixes pass CI.
+
+- 2026-10-11 | [ ] Finish existing coordinator 31486 and combined integration verification, inspect actual candidate diff, then review/publish local delivery. Gate source helper closure/contract alignment and recheck PR #16 exact-head CI.
+
+- 2026-10-11 | [ ] Poll actual reportfix batch 3732, run combined acceptance and inspect exact generated diff. Gate/publish report contract alignment and source helper closure; full agency objective still pending.
+
+- 2026-10-11 | [x] Correct combined refusal contract and verify real generated modules in isolated container; [ ] gate/publish alignment, rebuild reviewed coordinator acceptance under corrected frozen inputs, and prove correction/resumption plus independent project isolation before full agency claim.
+
+- 2026-10-11 | [x] Implement explicit repair feedback references in existing model runner; [ ] verify actual payload delivery, ancestry budget, Docker/live repair and prepare/dispatch ergonomics. Publish source changes only after full gates and review. Full agency goal remains active.
+
+- 2026-10-11 | [x] Deliver explicit one-command repair preparation, payload/reuse/ancestry/image/budget checks and actual isolated live repair pilot; [ ] complete final repository gate, review/publish/install and evaluate weaker-model performance against independent frozen tasks. Automatic failure-triggered dispatch and Claude comparison remain pending.
+
+- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
 
 - 2026-10-11 | [ ] Gate/push PR #16 review fixes and recheck final-head CI. Preserve old study limitations; practical planning repair has two remaining acceptance mismatches requiring contract/grader audit.
 

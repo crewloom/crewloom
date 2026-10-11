@@ -275,8 +275,26 @@
 
 - 2026-10-11 | Actual private paired study complete: 36/36 scored, frozen inputs unchanged. Raw history 14/18 versus selected context 17/18 (EN 7/9 vs 8/9; AR 7/9 vs 9/9). Requested gpt-5.5, reported identity unknown. Zero scope-ID/publication-intent/verified-claim errors. Nine synthetic cases, one trial per condition; no statistical or general-delivery claim. PR #16 opened from gated commit 06401c9.
 
+- 2026-10-11 | Actual first ledgerline run preserved: billing verified, planning generation failed container acceptance, report correctly blocked; worker overlap confirmed. Reused helper source now declared in billing/planning/report generation inputs; 38 example tests pass (3 runtime-dependent skips). Independent closure-corrected project created for a separate real attempt.
 
+- 2026-10-11 | Contract alignment: invalid-input grader now checks required ValueError without undocumented wording; public cycle contract explicitly repeats start ID at end. Alternate valid error wording accepted, RuntimeError rejected. Full Docker example suite passes 39 tests. Separate bound agency-ledgerline-contract-20261011 actual coordinator attempt started, prior three failures retained.
+
+- 2026-10-11 | Live contract-aligned coordinator interim: billing and planning verified by actual container acceptance; report running after merged ancestors, worker overlap confirmed. Full combined delivery remains pending; previous three attempts preserved.
+
+- 2026-10-11 | Report contract exposes exact bilingual title resources. Report refusal grading accepts legitimate wording but requires unknown-field naming; regression accepts alternate messages and rejects missing field name. Full Docker example suite passes 40 tests. Separate actual report-fix batch started; previous failures preserved.
+
+- 2026-10-11 | Combined unknown-field check now requires actual offending key extra rather than hidden phrase. Alternate error wording accepted; missing key name rejected. Full Docker example suite passes 41 tests. Actual generated integration bytes separately reverified with corrected grader in network-free read-only container: combined 13/13 and helpers 16/16. Original failed prepare unchanged; coordinator publication not yet approved.
+
+- 2026-10-11 | Initial evidence-driven repair runtime added in existing workflow runner. Twenty-nine workflow cases pass locally (five optional Docker cases skipped in that run); regression rejects altered candidate, changed original input, foreign checkout and substituted verifier. Full Docker workflow run pending; no live repair-quality claim.
+
+- 2026-10-11 | Evidence-driven repair workflow Docker suite passed all 29 cases; producer-before-verifier guard added and final Docker rerun initiated under exec66482. Actual provider repair payload/chain acceptance and publication still pending.
+
+- 2026-10-11 | Added one-command private repair preparation/execution, full-prompt budget and verifier-image checks. Workflow 31 cases passed in Docker; privacy 19 cases passed including real forced private commit rejection and clean commit acceptance. Separate bound live Codex pilot (requested gpt-5.5, reported identity unavailable) repaired an intentionally seeded broken Unicode slug; actual isolated bilingual acceptance passed 5/5 and original failed journal stayed byte-identical. This is transport/repair evidence, not a weak-model or Claude comparison.
+
+- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
 
 - 2026-10-11 | PR #16 review fixes: freeze actual evaluate_hosts grader and audit exact ordered records per arm rather than subsets. Fourteen evaluator tests pass (one optional Docker skip), including grader mutation invalidation and obsolete-selected/missing-raw rejection. Original live pilot predates grader fingerprint and is supporting evidence only.
 
 - 2026-10-11 | Local OpenCode profile support and English guide added. Model-host33 cases pass with actual OpenCode1.18.32 loopback protocol fixture enabled; workflow32 Docker cases pass, including changed-profile publication/reuse refusal. Separate real opencode/space-bunny-free feature attempt failed transport before producing code; retained privately and not scored as model quality. No actual local inference benchmark or universal improvement claim.
+
+- 2026-10-11 | Mandatory merged-source hook passed public structure, syntax, links and all requested regressions. Memory history repaired and revalidated before final PR readiness; final documentation-only commit gate pending.

@@ -83,7 +83,13 @@ User sources and customization data stay project-local; commit hooks reject priv
 
 - 2026-10-11 | Completed private understanding pilot shows 17/18 selected-context passes versus 14/18 raw-history on nine synthetic cases; PR #16 contains collection tooling. Practical agency delivery remains unproven.
 
+- 2026-10-11 | Practical delivery remains pending; contract/grader mismatch repaired and live attempt retained separately. Understanding PR review fixes committed as 096f473 through full gate.
 
+- 2026-10-11 | Generated multi-file example now passes separate real combined13/helper16 verification after acceptance contract alignment. Library changes still pending publication and original coordinator delivery has not been approved.
+
+- 2026-10-11 | Initial explicit repair runtime is local and regression-tested; automated repair preparation/dispatch and practical delivery approval remain pending.
+
+- 2026-10-11 | Crewloom now has local evidence-driven repair preparation/execution with unchanged acceptance and private candidate history. One real requested-model pilot passed five bilingual checks after a seeded failure; general model improvement and competitive performance remain unproven.
 
 - 2026-10-11 | PR #16 review tightened grader/arm immutability; original pilot remains a limited observation. Practical repair improved planning but uncovered undocumented grader requirements, so agency acceptance remains pending.
 
