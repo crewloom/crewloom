@@ -66,3 +66,5 @@ Crewloom now supports optional source-linked user context inside existing frozen
 
 ### 2026-10-11 — Private by storage, deliberate by publication
 User sources and customization data stay project-local; commit hooks reject private index blobs and known credentials. Existing hooks are retained. Export prepares only explicitly selected files and never publishes automatically. This is a Git-path protection layer, not encryption or universal leakage prevention.
+
+- 2026-10-11 | Privacy rollout also patches the dashboard CSS processor and verifies an actual outside-file read refusal; known dependency advisories are tested independently from Git data publication controls.

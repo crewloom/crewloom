@@ -270,3 +270,5 @@
 - 2026-10-11 | Ignored role memory vanished in new coordinator worktrees, blocking model execution | Initialize independent local memory from public templates while preserving guides/existing lessons; root private lessons are not copied. Regression uses a private root marker.
 - 2026-10-11 | Git worktrees inherit core.hooksPath | Resolve the committing worktree, verify common Git directory and bound project identity, scan its own index and run prior hooks there; root source registrations remain protected.
 - 2026-10-11 | Absolute hooksPath became stale after relocation, and last-line ignore detection duplicated effective rules | Validate/re-home the owned guard during rebind; only later negations trigger ignore repair.
+
+- 2026-10-11 | Next dependency retained PostCSS 8.4.31 with known source-map file-disclosure advisories | Pin patched 8.5.29 without a Next major upgrade; known-violation regression, all dashboard tests/build and clean audit verify compatibility.
