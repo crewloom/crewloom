@@ -74,3 +74,13 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-11 | The next agency-quality gap is measured user understanding. Pinned Arabic/English contracts and strict corruption-tested grading are prepared; live provider evidence and general agency delivery strength are still unproven.
 
 - 2026-10-11 | Understanding preparation exposed and repaired actual context loss across quoted/assumed memories. Production payloads retain both evidence kinds; fixture grading is prepared, while measured AI quality and full agency effectiveness remain open.
+
+- 2026-10-11 | Understanding benchmark source-coverage audit added locally and regression-tested; live model measurement and practical agency delivery remain pending.
+
+- 2026-10-11 | Understanding collection now runs locally, but the first live study yielded no scored responses because of CLI transport failure. Agency capability remains unverified beyond demonstrated runtime safeguards.
+
+- 2026-10-11 | Actual understanding evidence now includes one raw-history correction mistake avoided by paired selected context, with the full frozen study still running. Practical agency delivery remains unproven.
+
+- 2026-10-11 | Completed private understanding pilot shows 17/18 selected-context passes versus 14/18 raw-history on nine synthetic cases; PR #16 contains collection tooling. Practical agency delivery remains unproven.
+
+- 2026-10-11 | PR #16 review tightened grader/arm immutability; original pilot remains a limited observation. Practical repair improved planning but uncovered undocumented grader requirements, so agency acceptance remains pending.

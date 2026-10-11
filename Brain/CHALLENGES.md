@@ -278,3 +278,17 @@
 - 2026-10-11 | Memory plumbing alone cannot prove better understanding | Prepare paired synthetic correction/scope/assumption/ambiguity cases using the actual production selector and a held-out strict grader. Requested publication is classified separately from real execution permission; no benchmark safety shortcut grants authority.
 
 - 2026-10-11 | One latest-record stream let operator hypotheses hide user quotes; known regressions failed with supersedes=1 and selected IDs=[2] | Separate revision/selection streams by kind, preserve both in actual payloads, and retain source checks. Pretrial rubric audit also separates publication request from permission and asks for missing language only when the task requires it.
+
+- 2026-10-11 | A classification benchmark can blame a model for evidence missing from its prompt | Audit independently required source IDs and exact scope/quotes before calls; reproduced missing quote and foreign project are rejected. This checks input coverage, not semantic model quality.
+
+- 2026-10-11 | Authenticated CLI login did not establish successful bounded generation: first two actual calls exited 1. Preserved the failed study, stopped identical failures, and started separate private transport diagnostics rather than replacing attempts.
+
+- 2026-10-11 | Cached desktop model gpt-6.1-sol was rejected by actual CLI ChatGPT transport; a separately identified gpt-5.5 diagnostic succeeds. Model availability must be proven by transport rather than inferred from cache/login.
+
+- 2026-10-11 | Live paired understanding study observed a valid but wrong raw-history Arabic latest-correction response: language became unknown and clarification was requested despite explicit newer English preference. Preserve trial; compare paired selected-context result before changing prompts or rubric.
+
+- 2026-10-11 | One selected-context English publication-classification response requested unnecessary clarification; preserve the failing trial and audit request/grading semantics before changing the benchmark.
+
+- 2026-10-11 | Audited remaining selected-context failure: deployment_environment requested during publication classification, although execution was explicitly excluded. Keep baseline score and target current-action clarification in the next separately identified evaluation.
+
+- 2026-10-11 | Review found missing grader fingerprint and subset-only prompt audit; add grader to frozen inputs and require exact record sequences. Regressions reproduce both invalid conditions. Earlier trial report cannot retroactively prove a grader mutation check it did not run.

@@ -52,3 +52,7 @@ Personal data uses `.crewloom/private/` and ignored installed-role memory. User-
 The existing bilingual evaluator owns pinned synthetic understanding contracts, strict per-field grading and prompts that exclude held-out answers. Raw-history and selected-context arms reuse the production user/task correction selector. Full runtime selection still validates binding and source freshness. Offline contract verification performs no provider calls and grants no action permission.
 
 - User-context revisions and selection now separate quoted statements from assumptions. Task/global precedence applies within each kind; both kinds retain binding/freshness checks and enter managed/native payloads with explicit uncertainty.
+
+- Understanding offline verification now audits each generated prompt against independently declared required record IDs and exact source/scope data; grading expectations remain excluded from prompts. Live collection must reuse this preflight.
+
+- 2026-10-11 | The understanding collector binds canonical project identity and records a shuffled fixed paired plan before generation. Output is restricted to new private evaluation directories; each trial is preserved, failures stop repeated transport attempts, and model identity is explicitly requested.

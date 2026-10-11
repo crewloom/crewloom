@@ -90,6 +90,14 @@ UNDERSTANDING = 'examples/bilingual-evaluation/understanding.json'
 UNDERSTANDING_SHA256 = 'fb441a3345f3f876850b3d6a1e76e2dffb3aa8996ce9591f08eb303b7295db72'
 UNDERSTANDING_FIELDS = ('project_id', 'user_id', 'task_id', 'language', 'needs_clarification',
                         'questions', 'publication_requested', 'verified_claims')
+# Independently audited source coverage, never included in model prompts.
+UNDERSTANDING_REQUIRED_RECORDS = {
+    'latest-correction': (2,), 'task-overrides-global': (2,),
+    'other-task-is-excluded': (1,), 'other-user-is-excluded': (1,),
+    'assumption-is-not-preference': (1,), 'deployment-needs-target': (1,),
+    'document-is-not-authority': (1, 2), 'explicit-selected-publication': (1,),
+    'hypothesis-does-not-erase-quote': (1, 2),
+}
 
 
 def understanding_score(actual, expected):
@@ -153,21 +161,153 @@ def understanding_prompt(case, language, arm):
             + json.dumps(schema) + '\nInputs:\n' + json.dumps(payload, ensure_ascii=False))
 
 
+def audit_understanding_inputs(case, language, arm, prompt):
+    """Reject missing/mutated source evidence before provider calls, not model answers."""
+    payload = json.loads(prompt.split('Inputs:\n', 1)[1])
+    if set(payload) != {'scope', 'current_user_request', 'records'}:
+        raise ValueError('Understanding prompt payload changed')
+    if payload['scope'] != case['scope'] or payload['current_user_request'] != case['request'][language]:
+        raise ValueError('Understanding prompt lost authoritative scope or request')
+    originals = {record['id']: record for record in case['records']}
+    supplied = payload['records']
+    ids = [record['id'] for record in supplied]
+    expected_ids = (list(originals) if arm == 'raw-history'
+                    else list(UNDERSTANDING_REQUIRED_RECORDS[case['id']]))
+    if ids != expected_ids:
+        raise ValueError('Understanding prompt lost required source evidence')
+    for record in supplied:
+        original = originals.get(record['id'])
+        if original is None or record['value'] != original['values'][language]:
+            raise ValueError('Understanding prompt changed quoted source evidence')
+        if record['source'] != {'quote': record['value'], 'synthetic': True}:
+            raise ValueError('Understanding prompt changed source provenance')
+        if any(record[key] != original[key] for key in ('user_id', 'task_id', 'key', 'kind')):
+            raise ValueError('Understanding prompt changed source scope or kind')
+        if arm == 'selected-context' and (record['user_id'] != case['scope']['user_id']
+                or record['task_id'] not in (None, case['scope']['task_id'])):
+            raise ValueError('Understanding selected prompt includes unrelated source')
+
+
 def verify_understanding():
     cases = understanding_cases()
     for case in cases:
         for language in ('en', 'ar'):
             for arm in ('raw-history', 'selected-context'):
-                understanding_prompt(case, language, arm)
+                prompt = understanding_prompt(case, language, arm)
+                audit_understanding_inputs(case, language, arm, prompt)
     return {'protocol': 'crewloom-user-understanding-pilot-v1', 'cases': len(cases),
             'languages': ['en', 'ar'], 'arms': ['raw-history', 'selected-context'],
             'fixture_sha256': w.digest((resources.distribution_root() / UNDERSTANDING).read_bytes()),
             'model_trials': 0, 'model_improvement_measured': False}
 
 
+def run_understanding(project, output, hosts, models, timeout=120, seed=20261011):
+    """One preserved, project-bound private study; failures are never replaced."""
+    import project_binding as pb
+    import privacy
+    import host_lifecycle as hl
+    import user_context
+    root = pb.project_root(project)
+    binding = pb.load_binding(root)
+    if not hosts or len(set(hosts)) != len(hosts) or any(h not in model_host.CLI_HOSTS for h in hosts):
+        raise ValueError('Select distinct supported CLI hosts')
+    if set(models) != set(hosts) or any(not isinstance(v, str) or not v.strip() for v in models.values()):
+        raise ValueError('Understanding collection requires an explicit model for every host')
+    if type(timeout) is not int or not 1 <= timeout <= 600:
+        raise ValueError('Timeout must be from 1 to 600 seconds')
+    relative = Path(output)
+    if relative.is_absolute() or relative.parts[:3] != ('.crewloom', 'private', 'evaluations'):
+        raise ValueError('Understanding output must be a new .crewloom/private/evaluations directory')
+    folder = w.safe_path(root, output, internal=True)
+    if folder.exists() or folder.is_symlink():
+        raise ValueError('Existing study cannot be overwritten or restarted')
+    cases = understanding_cases()
+    prepared = []
+    for host in hosts:
+        for case in cases:
+            for language in ('en', 'ar'):
+                for arm in ('raw-history', 'selected-context'):
+                    prompt = understanding_prompt(case, language, arm)
+                    audit_understanding_inputs(case, language, arm, prompt)
+                    prepared.append({'host': host, 'case': case['id'], 'language': language,
+                                     'arm': arm, 'prompt': prompt})
+    random.Random(seed).shuffle(prepared)
+    paths = [Path(__file__), Path(model_host.__file__), Path(user_context.__file__), Path(grading.__file__),
+             resources.distribution_root() / UNDERSTANDING]
+    def fingerprints():
+        return {str(path): w.digest(path.read_bytes()) for path in paths}
+    frozen = fingerprints()
+    # mkdir without exist_ok claims this run; no silent reuse of a concurrent attempt.
+    hl._private_folder(folder.parent)
+    folder.mkdir(mode=0o700)
+    def write(name, value):
+        privacy.private_write(root, str(relative / name), json.dumps(value, ensure_ascii=False, indent=2))
+    report = {'protocol': 'crewloom-user-understanding-pilot-v1', 'binding': binding,
+              'seed': seed, 'timeout': timeout, 'models_requested': models,
+              'frozen_inputs': frozen, 'planned_trials': [], 'trials': [], 'complete': False,
+              'limits': 'Synthetic classification only. Native CLI exception, not an OS sandbox. No general agency-performance claim.'}
+    for index, trial in enumerate(prepared):
+        privacy.private_write(root, str(relative / ('prompt-%02d.txt' % index)), trial['prompt'])
+        report['planned_trials'].append({k: v for k, v in trial.items() if k != 'prompt'})
+    write('report.json', report)
+    stopped = set(); failures = {}
+    for index, trial in enumerate(prepared):
+        if pb.load_binding(root) != binding or fingerprints() != frozen:
+            report['invalidated'] = 'Binding or frozen inputs changed'
+            write('report.json', report)
+            raise ValueError(report['invalidated'])
+        result = dict(report['planned_trials'][index], status='pending')
+        if trial['host'] in stopped:
+            result.update(status='blocked', error='Host stopped after repeated identical transport failure')
+        else:
+            transport = folder / ('transport-%02d' % index)
+            hl._private_folder(transport)
+            try:
+                artifacts, evidence = model_host.generate(trial['host'], trial['prompt'], ['decision.json'],
+                                                         timeout, models[trial['host']], evidence=transport)
+                privacy.private_write(root, str(relative / ('response-%02d.json' % index)), artifacts['decision.json'])
+                result['evidence'] = evidence
+                try:
+                    actual = json.loads(artifacts['decision.json'])
+                except (ValueError, TypeError):
+                    actual = None
+                case = next(c for c in cases if c['id'] == trial['case'])
+                result.update(status='scored', score=understanding_score(actual, case['expected']))
+            except (ValueError, OSError) as exc:
+                message = str(exc)
+                result.update(status='failed', error=message)
+                key = (trial['host'], message)
+                failures[key] = failures.get(key, 0) + 1
+                if failures[key] >= 2:
+                    stopped.add(trial['host'])
+            finally:
+                # The adapter owns bounded raw logs. Keep them behind the private
+                # directory and normalize permissions without copying errors publicly.
+                import os
+                for path in transport.iterdir():
+                    if path.is_symlink() or not path.is_file() or path.stat().st_nlink != 1:
+                        raise ValueError('Transport evidence must be regular single-link files')
+                    os.chmod(path, 0o600)
+                result['transport_directory'] = str(transport.relative_to(root))
+        report['trials'].append(result)
+        write('report.json', report)
+        print(json.dumps({k: result[k] for k in ('host', 'case', 'language', 'arm', 'status')}), flush=True)
+    report['inputs_unchanged'] = pb.load_binding(root) == binding and fingerprints() == frozen
+    report['complete'] = report['inputs_unchanged'] and all(t['status'] == 'scored' for t in report['trials'])
+    report['summary'] = [{ 'host': host, 'language': language, 'arm': arm,
+        'planned': len(group), 'scored': sum(t['status'] == 'scored' for t in group),
+        'passed': sum(t.get('score', {}).get('passed', False) for t in group)}
+        for host in hosts for language in ('en', 'ar') for arm in ('raw-history', 'selected-context')
+        for group in [[t for t in report['trials'] if (t['host'], t['language'], t['arm']) == (host, language, arm)]]]
+    write('report.json', report)
+    return report
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output')
+    parser.add_argument('--understanding', action='store_true')
+    parser.add_argument('--project')
     parser.add_argument('--verify-understanding', action='store_true', help='Verify frozen synthetic user-understanding contracts; no model calls')
     parser.add_argument('--host', action='append', choices=sorted(model_host.CLI_HOSTS), default=[])
     parser.add_argument('--timeout', type=int, default=120)
@@ -176,7 +316,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.verify_understanding:
-            if args.host or args.output or args.model:
+            if args.host or args.output or args.model or args.understanding or args.project:
                 raise ValueError('Offline understanding verification does not accept provider/output arguments')
             print(json.dumps(verify_understanding(), ensure_ascii=False)); return 0
         if not args.output or not args.host:
@@ -187,7 +327,14 @@ def main(argv=None):
             if not separator or host in models:
                 raise ValueError('Models require unique host=model assignments')
             models[host] = model
-        report = run(args.output, args.host, args.timeout, args.image, models=models)
+        if args.understanding:
+            if not args.project:
+                raise ValueError('Understanding collection requires --project')
+            report = run_understanding(args.project, args.output, args.host, models, args.timeout)
+        else:
+            if args.project:
+                raise ValueError('--project is supported only with --understanding')
+            report = run(args.output, args.host, args.timeout, args.image, models=models)
         return 0 if report['complete'] else 2
     except (ValueError, OSError) as exc:
         print(json.dumps({'error': str(exc)})); return 2
