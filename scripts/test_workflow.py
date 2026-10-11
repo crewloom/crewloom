@@ -173,6 +173,41 @@ class WorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'limited to two'):
                 w.repair_feedback(self.root, third, third['steps'][0])
 
+    def test_local_provider_is_forwarded_and_frozen_before_publication_and_reuse(self):
+        import model_host
+        plan, _ = repair_fixture(self.root)
+        profile = {'schema_version': 1, 'provider_id': 'local',
+                   'base_url': 'http://127.0.0.1:43217/v1', 'models': ['fixture-small'],
+                   'prompt_budget_bytes': 65536}
+        path = self.root/'.crewloom/private/providers/local.json'
+        path.parent.mkdir(parents=True); path.write_text(json.dumps(profile))
+        plan['steps'][0].update(host='opencode', model='local/fixture-small',
+                               opencode_provider='.crewloom/private/providers/local.json')
+        (self.root/'workflow.json').write_text(json.dumps(plan))
+        plan, checksum = w.read_plan(self.root, 'workflow.json')
+        calls = []
+        def generate(host, prompt, outputs, timeout, model, **kwargs):
+            calls.append(kwargs['provider_profile'])
+            self.assertEqual(host, 'opencode'); self.assertEqual(model, 'local/fixture-small')
+            self.assertIn('provider_profile_sha256', prompt)
+            self.assertNotIn(profile['base_url'], prompt)
+            if len(calls) == 1:
+                changed = dict(profile, prompt_budget_bytes=65537)
+                path.write_text(json.dumps(changed))
+            return {'output.txt': 'correct'}, {}
+        def verify(root, argv, image, timeout, **kwargs):
+            (root/'receipt.json').write_text('{"passed":true}')
+            return {'exit_code': 0, 'image_id': image, 'output': ''}
+        with patch.object(model_host, 'generate', side_effect=generate), patch.object(w, 'inspect_image', return_value='sha256:fixture'), patch.object(w, 'docker_execute', side_effect=verify):
+            self.assertEqual(w.run(self.root, plan, checksum, 'image', allow_host_cli=True)['status'], 'failed')
+            self.assertFalse((self.root/'output.txt').exists())
+            self.assertEqual(w.run(self.root, plan, checksum, 'image', allow_host_cli=True)['status'], 'complete')
+            self.assertEqual(w.run(self.root, plan, checksum, 'image', allow_host_cli=True)['status'], 'complete')
+            self.assertEqual(len(calls), 2)
+            path.write_text(json.dumps(dict(profile, prompt_budget_bytes=65538)))
+            with self.assertRaisesRegex(ValueError, 'Model context changed'):
+                w.run(self.root, plan, checksum, 'image', allow_host_cli=True)
+
     def test_changed_completed_artifact_rejected(self):
         with patch.object(w,'inspect_image',return_value='sha256:test'),patch.object(w,'docker_execute',side_effect=self.execute):
             self.run_plan();(self.root/'output.txt').write_text('changed')

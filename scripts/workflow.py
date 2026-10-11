@@ -257,6 +257,8 @@ def read_plan(root, filename):
         kind = step.get('kind', 'command')
         if 'repair_from' in step and (kind != 'model' or not isinstance(step['repair_from'], dict)):
             raise ValueError('Only model steps may declare a repair reference')
+        if 'opencode_provider' in step and (kind != 'model' or step.get('host') != 'opencode'):
+            raise ValueError('Private local provider profiles require an OpenCode model step')
         if kind not in ('command', 'task', 'model') or not isinstance(step.get('summary'), str) or not step['summary'].strip():
             raise ValueError('Each step needs a summary and command/task/model kind')
         if kind == 'command':
@@ -1122,8 +1124,12 @@ def repair_feedback(root, plan, step):
             or any(failed.get('inputs', {}).get(path) != generated.get('outputs', {}).get(path)
                    for path in producer['outputs'])):
         raise ValueError('Failed verifier did not consume the candidate')
-    if any(step.get(k) != producer.get(k) for k in ('role', 'host', 'model', 'outputs')):
+    if any(step.get(k) != producer.get(k) for k in ('role', 'host', 'model', 'outputs', 'opencode_provider')):
         raise ValueError('Repair must preserve producer identity and output scope')
+    import model_host
+    profile = model_host.provider_profile(root, producer)
+    if profile and generated.get('provider_profile_sha256') != profile['sha256']:
+        raise ValueError('Original provider profile changed; use a new task contract')
     if plan.get('criteria') != source.get('criteria') or plan.get('language', 'en') != source.get('language', 'en'):
         raise ValueError('Repair must preserve criteria and language')
     if source.get('criteria') and source['criteria'] not in producer['inputs'] + verifier['inputs']:
@@ -1221,6 +1227,7 @@ def run_model_step(root, plan, step, inputs, record, state, folder, ledger, allo
             raise ValueError('Project model request budget exhausted')
         project_context_publish_gate(root, plan, step)
         consumed=host_module.consumed_context(root,plan['id'],step)
+        configured = host_module.provider_profile(root, step)
         prompt=build_prompt(root,step,plan.get('language','en'),plan['id'],consumed)
         feedback = repair_feedback(root, plan, step)
         if feedback:
@@ -1228,6 +1235,10 @@ def run_model_step(root, plan, step, inputs, record, state, folder, ledger, allo
             record['repair_feedback_sha256'] = digest(json.dumps(feedback, sort_keys=True).encode())
         if len(prompt.encode()) > host_module.MAX_TEXT:
             raise ValueError('Combined repair prompt exceeds prompt budget; narrow the task')
+        if configured:
+            if len(prompt.encode()) > configured['prompt_budget_bytes']:
+                raise ValueError('Prompt exceeds selected local provider byte budget; narrow declared inputs')
+            record['provider_profile_sha256'] = configured['sha256']
         record['context_sha256']=digest(prompt.encode())
         record['context_bytes']=len(prompt.encode())
         if consumed:
@@ -1268,7 +1279,8 @@ def run_model_step(root, plan, step, inputs, record, state, folder, ledger, allo
         ledger['attempts'].append(entry);save_ledger(root,ledger)
         record['status']='running';state['status']='running';save(folder,state)
         try:
-            artifacts,evidence=generate(step['host'],prompt,step['outputs'],step.get('timeout_seconds',180),step.get('model'))
+            parameters = {'provider_profile': configured['data']} if configured else {}
+            artifacts,evidence=generate(step['host'],prompt,step['outputs'],step.get('timeout_seconds',180),step.get('model'), **parameters)
         except BaseException:
             if reservation:
                 usage_budget.settle(shared_budget, reservation)
@@ -1279,6 +1291,8 @@ def run_model_step(root, plan, step, inputs, record, state, folder, ledger, allo
             raise ValueError('Inputs changed during model generation; outputs rejected')
         if repair_feedback(root, plan, step) != feedback:
             raise ValueError('Repair evidence changed during generation; outputs rejected')
+        if host_module.provider_profile(root, step) != configured:
+            raise ValueError('Provider profile changed during generation; outputs rejected')
         project_context_publish_gate(root, plan, step)
         from execution_policy import publish
         publish(root,{path:text.encode() for path,text in artifacts.items()},inputs)

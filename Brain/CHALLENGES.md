@@ -291,20 +291,8 @@
 
 - 2026-10-11 | Audited remaining selected-context failure: deployment_environment requested during publication classification, although execution was explicitly excluded. Keep baseline score and target current-action clarification in the next separately identified evaluation.
 
-- 2026-10-11 | Generated planning repeatedly validated normalized tuple dependencies through list-only helper and failed 13 checks. Generation saw helper prose but omitted actual helper implementations; add source closure without leaking acceptance tools or modifying baseline evidence.
 
-- 2026-10-11 | Feedback repair fixed normalized-input revalidation; two remaining failures exposed closed-cycle ambiguity and hidden twice error substring. Clarify cycle contract and validate exception type rather than wording; independent regression rejects wrong exception type.
 
-- 2026-10-11 | Five report acceptance failures included undisclosed exact translation/message requirements. Publish exact title copy as model input and grade error semantics rather than undocumented phrases; keep numerical/immutability/CLI checks unchanged.
+- 2026-10-11 | Review found missing grader fingerprint and subset-only prompt audit; add grader to frozen inputs and require exact record sequences. Regressions reproduce both invalid conditions. Earlier trial report cannot retroactively prove a grader mutation check it did not run.
 
-- 2026-10-11 | Integration checker retained an undocumented unknown report input fields phrase after per-task report grading was corrected. Check offending key while retaining exit2/no-output assertions; regression rejects missing key and independent actual-byte verification passes.
-
-- 2026-10-11 | Manual failure explanations lived outside the workflow evidence chain. Add project-scoped repair references and hash-validated immutable candidate copies; avoid rewriting original attempts or granting log text execution authority.
-
-- 2026-10-11 | Appending feedback after the base-prompt check could exceed its budget, and a mutable Docker tag could change repair acceptance. Check the complete prompt before provider calls, pin the recorded verifier image digest and test both refusals. Ordinary runtime .crewloom inputs are reserved; use a separately guarded ignored repair namespace for candidate copies.
-
-- 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
-
-- 2026-10-11 | Repository gate rejected three new fixture Git subprocesses without explicit environments. Added repo_map.git_environment() to each; the in-flight commit was stopped before publication so the corrected files can be staged and pass a fresh mandatory hook. No hook bypass used.
-
-- 2026-10-11 | The actual commit hook then exposed ambient GIT_INDEX_FILE reaching privacy.check from a new temporary workflow fixture. Scrub Git exports for the entire fixture lifetime as well as each Git subprocess; production foreign-index refusal remains intact. Reproduce with an explicit foreign index environment before retrying the full hook.
+- 2026-10-11 | Task-scoped OpenCode config intentionally excludes global custom provider definitions. Add an explicit private endpoint/model/byte-budget contract without importing plugins or wider host settings. A real installed-CLI protocol fixture verifies routing; catalogue presence alone did not establish cloud generation availability.

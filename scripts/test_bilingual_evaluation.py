@@ -52,6 +52,39 @@ class Contracts(unittest.TestCase):
 
 
 class UnderstandingContracts(unittest.TestCase):
+    def test_grader_change_invalidates_collection_before_next_call(self):
+        import tempfile
+        import project_binding as pb
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            grader = root / 'grader.py'; grader.write_text('original grader')
+            def generation(*args, **kwargs):
+                grader.write_text('changed grader')
+                return {'decision.json': '{}'}, {}
+            with patch.object(pb, 'project_root', return_value=root), \
+                    patch.object(pb, 'load_binding', return_value={'project_root': str(root)}), \
+                    patch.object(pilot.grading, '__file__', str(grader)), \
+                    patch.object(pilot.model_host, 'generate', side_effect=generation) as generate:
+                with self.assertRaisesRegex(ValueError, 'frozen inputs changed'):
+                    pilot.run_understanding(root, '.crewloom/private/evaluations/grader-change',
+                                            ['codex'], {'codex': 'fixture-model'})
+                self.assertEqual(generate.call_count, 1)
+                report = json.loads((root / '.crewloom/private/evaluations/grader-change/report.json').read_text())
+                self.assertIn(str(grader), report['frozen_inputs'])
+                self.assertIn('invalidated', report)
+                self.assertFalse(report['complete'])
+
+    def test_input_audit_refuses_obsolete_selected_and_missing_raw_records(self):
+        case = pilot.understanding_cases()[0]
+        for language in ('en', 'ar'):
+            raw = pilot.understanding_prompt(case, language, 'raw-history')
+            selected = pilot.understanding_prompt(case, language, 'selected-context')
+            with self.assertRaisesRegex(ValueError, 'required source'):
+                pilot.audit_understanding_inputs(case, language, 'selected-context', raw)
+            with self.assertRaisesRegex(ValueError, 'required source'):
+                pilot.audit_understanding_inputs(case, language, 'raw-history', selected)
+
     def test_private_collector_preserves_all_trials_and_refuses_restart(self):
         import tempfile
         import project_binding as pb
