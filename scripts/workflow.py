@@ -756,6 +756,12 @@ def agent_packet(root, plan, fingerprint):
             raise ValueError('Agent packet context changed during preparation')
         if mh.build_prompt(root, step, plan.get('language', 'en'), plan['id'], context) != prompt:
             raise ValueError('Agent packet guidance changed during preparation')
+        # The project lock serializes Crewloom callers, not ordinary editors. The
+        # last prompt read must precede the final freshness checks as well.
+        if hashes(root, step['inputs']) != before or pb.load_binding(root) != binding:
+            raise ValueError('Agent packet inputs or binding changed during preparation')
+        if context is not None and pc.require_fresh(root, binding, plan['id']) != context:
+            raise ValueError('Agent packet context changed during preparation')
         return {'schema_version': 1, 'kind': 'crewloom-agent-packet',
                 'project_id': binding['project_id'], 'checkout_id': binding['checkout_id'],
                 'project_root': str(root), 'workflow': plan['id'], 'step': step['id'],

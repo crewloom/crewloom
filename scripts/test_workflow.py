@@ -328,6 +328,16 @@ class WorkflowTests(unittest.TestCase):
             return prompt
         with patch.object(mh, 'build_prompt', side_effect=mutate), self.assertRaisesRegex(ValueError, 'inputs or binding changed'):
             w.agent_packet(self.root, plan, fingerprint)
+        calls = 0
+        def mutate_after_last_read(*args, **kwargs):
+            nonlocal calls
+            prompt = build(*args, **kwargs); calls += 1
+            if calls == 2:
+                (self.root/'input.txt').write_text('late editor change')
+            return prompt
+        with patch.object(mh, 'build_prompt', side_effect=mutate_after_last_read), self.assertRaisesRegex(ValueError, 'inputs or binding changed'):
+            w.agent_packet(self.root, plan, fingerprint)
+        self.assertEqual(calls, 2)
         w.cancel(self.root, plan, fingerprint)
         with self.assertRaisesRegex(ValueError, 'awaiting task'):
             w.agent_packet(self.root, plan, fingerprint)

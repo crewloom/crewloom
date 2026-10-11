@@ -318,3 +318,5 @@
 - 2026-10-11 | Bounded/single-link did not establish provider file confidentiality. Enforce current-user ownership and owner-only POSIX modes instead of silently accepting typical022-umask files; preserve native ACL limitations.
 
 - 2026-10-12 | Local OpenCode provider setup was mistaken for a restriction of all Crewloom improvement features. Separate supported automatic model adapters from portable external-agent task contracts; keep review, context freshness and command verification independent of agent brand. External reply import and automatic repair require a reviewed adapter, not an unsupported host label.
+
+- 2026-10-12 | PR18 P2 identified a late ordinary-editor mutation after the second prompt read. Move an additional source/binding/context check after that read; project locks only serialize Crewloom callers. Regression mutates an input immediately before the final builder returns and requires refusal.

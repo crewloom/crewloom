@@ -433,8 +433,8 @@
     ".gitignore": "7b831c29a3d8d1ba308ea37a4f0b0d19dfd49ea31ebfd593b7b61c6d034378db",
     "AGENTS.md": "878c374858ecbfb94b8aae9d6b5e92a2e20210ad704e3d3423e25992b8dcf52d",
     "Brain/ARCHITECTURE.md": "867757a3d2db35646251fb782d361d6b27161457e7b00c48906757c81dd3debe",
-    "Brain/CHALLENGES.md": "a8bb116edebc0c8e2110f07d48f875da0b594ae719b686cd02023653d0a7ec89",
-    "Brain/COMPLETED.md": "77488c198c33282026946167e14284838842e52cf16459004f1f84b0d32e5583",
+    "Brain/CHALLENGES.md": "dea9697c61a2d5b2f588ff5b0643154baf5c5875040d981f6244cc34e52793be",
+    "Brain/COMPLETED.md": "c56f808cdf7e9dc9bdba65e5534a68f899ad41693029d3d500359b6e1b9f38a7",
     "Brain/IDEAS_VAULT.md": "284e58f3b7890c16030641ebafd9f72b7cda953e1788e31ca84ecd4fe4daa02d",
     "Brain/ROADMAP_TODO.md": "a51921c614c579e734c6dc4ab67663e2766da0659b4d9f78257c3a7207a3f348",
     "CHANGELOG.md": "535679362c4d7a9e66682501c16fa66aa956534f191cb130042f05872f48cba3",
@@ -783,10 +783,10 @@
     "scripts/test_transport_acceptance_boundaries.py": "460689673458c4ebe16248642822e9bd2d0f3a49a9465ec9d73a02f11756aa3b",
     "scripts/test_transport_completion_boundaries.py": "37ac011ea0af1d8f2657329ca4ade73591e1b9b800ebbf9989bdd4dbca588421",
     "scripts/test_user_context.py": "a001b288a31ab04a6061fd5c06229e6bbec5b076faa87a6bbb104aba7dc94a53",
-    "scripts/test_workflow.py": "ee9a083ac1d7d1689bce08e8a984df46884fe053e8bb6efb47e3cef725d436ec",
+    "scripts/test_workflow.py": "eb287cc1aeb89186e04079e9061511de60a2b3f0591a0c3f2903feae53f822fc",
     "scripts/usage_budget.py": "6e737e9b444ca2f99b6e4f401c699c52904442ae84ad60732e1795023c70e2e5",
     "scripts/user_context.py": "13769a1c86d0b28f82a77d104e6e2457589751f47d050121a8064613b368252a",
-    "scripts/workflow.py": "4d949f9897cd932098a31285f7f0961b1a9e68b729986f2cf54bbd1b740f498b",
+    "scripts/workflow.py": "935cda75ca881db7b93f71fa7fcd67978d41bdb7b0c6b47f593a8d66dea7b065",
     "workflows/software-feature.json": "e6481e1532deae7a10204ebbb7ef58c94ccc7244202e1aef838ddb8f273ec290"
   }
 }

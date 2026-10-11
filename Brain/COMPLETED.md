@@ -302,3 +302,5 @@
 - 2026-10-11 | PR17 final initial head passed all nine CI checks. Review P2 reproduced acceptance of mode0644 provider files; loader now refuses it and accepts mode0600. Actual OpenCode model-host33 and Docker workflow32 regressions pass after the ownership fix; mandatory review-fix commit gate pending.
 
 - 2026-10-12 | Added host-neutral agent-packet CLI and English host guide. Workflow34 tests pass with all Docker cases enabled: packet preserves journal/output state, makes no provider call, carries Arabic and identity/schema/hash data, refuses in-flight source changes, cancelled tasks and stale enforced context. PR17 merged at 2b8508b; installed exact snapshot and validate passed42 skills. New packet publication/runtime update pending.
+
+- 2026-10-12 | PR18 late-input mutation review fixed; workflow34 passes all Docker cases again. The new regression verifies a change after the final prompt read is refused; final hook and exact-head CI pending.
