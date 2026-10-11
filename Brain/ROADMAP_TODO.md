@@ -173,3 +173,11 @@
 - 2026-10-11 [x] Prepare pinned bilingual understanding contracts and reject known wrong/malformed responses; [ ] implement private bound-project collection, freeze/run all 32 planned trials per selected available host, and measure field-level errors before claiming model improvement.
 
 - 2026-10-11 [x] Preserve quoted evidence across later hypotheses and refreeze nine-scenario understanding protocol before provider calls; planned collection is 36 trials per selected host, superseding the earlier eight-scenario preparation checkpoint.
+
+- 2026-10-11 [x] Add prompt source-coverage audit to offline understanding verification; [ ] integrate the audit into a bound private live collector, run the frozen paired study and publish reviewed implementation. Agency effectiveness remains unproven.
+
+- 2026-10-11 | [x] Implement private collector and execute first real study attempt; [ ] diagnose CLI transport, retain per-trial raw transport, verify full gate, publish implementation and run a separately identified successful study. Full agency-delivery proof remains pending.
+
+- 2026-10-11 | [x] Retain private raw transport per attempt; [ ] collect/inspect separately identified paired-gpt55-v1 study, verify full repository gate and publish collector. Do not infer general agency capability from nine synthetic cases.
+
+- 2026-10-11 | [ ] Inspect correction ambiguity observed in the running frozen study; retain wrong response and complete paired comparison before improvements.

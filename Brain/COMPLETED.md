@@ -262,3 +262,13 @@
 - 2026-10-11 | Understanding protocol preparation: eight bilingual synthetic scenarios, two arms, pinned fixture, strict grader and installed CLI contract verification. Nine evaluator tests (one optional Docker skip) exercise 64 single-field corruptions plus malformed responses; 14 user-context regressions pass after selector reuse. Live collection/model improvement remains unmeasured.
 
 - 2026-10-11 | Fixed two reproduced statement-loss cases: later same-key or task-specific hypotheses no longer erase quoted statements; same-kind corrections preserve correct supersedes links. Sixteen user-context cases pass, including managed/native delivery of both kinds. Understanding preparation explicitly refrozen before any model trial: nine scenarios (36 planned trials/host), corrected request-intent/missing-language labels, 72 single-field corruptions plus malformed responses rejected. Live quality comparison remains pending.
+
+- 2026-10-11 | Understanding input preflight: independently audited required source IDs, exact bilingual quotes, authoritative scope/request and selected user/task isolation checked before offline verification. Ten evaluator tests pass (one optional Docker skip), including lost-quote and changed-project rejection. Local branch only; no new provider trial or runtime rollout.
+
+- 2026-10-11 | Private bound understanding collector implemented locally: fixed 36-trial plan, explicit models, owner-only prompts/responses/report, input/binding change refusal and preserved failures. Twelve evaluator tests pass (one optional Docker skip). Live Codex run terminal: two transport failures, 34 blocked trials, zero scored; no model improvement measured.
+
+- 2026-10-11 | Added private per-trial raw transport retention and owner-only permissions; 12 evaluator tests pass (one optional Docker skip). Live diagnostic gpt-5.5 succeeded; requested identity recorded, reported model remains unknown.
+
+- 2026-10-11 | Live study interim: 16/36 trials scored, 15 whole-response passes. Arabic latest-correction failed in raw history and passed in paired selected context. Existing live collection session 77308 and full-gate session 13616 remain active; no final improvement claim.
+
+- 2026-10-11 | Full repository gate passes for private understanding collector and input audit: public structure, Python syntax, links and requested regressions; explicit runtime-dependent skips remain. Paired collection still running separately.

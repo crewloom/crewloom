@@ -52,6 +52,65 @@ class Contracts(unittest.TestCase):
 
 
 class UnderstandingContracts(unittest.TestCase):
+    def test_private_collector_preserves_all_trials_and_refuses_restart(self):
+        import tempfile
+        import project_binding as pb
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            binding = {'project_id': 'study', 'checkout_id': 'a' * 32, 'project_root': str(root)}
+            answer = json.dumps(pilot.understanding_cases()[0]['expected'])
+            with patch.object(pb, 'project_root', return_value=root), \
+                    patch.object(pb, 'load_binding', return_value=binding), \
+                    patch.object(pilot.model_host, 'generate', return_value=({'decision.json': answer}, {'synthetic': True})) as generate:
+                relative = '.crewloom/private/evaluations/study'
+                report = pilot.run_understanding(root, relative, ['codex'], {'codex': 'fixture-model'})
+                self.assertEqual(generate.call_count, 36)
+                self.assertEqual(len(report['trials']), 36)
+                self.assertTrue(report['complete'])
+                self.assertEqual(sum(g['planned'] for g in report['summary']), 36)
+                for path in (root / relative).iterdir():
+                    self.assertEqual(path.stat().st_mode & 0o777, 0o700 if path.is_dir() else 0o600)
+                with self.assertRaisesRegex(ValueError, 'overwritten'):
+                    pilot.run_understanding(root, relative, ['codex'], {'codex': 'fixture-model'})
+                with self.assertRaisesRegex(ValueError, 'private/evaluations'):
+                    pilot.run_understanding(root, 'public', ['codex'], {'codex': 'fixture-model'})
+                with self.assertRaisesRegex(ValueError, 'explicit model'):
+                    pilot.run_understanding(root, relative + '-other', ['codex'], {})
+
+    def test_private_collector_preserves_failed_and_blocked_attempts(self):
+        import tempfile
+        import project_binding as pb
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            with patch.object(pb, 'project_root', return_value=root), \
+                    patch.object(pb, 'load_binding', return_value={'project_root': str(root)}), \
+                    patch.object(pilot.model_host, 'generate', side_effect=ValueError('fixture unavailable')) as generate:
+                report = pilot.run_understanding(root, '.crewloom/private/evaluations/failed',
+                                                  ['codex'], {'codex': 'fixture-model'})
+                self.assertEqual(generate.call_count, 2)
+                self.assertEqual(len(report['trials']), 36)
+                self.assertFalse(report['complete'])
+                self.assertEqual([t['status'] for t in report['trials'][:3]], ['failed', 'failed', 'blocked'])
+
+    def test_input_audit_rejects_lost_quote_and_changed_scope(self):
+        case = next(c for c in pilot.understanding_cases()
+                    if c['id'] == 'hypothesis-does-not-erase-quote')
+        for language in ('en', 'ar'):
+            prompt = pilot.understanding_prompt(case, language, 'selected-context')
+            prefix, raw = prompt.split('Inputs:\n', 1)
+            payload = json.loads(raw)
+            payload['records'] = payload['records'][1:]
+            with self.assertRaisesRegex(ValueError, 'required source'):
+                pilot.audit_understanding_inputs(case, language, 'selected-context',
+                                                  prefix + 'Inputs:\n' + json.dumps(payload))
+            payload = json.loads(raw)
+            payload['scope']['project_id'] = 'foreign'
+            with self.assertRaisesRegex(ValueError, 'authoritative scope'):
+                pilot.audit_understanding_inputs(case, language, 'selected-context',
+                                                  prefix + 'Inputs:\n' + json.dumps(payload))
+
     def test_frozen_reference_and_every_single_field_mutation(self):
         for case in pilot.understanding_cases():
             expected = case['expected']

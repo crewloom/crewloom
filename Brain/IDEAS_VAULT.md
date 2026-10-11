@@ -87,3 +87,11 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | Keep a whole-response primary metric alongside per-field errors so a wrong project cannot hide behind seven correct fields. Distinguish intent classification from authenticated execution authority and preserve failed/unavailable trials.
 
 - A newer hypothesis is not an explicit quoted correction. Carry contradictory interpretations as labelled evidence rather than erasing prior quotes or silently declaring them facts. Audit rubric semantics before the first model call.
+
+- Keep source-coverage assertions outside model prompts; preserve separate measures for input completeness, response correctness and practical delivery.
+
+- 2026-10-11 | Treat login, transport success, response accuracy and delivery success as separate evidence; stopped/unavailable trials stay in the original study denominator.
+
+- 2026-10-11 | A temporary benchmark model is an explicit run parameter, not a silent global migration; keep requested and reported identities separate.
+
+- 2026-10-11 | Preserve paired disagreements to distinguish correction ambiguity in raw history from selector benefit; one disagreement is a concrete lead, not a statistical generalization.
