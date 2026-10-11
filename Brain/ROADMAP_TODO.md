@@ -181,3 +181,7 @@
 - 2026-10-11 | [x] Retain private raw transport per attempt; [ ] collect/inspect separately identified paired-gpt55-v1 study, verify full repository gate and publish collector. Do not infer general agency capability from nine synthetic cases.
 
 - 2026-10-11 | [ ] Inspect correction ambiguity observed in the running frozen study; retain wrong response and complete paired comparison before improvements.
+
+- 2026-10-11 | [x] Complete actual paired collection and inspect field errors; [ ] review/merge PR #16, deploy verified collector, diagnose remaining clarification error and prove harder specialist multi-file delivery.
+
+- 2026-10-11 [ ] Execute practical agency acceptance in documentation/AGENCY_ACCEPTANCE.md: bound concurrent projects, source-linked discovery, multi-file implementation, independent specialist QA, correction/resumption and reviewed private/public delivery.

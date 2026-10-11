@@ -286,3 +286,7 @@
 - 2026-10-11 | Cached desktop model gpt-6.1-sol was rejected by actual CLI ChatGPT transport; a separately identified gpt-5.5 diagnostic succeeds. Model availability must be proven by transport rather than inferred from cache/login.
 
 - 2026-10-11 | Live paired understanding study observed a valid but wrong raw-history Arabic latest-correction response: language became unknown and clarification was requested despite explicit newer English preference. Preserve trial; compare paired selected-context result before changing prompts or rubric.
+
+- 2026-10-11 | One selected-context English publication-classification response requested unnecessary clarification; preserve the failing trial and audit request/grading semantics before changing the benchmark.
+
+- 2026-10-11 | Audited remaining selected-context failure: deployment_environment requested during publication classification, although execution was explicitly excluded. Keep baseline score and target current-action clarification in the next separately identified evaluation.

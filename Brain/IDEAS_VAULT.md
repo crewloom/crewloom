@@ -95,3 +95,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | A temporary benchmark model is an explicit run parameter, not a silent global migration; keep requested and reported identities separate.
 
 - 2026-10-11 | Preserve paired disagreements to distinguish correction ambiguity in raw history from selector benefit; one disagreement is a concrete lead, not a statistical generalization.
+
+- 2026-10-11 | Paired synthetic outcomes identify useful targeted corrections, while general agency capability still requires actual multi-role delivery evidence.
