@@ -258,3 +258,5 @@
 - 2026-10-11 | CSS privacy dependency fix: PostCSS 8.5.29 override/lock; known outside-map read is rejected by the new regression (fails with 8.4.31, passes patched). Dashboard 40 tests and production build pass; npm audit reports zero known vulnerabilities.
 
 - 2026-10-11 | Inherited guard reuse: 18 privacy cases pass; repeated parallel setup preserves shared hooksPath and clean commits, while recording an original source in the worktree blocks its commit.
+
+- 2026-10-11 | Understanding protocol preparation: eight bilingual synthetic scenarios, two arms, pinned fixture, strict grader and installed CLI contract verification. Nine evaluator tests (one optional Docker skip) exercise 64 single-field corruptions plus malformed responses; 14 user-context regressions pass after selector reuse. Live collection/model improvement remains unmeasured.

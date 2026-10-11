@@ -176,6 +176,19 @@ def contract(root, task_id, user_id, goal, constraints, acceptance, questions, s
         return item
 
 
+def select_records(records, user_id, task_id):
+    """Apply the production user/task correction precedence to validated records."""
+    latest = {}
+    for record in records:
+        if record['user_id'] == user_id and record['task_id'] in (None, task_id):
+            latest[(record['key'], record['task_id'])] = record
+    # A task-specific correction overrides the project-wide value of the same key.
+    selected = {key: record for (key, task), record in latest.items() if task is None}
+    selected.update({key: record for (key, task), record in latest.items() if task == task_id})
+    records = [selected[key] for key in sorted(selected)]
+    return records
+
+
 def select(root, task_id):
     store = load(root)
     item = store['contracts'].get(task_id)
@@ -184,14 +197,7 @@ def select(root, task_id):
     fresh(root, item['source'])
     if item['questions']:
         raise ValueError('Task has unresolved questions: ' + '; '.join(item['questions']))
-    latest = {}
-    for record in store['records']:
-        if record['user_id'] == item['user_id'] and record['task_id'] in (None, task_id):
-            latest[(record['key'], record['task_id'])] = record
-    # A task-specific correction overrides the project-wide value of the same key.
-    selected = {key: record for (key, task), record in latest.items() if task is None}
-    selected.update({key: record for (key, task), record in latest.items() if task == task_id})
-    records = [selected[key] for key in sorted(selected)]
+    records = select_records(store['records'], item['user_id'], task_id)
     for record in records:
         fresh(root, record['source'])
     result = {'contract': {k: v for k, v in item.items() if k != 'history'}, 'memories': records,

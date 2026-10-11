@@ -47,3 +47,6 @@ Personal data uses `.crewloom/private/` and ignored installed-role memory. User-
 - 2026-10-11: Dashboard pins PostCSS 8.5.29 through npm overrides so Next resolves a patched CSS processor; regression observes external map reads and must refuse an absolute untrusted sourceMappingURL.
 
 - Linked worktree privacy setup validates/reuses an inherited owned guard instead of replacing shared core.hooksPath; source registrations remain local and the committing worktree is scanned.
+
+### 2026-10-11 — Understanding pilot preparation
+The existing bilingual evaluator owns pinned synthetic understanding contracts, strict per-field grading and prompts that exclude held-out answers. Raw-history and selected-context arms reuse the production user/task correction selector. Full runtime selection still validates binding and source freshness. Offline contract verification performs no provider calls and grants no action permission.

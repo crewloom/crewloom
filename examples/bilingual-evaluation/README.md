@@ -21,3 +21,17 @@ The [separate configured-model OpenCode diagnostic](results-20261010/opencode-co
 The three generated source files are stored alongside the records and identified by their `source_sha256` fields. Input fingerprints in the public records use repository-relative paths; no credentials, private project inputs, or raw authentication error logs are published.
 
 Grader verification checked all 40 manually specified cases against grader-only references and used the real Docker harness to reject a returned `None` and a mutating implementation. These checks establish the acceptance contract and scoring boundary; they do not broaden the provider evidence.
+
+## User-understanding contract preparation
+
+```sh
+crewloom evaluate-bilingual --verify-understanding
+```
+
+This offline command verifies the frozen [understanding scenarios](understanding.json); it does not call a model or claim improved understanding. Eight synthetic scenarios cover corrections, task and user scope, assumptions, missing deployment information, instructions quoted from documents, and an explicit selected publication request. Each scenario has equivalent Arabic/English inputs and two planned arms: raw history and selected context. The selected arm uses the same correction-precedence function as production user context, while runtime source-freshness and project-binding checks remain in the production selection entry point.
+
+`understanding_prompt` passes only authoritative synthetic scope, current request and source records. Expected answers stay in the local grader and are excluded from generated prompts. Installed native CLIs remain a documented native host exception; excluding answers from a prompt does not prove arbitrary host tools cannot access public fixtures.
+
+`understanding_score` grades eight fields separately and requires every field to pass for a trial to pass. Missing/extra keys, boolean coercions and malformed lists receive no credit. `publication_requested` classifies the synthetic user's intent; it never grants real publication permission. Source statements do not prove tests passed.
+
+The fixture is pinned by SHA-256 and changed content is refused until explicit protocol refreezing. The planned pilot has 32 trials per selected host (eight scenarios × two languages × two arms), balanced frozen order, identical requested model/adapter settings, one attempt per trial and no replacement of failures. Reports and transport evidence must remain under an explicitly bound project's private runtime, preserve unavailable/failed attempts, and distinguish requested/reported model identities. Actual collection and real model comparison remain pending; the offline verification reports zero model trials honestly. This small classification pilot cannot prove general agency performance, natural-language extraction quality or business delivery readiness.

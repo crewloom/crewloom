@@ -70,3 +70,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-11 | Privacy rollout also patches the dashboard CSS processor and verifies an actual outside-file read refusal; known dependency advisories are tested independently from Git data publication controls.
 
 - 2026-10-11 | Parallel task privacy setup reuses verified inherited protection while preserving checkout-local source registrations; independent task setup does not create recursive hook chains.
+
+- 2026-10-11 | The next agency-quality gap is measured user understanding. Pinned Arabic/English contracts and strict corruption-tested grading are prepared; live provider evidence and general agency delivery strength are still unproven.
