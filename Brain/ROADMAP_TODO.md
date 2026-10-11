@@ -185,3 +185,9 @@
 - 2026-10-11 | [x] Complete actual paired collection and inspect field errors; [ ] review/merge PR #16, deploy verified collector, diagnose remaining clarification error and prove harder specialist multi-file delivery.
 
 - 2026-10-11 [ ] Execute practical agency acceptance in documentation/AGENCY_ACCEPTANCE.md: bound concurrent projects, source-linked discovery, multi-file implementation, independent specialist QA, correction/resumption and reviewed private/public delivery.
+
+- 2026-10-11 | [x] Reproduce actual planning failure and correct example generation input closure; [ ] inspect independent closure run, combined verification, exact diff review and reviewed delivery. No delivery success claimed.
+
+- 2026-10-11 | [ ] Poll live contract-aligned attempt session 31486, inspect combined acceptance and exact diff; gate/publish source closure and contract alignment separately after PR #16 review fixes pass CI.
+
+- 2026-10-11 | [ ] Finish existing coordinator 31486 and combined integration verification, inspect actual candidate diff, then review/publish local delivery. Gate source helper closure/contract alignment and recheck PR #16 exact-head CI.

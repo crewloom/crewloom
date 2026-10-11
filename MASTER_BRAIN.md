@@ -82,3 +82,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-11 | Actual understanding evidence now includes one raw-history correction mistake avoided by paired selected context, with the full frozen study still running. Practical agency delivery remains unproven.
 
 - 2026-10-11 | Completed private understanding pilot shows 17/18 selected-context passes versus 14/18 raw-history on nine synthetic cases; PR #16 contains collection tooling. Practical agency delivery remains unproven.
+
+- 2026-10-11 | Practical delivery remains pending; contract/grader mismatch repaired and live attempt retained separately. Understanding PR review fixes committed as 096f473 through full gate.

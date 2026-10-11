@@ -274,3 +274,9 @@
 - 2026-10-11 | Full repository gate passes for private understanding collector and input audit: public structure, Python syntax, links and requested regressions; explicit runtime-dependent skips remain. Paired collection still running separately.
 
 - 2026-10-11 | Actual private paired study complete: 36/36 scored, frozen inputs unchanged. Raw history 14/18 versus selected context 17/18 (EN 7/9 vs 8/9; AR 7/9 vs 9/9). Requested gpt-5.5, reported identity unknown. Zero scope-ID/publication-intent/verified-claim errors. Nine synthetic cases, one trial per condition; no statistical or general-delivery claim. PR #16 opened from gated commit 06401c9.
+
+- 2026-10-11 | Actual first ledgerline run preserved: billing verified, planning generation failed container acceptance, report correctly blocked; worker overlap confirmed. Reused helper source now declared in billing/planning/report generation inputs; 38 example tests pass (3 runtime-dependent skips). Independent closure-corrected project created for a separate real attempt.
+
+- 2026-10-11 | Contract alignment: invalid-input grader now checks required ValueError without undocumented wording; public cycle contract explicitly repeats start ID at end. Alternate valid error wording accepted, RuntimeError rejected. Full Docker example suite passes 39 tests. Separate bound agency-ledgerline-contract-20261011 actual coordinator attempt started, prior three failures retained.
+
+- 2026-10-11 | Live contract-aligned coordinator interim: billing and planning verified by actual container acceptance; report running after merged ancestors, worker overlap confirmed. Full combined delivery remains pending; previous three attempts preserved.

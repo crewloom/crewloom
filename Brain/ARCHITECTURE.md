@@ -56,3 +56,7 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - Understanding offline verification now audits each generated prompt against independently declared required record IDs and exact source/scope data; grading expectations remain excluded from prompts. Live collection must reuse this preflight.
 
 - 2026-10-11 | The understanding collector binds canonical project identity and records a shuffled fixed paired plan before generation. Output is restricted to new private evaluation directories; each trial is preserved, failures stop repeated transport attempts, and model identity is explicitly requested.
+
+- 2026-10-11 | Concurrent example generation now declares reused helper implementations as prompt inputs for billing, planning and report. Acceptance tools remain excluded from generation.
+
+- 2026-10-11 | Planning acceptance enforces declared exception types without fixture-specific wording. Cycle representation is explicitly closed in the public generation contract.

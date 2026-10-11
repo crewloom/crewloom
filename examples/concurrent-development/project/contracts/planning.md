@@ -22,7 +22,7 @@ DEFAULT_CAPACITY = 2
 
 def check_capacity(value) -> int       # explicit int; an omitted value uses DEFAULT_CAPACITY
 def checked_tasks(tasks) -> list        # validated {'id','depends_on','priority'} in input order
-def detect_cycle(tasks) -> list        # ids on one cycle in visit order, [] when sound
+def detect_cycle(tasks) -> list        # ids on one cycle in visit order, repeating the starting id at the end; [] when sound
 def depths(tasks) -> dict              # id -> dependency depth; a cycle raises ValueError
 def schedule(tasks, capacity=None) -> dict
 ```
