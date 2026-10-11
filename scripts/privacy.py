@@ -198,6 +198,22 @@ def init(root, task_id=None):
         configured = subprocess.run(['git', 'config', '--get', 'core.hooksPath'], cwd=root,
                                     env=repo_map.git_environment(), capture_output=True, text=True).stdout.strip()
         existing = read_private(root, POLICY, None)
+        configured_path = Path(configured)
+        if configured_path.is_absolute() and configured_path.parts[-3:] == ('.crewloom', 'private', 'hooks') and configured != str(hooks):
+            owner = configured_path.parent.parent.parent.resolve()
+            owner_binding = pb.load_binding(owner)
+            owner_policy = read_private(owner, POLICY, None)
+            wrapper = w.safe_path(owner, '.crewloom/private/hooks/pre-commit', internal=True)
+            common = lambda selected: Path(git(selected, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()).resolve()
+            if owner_binding['project_id'] != pb.load_binding(root)['project_id'] or common(owner) != common(root):
+                raise ValueError('Inherited privacy hook belongs to another project')
+            if not owner_policy or owner_policy.get('scope') != owner_binding or not wrapper.is_file() or wrapper.is_symlink() or not os.access(wrapper, os.X_OK) or w.digest(wrapper.read_bytes()) != owner_policy.get('wrapper_sha256'):
+                raise ValueError('Inherited privacy hook ownership is unknown or changed')
+            # Shared core.hooksPath already guards this linked worktree. Replacing it
+            # with another wrapper could chain the two owned guards into a cycle.
+            return {'status': 'inherited-enabled', 'existing_hooks_preserved': True,
+                    'findings': check(root, role_memory=owner_policy.get('private_role_memory', True),
+                                      extra_origins=read_private(owner, SOURCES, []))}
         if configured == str(hooks):
             if not existing or existing.get('scope') != pb.load_binding(root):
                 raise ValueError('Privacy hook ownership is unknown')

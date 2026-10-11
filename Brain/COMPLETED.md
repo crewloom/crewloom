@@ -256,3 +256,5 @@
 - 2026-10-11 | Review fixes: moved checkout rebind re-homes the owned guard and prior-hook paths; ordinary ignore additions stay unchanged. 17 privacy regressions pass, including clean/private commits after relocation.
 
 - 2026-10-11 | CSS privacy dependency fix: PostCSS 8.5.29 override/lock; known outside-map read is rejected by the new regression (fails with 8.4.31, passes patched). Dashboard 40 tests and production build pass; npm audit reports zero known vulnerabilities.
+
+- 2026-10-11 | Inherited guard reuse: 18 privacy cases pass; repeated parallel setup preserves shared hooksPath and clean commits, while recording an original source in the worktree blocks its commit.

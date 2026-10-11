@@ -45,3 +45,5 @@ The existing frozen context owns delivery of optional project-local user stateme
 Personal data uses `.crewloom/private/` and ignored installed-role memory. User-context sources get private copies and canonical publication-deny registrations; recording enables a chained project hook under the existing lock. The guard scans index objects, including checked temporary indexes, while preserving prior hooks. Publication packets contain explicit files only and never upload. Known-pattern checks do not prove confidentiality.
 
 - 2026-10-11: Dashboard pins PostCSS 8.5.29 through npm overrides so Next resolves a patched CSS processor; regression observes external map reads and must refuse an absolute untrusted sourceMappingURL.
+
+- Linked worktree privacy setup validates/reuses an inherited owned guard instead of replacing shared core.hooksPath; source registrations remain local and the committing worktree is scanned.

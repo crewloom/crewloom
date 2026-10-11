@@ -272,3 +272,5 @@
 - 2026-10-11 | Absolute hooksPath became stale after relocation, and last-line ignore detection duplicated effective rules | Validate/re-home the owned guard during rebind; only later negations trigger ignore repair.
 
 - 2026-10-11 | Next dependency retained PostCSS 8.4.31 with known source-map file-disclosure advisories | Pin patched 8.5.29 without a Next major upgrade; known-violation regression, all dashboard tests/build and clean audit verify compatibility.
+
+- 2026-10-11 | Replacing shared hooksPath from each linked worktree could chain owned guards into a cycle | Validate common Git directory/project/wrapper ownership, reuse the inherited guard and retain worktree-local source registrations.

@@ -81,3 +81,5 @@ Compare the same model on frozen Arabic/English correction and ambiguous-request
 Keep personal preferences as scoped private input data instead of editing distributed role guides. Future publication review can compare selected-file hashes and provenance, but must not convert a clean pattern scan into a claim that arbitrary content is public-safe.
 
 - 2026-10-11 | Use a bounded synthetic outside-file regression when patching disclosure dependencies; validate actual consumer resolution, lockfile, production build and current audit rather than forcing unrelated major upgrades.
+
+- Shared Git configuration needs one validated guard owner; each checkout can keep separate private source registrations without rebuilding a recursive hook chain.

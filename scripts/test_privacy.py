@@ -106,6 +106,33 @@ class PrivacyTests(unittest.TestCase):
         self.assertIsNone(pb.ignore_local_state(self.root))
         self.assertEqual(path.read_bytes(), before)
 
+    def test_parallel_setup_reuses_the_owned_guard_without_chaining_cycles(self):
+        p.init(self.root)
+        configured = self.git('config', '--get', 'core.hooksPath').stdout.strip()
+        self.git('add', 'code.py', 'crewloom.project.json', '.gitignore')
+        self.git('commit', '-m', 'parallel base')
+        folder = tempfile.TemporaryDirectory(); self.addCleanup(folder.cleanup)
+        other = Path(folder.name).resolve() / 'parallel'
+        self.git('worktree', 'add', '-b', 'parallel-setup', str(other))
+        pb.bootstrap(other, project_id='privacy-fixture')
+        self.assertEqual(p.init(other)['status'], 'inherited-enabled')
+        self.assertEqual(self.git('config', '--get', 'core.hooksPath').stdout.strip(), configured)
+        self.assertEqual(p.init(self.root)['status'], 'already-enabled')
+        (other / 'clean.py').write_text('value = 1\n')
+        def run(*args):
+            return subprocess.run(['git', *args], cwd=other, capture_output=True, text=True,
+                                  env=repo_map.git_environment(), timeout=30)
+        self.assertEqual(run('add', 'clean.py').returncode, 0)
+        clean = run('commit', '-m', 'accept parallel clean')
+        self.assertEqual(clean.returncode, 0, clean.stdout + clean.stderr)
+        (other / 'snippet.txt').write_text('Private parallel excerpt')
+        p.source_snapshot(other, 'snippet.txt', b'Private parallel excerpt')
+        self.assertEqual(self.git('config', '--get', 'core.hooksPath').stdout.strip(), configured)
+        self.assertEqual(run('add', 'snippet.txt').returncode, 0)
+        bad = run('commit', '-m', 'reject parallel source')
+        self.assertNotEqual(bad.returncode, 0)
+        self.assertIn('private path', bad.stdout + bad.stderr)
+
     def test_existing_pre_commit_and_other_hooks_are_preserved(self):
         hooks = self.root / '.githooks'; hooks.mkdir()
         previous = hooks / 'pre-commit'

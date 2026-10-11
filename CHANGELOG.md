@@ -65,3 +65,5 @@ Added `crewloom user-context` for project-local quoted statements, assumptions, 
 Added private source copies, automatic chained Git protection for new user context, private installed-role memory ignores and `crewloom privacy` setup/check/export. Selected export packets are local and owner-readable; existing tracked files and history are retained for explicit review.
 
 - Patched dashboard PostCSS through a locked 8.5.29 override; regression refuses an untrusted external source map without reading its file.
+
+- Reuse validated inherited privacy guards across linked worktrees instead of chaining owned wrappers recursively.
