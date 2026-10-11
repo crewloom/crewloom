@@ -27,7 +27,7 @@ crewloom project enter --project /path/to/project --project-id registered-id \
   --task-id improve-output --role context-guardian --seed request.txt
 ```
 
-Arabic text works in the same commands. A statement must preserve its exact quote. A paraphrase or inferred preference requires `--kind assumption`. Re-recording the same user/key/task explicitly supersedes the previous record and retains it. A task-specific value overrides the project-wide value of the same key. Project-wide records require no active task reservation; finish or cancel the current task before recording them without `--task-id`.
+Arabic text works in the same commands. A statement must preserve its exact quote. A paraphrase or inferred preference requires `--kind assumption`. Re-recording the same user/key/task/kind supersedes the previous record of that kind and retains its history. Quoted statements and assumptions use separate revision streams: a new hypothesis never erases a quoted statement. Task-specific records override project-wide records within the same kind. Both selected kinds retain their source/freshness checks. Historical cross-kind supersedes links are preserved, but selection treats the kinds independently. Project-wide records require no active task reservation; finish or cancel the current task before recording them without `--task-id`.
 
 A contract keeps the goal, constraints, acceptance and optional repeated `--question` fields. Unresolved questions block selection and project entry. Resolve them by recording a revised contract; previous contracts remain in history. Questions are supplied explicitly: this implementation does not automatically detect every ambiguity in natural language.
 

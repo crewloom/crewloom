@@ -85,3 +85,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - Shared Git configuration needs one validated guard owner; each checkout can keep separate private source registrations without rebuilding a recursive hook chain.
 
 - 2026-10-11 | Keep a whole-response primary metric alongside per-field errors so a wrong project cannot hide behind seven correct fields. Distinguish intent classification from authenticated execution authority and preserve failed/unavailable trials.
+
+- A newer hypothesis is not an explicit quoted correction. Carry contradictory interpretations as labelled evidence rather than erasing prior quotes or silently declaring them facts. Audit rubric semantics before the first model call.

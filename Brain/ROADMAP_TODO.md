@@ -171,3 +171,5 @@
 - 2026-10-11 [x] Reuse inherited privacy guards during parallel task setup and source recording.
 
 - 2026-10-11 [x] Prepare pinned bilingual understanding contracts and reject known wrong/malformed responses; [ ] implement private bound-project collection, freeze/run all 32 planned trials per selected available host, and measure field-level errors before claiming model improvement.
+
+- 2026-10-11 [x] Preserve quoted evidence across later hypotheses and refreeze nine-scenario understanding protocol before provider calls; planned collection is 36 trials per selected host, superseding the earlier eight-scenario preparation checkpoint.

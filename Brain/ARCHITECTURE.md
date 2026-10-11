@@ -50,3 +50,5 @@ Personal data uses `.crewloom/private/` and ignored installed-role memory. User-
 
 ### 2026-10-11 — Understanding pilot preparation
 The existing bilingual evaluator owns pinned synthetic understanding contracts, strict per-field grading and prompts that exclude held-out answers. Raw-history and selected-context arms reuse the production user/task correction selector. Full runtime selection still validates binding and source freshness. Offline contract verification performs no provider calls and grants no action permission.
+
+- User-context revisions and selection now separate quoted statements from assumptions. Task/global precedence applies within each kind; both kinds retain binding/freshness checks and enter managed/native payloads with explicit uncertainty.

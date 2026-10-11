@@ -173,7 +173,7 @@ class InstalledDistributionTests(unittest.TestCase):
         result = self.crewloom('evaluate-bilingual', '--verify-understanding')
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
-        self.assertEqual(report['cases'], 8)
+        self.assertEqual(report['cases'], 9)
         self.assertEqual(report['model_trials'], 0)
         self.assertFalse(report['model_improvement_measured'])
         self.assertEqual(len(report['fixture_sha256']), 64)

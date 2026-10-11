@@ -260,3 +260,5 @@
 - 2026-10-11 | Inherited guard reuse: 18 privacy cases pass; repeated parallel setup preserves shared hooksPath and clean commits, while recording an original source in the worktree blocks its commit.
 
 - 2026-10-11 | Understanding protocol preparation: eight bilingual synthetic scenarios, two arms, pinned fixture, strict grader and installed CLI contract verification. Nine evaluator tests (one optional Docker skip) exercise 64 single-field corruptions plus malformed responses; 14 user-context regressions pass after selector reuse. Live collection/model improvement remains unmeasured.
+
+- 2026-10-11 | Fixed two reproduced statement-loss cases: later same-key or task-specific hypotheses no longer erase quoted statements; same-kind corrections preserve correct supersedes links. Sixteen user-context cases pass, including managed/native delivery of both kinds. Understanding preparation explicitly refrozen before any model trial: nine scenarios (36 planned trials/host), corrected request-intent/missing-language labels, 72 single-field corruptions plus malformed responses rejected. Live quality comparison remains pending.
