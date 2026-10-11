@@ -165,3 +165,7 @@
 ### 2026-10-11 — Privacy and publication
 - [x] Private source copies, installed-role memory ignores, chained index guard and explicit file-selection packets.
 - [ ] Audit any pre-existing uploaded private history only for an explicitly selected repository; no history rewriting or automatic credential rotation.
+
+- 2026-10-11 [x] Patch dashboard CSS source-map dependency and add outside-file read regression; audit clean at verification time.
+
+- 2026-10-11 [x] Reuse inherited privacy guards during parallel task setup and source recording.
