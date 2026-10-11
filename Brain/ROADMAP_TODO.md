@@ -193,3 +193,5 @@
 - 2026-10-11 | [ ] Finish existing coordinator 31486 and combined integration verification, inspect actual candidate diff, then review/publish local delivery. Gate source helper closure/contract alignment and recheck PR #16 exact-head CI.
 
 - 2026-10-11 | [ ] Poll actual reportfix batch 3732, run combined acceptance and inspect exact generated diff. Gate/publish report contract alignment and source helper closure; full agency objective still pending.
+
+- 2026-10-11 | [x] Correct combined refusal contract and verify real generated modules in isolated container; [ ] gate/publish alignment, rebuild reviewed coordinator acceptance under corrected frozen inputs, and prove correction/resumption plus independent project isolation before full agency claim.

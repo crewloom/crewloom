@@ -300,6 +300,20 @@ class SetupRefusalTests(unittest.TestCase):
 
 
 class ApplicationSemanticsTests(unittest.TestCase):
+    def test_combined_unknown_field_checks_named_key_without_fixed_phrase(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / 'project'; shutil.copytree(self.root, root)
+            path = root / 'src/report.py'
+            varied = path.read_text().replace('unknown report input fields', 'Unrecognized fields')
+            path.write_text(varied)
+            command = [sys.executable, '-c', "import json,runpy; m=runpy.run_path('tools/check_combined.py'); print(json.dumps(m['refusals']()))"]
+            good = subprocess.run(command, cwd=root, capture_output=True, text=True, check=True)
+            self.assertEqual(json.loads(good.stdout)['an_unknown_payload_field_is_refused'],
+                             {'returncode': 2, 'no_report': True, 'names_cause': True})
+            path.write_text(varied.replace("'Unrecognized fields: ' + ', '.join(sorted(unknown))", "'Unrecognized fields'"))
+            bad = subprocess.run(command, cwd=root, capture_output=True, text=True, check=True)
+            self.assertFalse(json.loads(bad.stdout)['an_unknown_payload_field_is_refused']['names_cause'])
+
     def test_report_refusals_allow_wording_but_require_unknown_field_name(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / 'project'

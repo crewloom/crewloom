@@ -296,3 +296,5 @@
 - 2026-10-11 | Feedback repair fixed normalized-input revalidation; two remaining failures exposed closed-cycle ambiguity and hidden twice error substring. Clarify cycle contract and validate exception type rather than wording; independent regression rejects wrong exception type.
 
 - 2026-10-11 | Five report acceptance failures included undisclosed exact translation/message requirements. Publish exact title copy as model input and grade error semantics rather than undocumented phrases; keep numerical/immutability/CLI checks unchanged.
+
+- 2026-10-11 | Integration checker retained an undocumented unknown report input fields phrase after per-task report grading was corrected. Check offending key while retaining exit2/no-output assertions; regression rejects missing key and independent actual-byte verification passes.

@@ -282,3 +282,5 @@
 - 2026-10-11 | Live contract-aligned coordinator interim: billing and planning verified by actual container acceptance; report running after merged ancestors, worker overlap confirmed. Full combined delivery remains pending; previous three attempts preserved.
 
 - 2026-10-11 | Report contract exposes exact bilingual title resources. Report refusal grading accepts legitimate wording but requires unknown-field naming; regression accepts alternate messages and rejects missing field name. Full Docker example suite passes 40 tests. Separate actual report-fix batch started; previous failures preserved.
+
+- 2026-10-11 | Combined unknown-field check now requires actual offending key extra rather than hidden phrase. Alternate error wording accepted; missing key name rejected. Full Docker example suite passes 41 tests. Actual generated integration bytes separately reverified with corrected grader in network-free read-only container: combined 13/13 and helpers 16/16. Original failed prepare unchanged; coordinator publication not yet approved.

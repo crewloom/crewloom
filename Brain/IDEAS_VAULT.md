@@ -103,3 +103,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | Repair feedback must distinguish genuine behavioral defects from grader requirements absent from the public contract; preserve prior reports rather than silently rescoring them.
 
 - 2026-10-11 | Public copy resources and semantic refusal checks make failures actionable without weakening required invalid-input or unknown-field behavior.
+
+- 2026-10-11 | Compare equivalent per-task and integration contracts to catch duplicate hidden wording requirements; retain separately identified re-verification rather than rewriting failed prepare.
