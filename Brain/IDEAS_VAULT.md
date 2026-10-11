@@ -101,3 +101,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | Contract prose does not replace actual reused helper code. Include existing runtime dependencies in generation input closure and preserve original failed attempts.
 
 - 2026-10-11 | Repair feedback must distinguish genuine behavioral defects from grader requirements absent from the public contract; preserve prior reports rather than silently rescoring them.
+
+- 2026-10-11 | Public copy resources and semantic refusal checks make failures actionable without weakening required invalid-input or unknown-field behavior.

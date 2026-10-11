@@ -191,3 +191,5 @@
 - 2026-10-11 | [ ] Poll live contract-aligned attempt session 31486, inspect combined acceptance and exact diff; gate/publish source closure and contract alignment separately after PR #16 review fixes pass CI.
 
 - 2026-10-11 | [ ] Finish existing coordinator 31486 and combined integration verification, inspect actual candidate diff, then review/publish local delivery. Gate source helper closure/contract alignment and recheck PR #16 exact-head CI.
+
+- 2026-10-11 | [ ] Poll actual reportfix batch 3732, run combined acceptance and inspect exact generated diff. Gate/publish report contract alignment and source helper closure; full agency objective still pending.

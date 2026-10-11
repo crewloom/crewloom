@@ -300,6 +300,25 @@ class SetupRefusalTests(unittest.TestCase):
 
 
 class ApplicationSemanticsTests(unittest.TestCase):
+    def test_report_refusals_allow_wording_but_require_unknown_field_name(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / 'project'
+            shutil.copytree(self.root, root)
+            path = root / 'src/report.py'
+            original = path.read_text()
+            varied = original.replace('unknown report input fields', 'Unrecognized fields').replace(
+                'report input must be a JSON object', 'Invalid document type')
+            path.write_text(varied)
+            good = subprocess.run([sys.executable, 'tools/check_report.py'], cwd=root,
+                                  capture_output=True, text=True)
+            self.assertEqual(good.returncode, 0, good.stdout + good.stderr)
+            path.write_text(varied.replace("'Unrecognized fields: ' + ', '.join(sorted(unknown))",
+                                           "'Unrecognized fields'"))
+            bad = subprocess.run([sys.executable, 'tools/check_report.py'], cwd=root,
+                                 capture_output=True, text=True)
+            self.assertNotEqual(bad.returncode, 0)
+            self.assertIn('unknown_payload_field_is_refused', bad.stdout + bad.stderr)
+
     def test_refusal_grader_accepts_other_wording_but_rejects_wrong_exception_type(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / 'project'

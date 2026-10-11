@@ -280,3 +280,5 @@
 - 2026-10-11 | Contract alignment: invalid-input grader now checks required ValueError without undocumented wording; public cycle contract explicitly repeats start ID at end. Alternate valid error wording accepted, RuntimeError rejected. Full Docker example suite passes 39 tests. Separate bound agency-ledgerline-contract-20261011 actual coordinator attempt started, prior three failures retained.
 
 - 2026-10-11 | Live contract-aligned coordinator interim: billing and planning verified by actual container acceptance; report running after merged ancestors, worker overlap confirmed. Full combined delivery remains pending; previous three attempts preserved.
+
+- 2026-10-11 | Report contract exposes exact bilingual title resources. Report refusal grading accepts legitimate wording but requires unknown-field naming; regression accepts alternate messages and rejects missing field name. Full Docker example suite passes 40 tests. Separate actual report-fix batch started; previous failures preserved.

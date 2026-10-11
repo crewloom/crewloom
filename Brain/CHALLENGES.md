@@ -294,3 +294,5 @@
 - 2026-10-11 | Generated planning repeatedly validated normalized tuple dependencies through list-only helper and failed 13 checks. Generation saw helper prose but omitted actual helper implementations; add source closure without leaking acceptance tools or modifying baseline evidence.
 
 - 2026-10-11 | Feedback repair fixed normalized-input revalidation; two remaining failures exposed closed-cycle ambiguity and hidden twice error substring. Clarify cycle contract and validate exception type rather than wording; independent regression rejects wrong exception type.
+
+- 2026-10-11 | Five report acceptance failures included undisclosed exact translation/message requirements. Publish exact title copy as model input and grade error semantics rather than undocumented phrases; keep numerical/immutability/CLI checks unchanged.

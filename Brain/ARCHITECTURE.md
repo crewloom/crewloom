@@ -60,3 +60,5 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-11 | Concurrent example generation now declares reused helper implementations as prompt inputs for billing, planning and report. Acceptance tools remain excluded from generation.
 
 - 2026-10-11 | Planning acceptance enforces declared exception types without fixture-specific wording. Cycle representation is explicitly closed in the public generation contract.
+
+- 2026-10-11 | Report titles are explicit bilingual contract resources. Invalid payload acceptance checks required ValueError and named unknown key, rather than fixture-specific messages.
