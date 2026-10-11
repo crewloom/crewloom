@@ -274,3 +274,5 @@
 - 2026-10-11 | Full repository gate passes for private understanding collector and input audit: public structure, Python syntax, links and requested regressions; explicit runtime-dependent skips remain. Paired collection still running separately.
 
 - 2026-10-11 | Actual private paired study complete: 36/36 scored, frozen inputs unchanged. Raw history 14/18 versus selected context 17/18 (EN 7/9 vs 8/9; AR 7/9 vs 9/9). Requested gpt-5.5, reported identity unknown. Zero scope-ID/publication-intent/verified-claim errors. Nine synthetic cases, one trial per condition; no statistical or general-delivery claim. PR #16 opened from gated commit 06401c9.
+
+- 2026-10-11 | PR #16 review fixes: freeze actual evaluate_hosts grader and audit exact ordered records per arm rather than subsets. Fourteen evaluator tests pass (one optional Docker skip), including grader mutation invalidation and obsolete-selected/missing-raw rejection. Original live pilot predates grader fingerprint and is supporting evidence only.

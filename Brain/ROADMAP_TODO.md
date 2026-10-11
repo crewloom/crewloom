@@ -185,3 +185,5 @@
 - 2026-10-11 | [x] Complete actual paired collection and inspect field errors; [ ] review/merge PR #16, deploy verified collector, diagnose remaining clarification error and prove harder specialist multi-file delivery.
 
 - 2026-10-11 [ ] Execute practical agency acceptance in documentation/AGENCY_ACCEPTANCE.md: bound concurrent projects, source-linked discovery, multi-file implementation, independent specialist QA, correction/resumption and reviewed private/public delivery.
+
+- 2026-10-11 | [ ] Gate/push PR #16 review fixes and recheck final-head CI. Preserve old study limitations; practical planning repair has two remaining acceptance mismatches requiring contract/grader audit.

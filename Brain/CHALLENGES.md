@@ -290,3 +290,5 @@
 - 2026-10-11 | One selected-context English publication-classification response requested unnecessary clarification; preserve the failing trial and audit request/grading semantics before changing the benchmark.
 
 - 2026-10-11 | Audited remaining selected-context failure: deployment_environment requested during publication classification, although execution was explicitly excluded. Keep baseline score and target current-action clarification in the next separately identified evaluation.
+
+- 2026-10-11 | Review found missing grader fingerprint and subset-only prompt audit; add grader to frozen inputs and require exact record sequences. Regressions reproduce both invalid conditions. Earlier trial report cannot retroactively prove a grader mutation check it did not run.

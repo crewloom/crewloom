@@ -171,7 +171,9 @@ def audit_understanding_inputs(case, language, arm, prompt):
     originals = {record['id']: record for record in case['records']}
     supplied = payload['records']
     ids = [record['id'] for record in supplied]
-    if len(ids) != len(set(ids)) or not set(UNDERSTANDING_REQUIRED_RECORDS[case['id']]).issubset(ids):
+    expected_ids = (list(originals) if arm == 'raw-history'
+                    else list(UNDERSTANDING_REQUIRED_RECORDS[case['id']]))
+    if ids != expected_ids:
         raise ValueError('Understanding prompt lost required source evidence')
     for record in supplied:
         original = originals.get(record['id'])
@@ -230,7 +232,7 @@ def run_understanding(project, output, hosts, models, timeout=120, seed=20261011
                     prepared.append({'host': host, 'case': case['id'], 'language': language,
                                      'arm': arm, 'prompt': prompt})
     random.Random(seed).shuffle(prepared)
-    paths = [Path(__file__), Path(model_host.__file__), Path(user_context.__file__),
+    paths = [Path(__file__), Path(model_host.__file__), Path(user_context.__file__), Path(grading.__file__),
              resources.distribution_root() / UNDERSTANDING]
     def fingerprints():
         return {str(path): w.digest(path.read_bytes()) for path in paths}
