@@ -268,3 +268,4 @@
 - Fix: Private source snapshots/registrations, role-memory ignores, chained index-object guard and explicit export selection. Batched object scanning avoids per-file subprocess overhead.
 - Boundary: Existing uploaded history and unknown secrets require separate review; private edits to tracked public code must be separated into local input/override data rather than hidden with Git flags.
 - 2026-10-11 | Ignored role memory vanished in new coordinator worktrees, blocking model execution | Initialize independent local memory from public templates while preserving guides/existing lessons; root private lessons are not copied. Regression uses a private root marker.
+- 2026-10-11 | Git worktrees inherit core.hooksPath | Resolve the committing worktree, verify common Git directory and bound project identity, scan its own index and run prior hooks there; root source registrations remain protected.

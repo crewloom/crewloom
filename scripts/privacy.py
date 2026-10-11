@@ -100,9 +100,9 @@ def private_name(name, origins=(), role_memory=True):
                for prefix in ('.agents', '.claude', '.opencode'))
 
 
-def check(root, names=None, role_memory=True):
+def check(root, names=None, role_memory=True, extra_origins=()):
     """Read the actual index blobs, including forced additions and already tracked private paths."""
-    origins = read_private(root, SOURCES, [])
+    origins = [*read_private(root, SOURCES, []), *extra_origins]
     indexed = git(root, 'ls-files', '--stage', '-z').decode().split('\0')
     if len(indexed) > 10001:
         raise ValueError('Privacy index exceeds 10000 records; explicit review required')
@@ -237,14 +237,22 @@ def hook(root):
     policy = read_private(root, POLICY, None)
     if not policy or policy.get('scope') != pb.load_binding(root):
         raise ValueError('Privacy hook project binding changed')
-    findings = check(root, role_memory=policy.get('private_role_memory', True))
+    selected = Path(git(Path.cwd(), 'rev-parse', '--show-toplevel').decode().strip()).resolve()
+    extra_origins = ()
+    if selected != root:
+        owner_common = Path(git(root, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()).resolve()
+        selected_common = Path(git(selected, 'rev-parse', '--path-format=absolute', '--git-common-dir').decode().strip()).resolve()
+        if selected_common != owner_common or pb.load_binding(selected)['project_id'] != policy['scope']['project_id']:
+            raise ValueError('Inherited privacy hook belongs to another project')
+        extra_origins = read_private(root, SOURCES, [])
+    findings = check(selected, role_memory=policy.get('private_role_memory', True), extra_origins=extra_origins)
     if findings:
         return {'status': 'rejected', 'findings': findings}, 2
     previous = policy.get('previous_pre_commit')
     if previous:
         if not Path(previous).is_file() or not os.access(previous, os.X_OK):
             raise ValueError('Previous pre-commit disappeared or is not executable')
-        result = subprocess.run([previous], cwd=root, env=os.environ.copy(), check=False)
+        result = subprocess.run([previous], cwd=selected, env=os.environ.copy(), check=False)
         if result.returncode:
             return {'status': 'previous-hook-rejected'}, result.returncode
     return {'status': 'accepted'}, 0

@@ -252,3 +252,4 @@
 - Impact: Forced private additions blocked, original sources registered, prior hooks preserved and selected ZIP packets owner-only.
 - Evidence: Real bad commit rejected and clean commit accepted; user-context 14 cases, installation 6 cases, binding 38 cases and repository-gate 20 cases pass. Privacy-specific regressions: 14 cases cover the private commit/publication boundaries. No history rewrite, repository-visibility change or universal secret detection claimed.
 - 2026-10-11 | Coordinator privacy compatibility: isolated task worktrees seed missing role memory without copying private root lessons; real scope-hook fixture includes privacy dependencies.
+- 2026-10-11 | Privacy acceptance: 15 regressions include clean/private commits in an independently bound linked worktree; 49 coordinator cases (17 optional skips), 29 scope and 11 real distribution cases pass.

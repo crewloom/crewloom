@@ -52,6 +52,28 @@ class PrivacyTests(unittest.TestCase):
         self.git('add', 'code.py')
         self.assertEqual(self.git('commit', '-m', 'public code', check=False).returncode, 0)
 
+    def test_inherited_guard_checks_the_bound_worktree_index(self):
+        p.init(self.root)
+        self.git('add', 'code.py', 'crewloom.project.json', '.gitignore')
+        self.git('commit', '-m', 'public base')
+        worktree_folder = tempfile.TemporaryDirectory(); self.addCleanup(worktree_folder.cleanup)
+        other = Path(worktree_folder.name).resolve() / 'parallel'
+        self.git('worktree', 'add', '-b', 'parallel', str(other))
+        pb.bootstrap(other, project_id='privacy-fixture')
+        (other / 'second.py').write_text('value = 2\n')
+        def run(*args):
+            return subprocess.run(['git', *args], cwd=other, capture_output=True, text=True,
+                                  env=repo_map.git_environment())
+        self.assertEqual(run('add', 'second.py').returncode, 0)
+        result = run('commit', '-m', 'task public code')
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        p.private_write(other, '.crewloom/private/note.txt', b'private task')
+        self.assertEqual(run('add', '-f', '.crewloom/private/note.txt').returncode, 0)
+        result = run('commit', '-m', 'reject task private')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('private path', result.stdout + result.stderr)
+        self.assertFalse((self.root / 'second.py').exists())
+
     def test_existing_pre_commit_and_other_hooks_are_preserved(self):
         hooks = self.root / '.githooks'; hooks.mkdir()
         previous = hooks / 'pre-commit'
