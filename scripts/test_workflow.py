@@ -293,6 +293,63 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(result['status'],'complete')
         self.assertEqual(result['completed']['build']['reviewer'],'reviewer-a')
 
+    def test_agent_packet_is_portable_bound_and_does_not_accept_or_generate(self):
+        import crewloom
+        import project_binding as pb
+        import model_host as mh
+        pb.bootstrap(self.root, project_id='packet-project', mode='off')
+        _, errors = crewloom.install_skills(self.root, 'agents', ['fullstack-mvp-engineer'], False)
+        self.assertFalse(errors)
+        self.plan['steps'][0]['kind'] = 'task'; self.plan['steps'][0].pop('argv')
+        self.plan['language'] = 'ar'
+        plan, fingerprint = self.write_plan()
+        with self.assertRaisesRegex(ValueError, 'awaiting task'):
+            w.agent_packet(self.root, plan, fingerprint)
+        self.assertEqual(w.run(self.root, plan, fingerprint, 'image')['status'], 'awaiting_task')
+        state_path = w.runtime(self.root, plan['id'])/'state.json'
+        original = state_path.read_bytes()
+        with patch.object(mh, 'generate') as generate:
+            packet = w.agent_packet(self.root, plan, fingerprint)
+            generate.assert_not_called()
+        self.assertEqual(packet['project_id'], 'packet-project')
+        self.assertEqual(packet['checkout_id'], pb.load_binding(self.root)['checkout_id'])
+        self.assertEqual(packet['input_sha256'], w.hashes(self.root, ['input.txt']))
+        self.assertEqual(packet['prompt_sha256'], w.digest(packet['prompt'].encode()))
+        self.assertIn('"language":"ar"', packet['prompt'])
+        self.assertEqual(packet['response_schema'], mh.SCHEMA)
+        self.assertFalse(packet['execution_verified'])
+        self.assertEqual(state_path.read_bytes(), original)
+        self.assertFalse((self.root/'output.txt').exists())
+        # A source changing while the packet is assembled is refused, not exported.
+        build = mh.build_prompt
+        def mutate(*args, **kwargs):
+            prompt = build(*args, **kwargs)
+            (self.root/'input.txt').write_text('changed')
+            return prompt
+        with patch.object(mh, 'build_prompt', side_effect=mutate), self.assertRaisesRegex(ValueError, 'inputs or binding changed'):
+            w.agent_packet(self.root, plan, fingerprint)
+        w.cancel(self.root, plan, fingerprint)
+        with self.assertRaisesRegex(ValueError, 'awaiting task'):
+            w.agent_packet(self.root, plan, fingerprint)
+
+
+    def test_agent_packet_enforced_context_refuses_stale_sources(self):
+        import crewloom
+        import project_binding as pb
+        subprocess.run(['git', 'init', '-q'], cwd=self.root, env=repo_map.git_environment(), check=True)
+        pb.bootstrap(self.root, project_id='packet-enforced', mode='enforced')
+        _, errors = crewloom.install_skills(self.root, 'agents', ['fullstack-mvp-engineer'], False)
+        self.assertFalse(errors)
+        self.plan['steps'][0]['kind'] = 'task'; self.plan['steps'][0].pop('argv')
+        plan, fingerprint = self.write_plan()
+        self.assertEqual(w.run(self.root, plan, fingerprint, 'image')['status'], 'awaiting_task')
+        packet = w.agent_packet(self.root, plan, fingerprint)
+        self.assertIn('"project_context":', packet['prompt'])
+        self.assertIn('packet-enforced', packet['prompt'])
+        (self.root/'input.txt').write_text('obsolete source')
+        with self.assertRaisesRegex(ValueError, 'stale'):
+            w.agent_packet(self.root, plan, fingerprint)
+
     def test_task_actions_need_explicit_project(self):
         import contextlib,io
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as error:w.main(['run'])

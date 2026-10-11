@@ -316,3 +316,5 @@
 - 2026-10-11 | Final merge audit found an overbroad DOTALL conflict-marker expression had omitted owned appended memory. Restore full ef25e9e memory and retain both reviewed-main and local-profile additions; assert original lines remain before regenerating the manifest. Code changes were unaffected. Narrowed real OpenCode cloud diagnostic also returned FreeTierError; preserve both transport failures and stop repeats.
 
 - 2026-10-11 | Bounded/single-link did not establish provider file confidentiality. Enforce current-user ownership and owner-only POSIX modes instead of silently accepting typical022-umask files; preserve native ACL limitations.
+
+- 2026-10-12 | Local OpenCode provider setup was mistaken for a restriction of all Crewloom improvement features. Separate supported automatic model adapters from portable external-agent task contracts; keep review, context freshness and command verification independent of agent brand. External reply import and automatic repair require a reviewed adapter, not an unsupported host label.

@@ -94,3 +94,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-11 | PR #16 review tightened grader/arm immutability; original pilot remains a limited observation. Practical repair improved planning but uncovered undocumented grader requirements, so agency acceptance remains pending.
 
 - 2026-10-11 | Flexible OpenCode selection now supports private loopback provider contracts without merging global host configuration. Actual protocol compatibility is demonstrated; actual weak-model or Claude-level capability is not.
+
+- 2026-10-12 | Crewloom improvement contracts now include portable task-packet export for external agents alongside five automatic model adapters. Export shares scoped context and evidence rules but grants no execution/acceptance authority; arbitrary automatic host dispatch remains unsupported.

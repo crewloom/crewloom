@@ -113,3 +113,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-11 | Freeze transitive scoring dependencies as well as prompts; exact arm inventory protects distractors and obsolete-record exclusion.
 
 - 2026-10-11 | Keep portable workflows separate from machine-local model endpoints. Evaluate capability by actual valid artifacts and unchanged acceptance rather than model names, context-window advertising or a successful catalogue lookup.
+
+- 2026-10-12 | Evaluate new agent integrations against the portable packet contract before adding automatic dispatch: exact project binding, schema-valid declared artifacts, fresh inputs, preserved failed attempts and independent verification. Contract availability alone proves no model quality gain.

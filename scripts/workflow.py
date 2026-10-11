@@ -727,6 +727,48 @@ def handoff(root, plan, state):
             'instruction': 'Read the selected role and project memory; retain this root and verify every supplied artifact.'}
 
 
+def agent_packet(root, plan, fingerprint):
+    """Portable text-generation contract for an external agent; never dispatch or accept."""
+    import project_binding as pb
+    import project_context as pc
+    import model_host as mh
+    binding = pb.load_binding(root)
+    pb.catalog_guard(root, binding['project_id'])
+    with project_lock(safe_path(root, '.crewloom', internal=True), reentrant=True):
+        _, state = state_for(root, plan, fingerprint)
+        transfer = handoff(root, plan, state)
+        step = transfer['next_step']
+        if state['status'] != 'awaiting_task' or not step or step.get('kind') != 'task':
+            raise ValueError('Agent packet requires the next awaiting task; run the workflow first')
+        reservation = active_workflow(root)
+        if not reservation or reservation['workflow'] != plan['id'] or reservation['plan_sha256'] != fingerprint:
+            raise ValueError('Agent packet requires this workflow reservation')
+        context = pc.require_fresh(root, binding, plan['id']) if mh.pc_path_exists(root, plan['id']) else None
+        if lifecycle_mode(root) == 'enforced' and context is None:
+            raise ValueError('Agent packet requires fresh managed project context')
+        if context is not None and not mh._generation_matches(context, sorted(step['inputs']), step['role']):
+            raise ValueError('Agent packet context does not match the next task scope')
+        before = hashes(root, step['inputs'])
+        prompt = mh.build_prompt(root, step, plan.get('language', 'en'), plan['id'], context)
+        if hashes(root, step['inputs']) != before or pb.load_binding(root) != binding:
+            raise ValueError('Agent packet inputs or binding changed during preparation')
+        if context is not None and pc.require_fresh(root, binding, plan['id']) != context:
+            raise ValueError('Agent packet context changed during preparation')
+        if mh.build_prompt(root, step, plan.get('language', 'en'), plan['id'], context) != prompt:
+            raise ValueError('Agent packet guidance changed during preparation')
+        return {'schema_version': 1, 'kind': 'crewloom-agent-packet',
+                'project_id': binding['project_id'], 'checkout_id': binding['checkout_id'],
+                'project_root': str(root), 'workflow': plan['id'], 'step': step['id'],
+                'plan_sha256': fingerprint, 'input_sha256': before,
+                'prompt': prompt, 'prompt_sha256': digest(prompt.encode()),
+                'response_schema': mh.SCHEMA, 'outputs': step['outputs'],
+                'handoff': transfer, 'execution_verified': False,
+                'instruction': 'Deliver this prompt and response schema to your chosen agent. '
+                               'Packet delivery grants no tool permission. Validate returned artifacts '
+                               'and current inputs before authorized writes; use existing task review '
+                               'and command verification. Never treat generation as acceptance.'}
+
+
 def binding_id(root):
     """Project and checkout identity for executor evidence correlation, when this project is bound."""
     path = safe_path(root, '.crewloom/binding.json', internal=True)
@@ -1335,7 +1377,7 @@ def doctor(image, root=None, host=None, model_host=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('run', 'status', 'handoff', 'accept', 'cancel', 'doctor', 'prepare-repair', 'repair'))
+    parser.add_argument('action', choices=('run', 'status', 'handoff', 'agent-packet', 'accept', 'cancel', 'doctor', 'prepare-repair', 'repair'))
     parser.add_argument('--project', help='Explicit canonical project root; required for task actions')
     parser.add_argument('--plan', default='workflow.json')
     parser.add_argument('--image', default=DEFAULT_IMAGE)
@@ -1371,6 +1413,8 @@ def main(argv=None):
             plan, fingerprint = read_plan(root, args.plan)
             if args.action in ('status', 'handoff'):
                 _, state = state_for(root, plan, fingerprint); result = handoff(root, plan, state)
+            elif args.action == 'agent-packet':
+                result = agent_packet(root, plan, fingerprint)
             elif args.action == 'cancel':
                 result = cancel(root, plan, fingerprint, args.reason or 'operator request')
             else:
@@ -1380,7 +1424,7 @@ def main(argv=None):
                 result = run(root, plan, fingerprint, args.image, args.step if args.action == 'accept' else None,
                              args.reviewer, args.allow_host_cli, token)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return 0 if args.action in ('status', 'handoff', 'accept', 'cancel') or result.get('status') == 'complete' or result.get('isolated_execution_ready') else 2
+        return 0 if args.action in ('status', 'handoff', 'agent-packet', 'accept', 'cancel') or result.get('status') == 'complete' or result.get('isolated_execution_ready') else 2
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         print(json.dumps({'status': 'blocked', 'error': str(exc)}, ensure_ascii=False))
         return 2

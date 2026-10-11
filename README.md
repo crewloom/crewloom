@@ -37,7 +37,7 @@ worktrees and Docker; the automated regression suite substitutes only provider g
 The [controlled context study](documentation/CONTEXT_STUDY.md) measures input tokens, cache usage,
 latency and held-out correctness separately. Missing provider metrics remain unknown.
 
-Use the [software task plan](workflows/software-feature.json) for agent-produced work. Read [execution and failure handling](documentation/EXECUTION.md), [host setup](documentation/HOSTS.md), and [objective evaluation](examples/evaluation/unicode-slug/README.md).
+Use the [software task plan](workflows/software-feature.json) for agent-produced work. Read [execution and failure handling](documentation/EXECUTION.md), [host setup and portable agent packets](documentation/HOSTS.md), and [objective evaluation](examples/evaluation/unicode-slug/README.md).
 
 ## Try local checks in a minute
 
