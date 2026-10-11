@@ -314,3 +314,5 @@
 - 2026-10-11 | Task-scoped OpenCode config intentionally excludes global custom provider definitions. Add an explicit private endpoint/model/byte-budget contract without importing plugins or wider host settings. A real installed-CLI protocol fixture verifies routing; catalogue presence alone did not establish cloud generation availability.
 
 - 2026-10-11 | Final merge audit found an overbroad DOTALL conflict-marker expression had omitted owned appended memory. Restore full ef25e9e memory and retain both reviewed-main and local-profile additions; assert original lines remain before regenerating the manifest. Code changes were unaffected. Narrowed real OpenCode cloud diagnostic also returned FreeTierError; preserve both transport failures and stop repeats.
+
+- 2026-10-11 | Bounded/single-link did not establish provider file confidentiality. Enforce current-user ownership and owner-only POSIX modes instead of silently accepting typical022-umask files; preserve native ACL limitations.

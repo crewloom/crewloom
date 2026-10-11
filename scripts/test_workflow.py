@@ -180,7 +180,7 @@ class WorkflowTests(unittest.TestCase):
                    'base_url': 'http://127.0.0.1:43217/v1', 'models': ['fixture-small'],
                    'prompt_budget_bytes': 65536}
         path = self.root/'.crewloom/private/providers/local.json'
-        path.parent.mkdir(parents=True); path.write_text(json.dumps(profile))
+        path.parent.mkdir(parents=True); path.write_text(json.dumps(profile)); path.chmod(0o600)
         plan['steps'][0].update(host='opencode', model='local/fixture-small',
                                opencode_provider='.crewloom/private/providers/local.json')
         (self.root/'workflow.json').write_text(json.dumps(plan))

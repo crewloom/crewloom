@@ -205,3 +205,5 @@
 - 2026-10-11 | [ ] Gate/push PR #16 review fixes and recheck final-head CI. Preserve old study limitations; practical planning repair has two remaining acceptance mismatches requiring contract/grader audit.
 
 - 2026-10-11 | [x] PR16 merged and stable installed; [x] local-provider routing/profile freshness checks and real OpenCode protocol acceptance; [ ] final merged-head gate, reviewed publication/runtime rollout and actual weak/local-model quality comparison. Failed cloud transport remains preserved, not replaced.
+
+- 2026-10-11 | [x] Initial PR17 nine-check CI and provider ownership regression; [ ] gate/push the reviewed fix, resolve its addressed thread, recheck exact final head, normal merge and runtime installation.

@@ -70,3 +70,5 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-11 | Final repair budget guard counts all model repair requests by original workflow across new IDs and branches. Regression rejects a branch after two requests, an oversized feedback prompt before provider calls and a substituted verifier image. Final Docker workflow31 passes.
 
 - 2026-10-11 | OpenCode model IDs remain explicit provider/model values. Optional opencode_provider references a bounded project-private five-field loopback provider contract; fixed OpenAI-compatible SDK and deny-all host profile remain. Hash enters prompt/generation evidence; changed profiles reject repair, publication and reuse. Byte budgets are not tokenizer or context-capacity estimates.
+
+- 2026-10-11 | Private local-provider readers now reject foreign ownership and any group/other permission bits on POSIX, matching the documented chmod600 contract. Non-POSIX ACL ownership remains unverified.

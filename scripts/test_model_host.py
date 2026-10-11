@@ -70,6 +70,11 @@ class LocalProviderTests(unittest.TestCase):
             path.write_text(json.dumps(self.profile()))
             step = {'host': 'opencode', 'model': 'local/model-small',
                     'opencode_provider': '.crewloom/private/providers/local.json'}
+            if os.name == 'posix':
+                path.chmod(0o644)
+                with self.assertRaisesRegex(ValueError, 'owner-only'):
+                    h.provider_profile(root, step)
+            path.chmod(0o600)
             loaded = h.provider_profile(root, step)
             self.assertEqual(loaded['prompt_budget_bytes'], 16384)
             with self.assertRaises(ValueError):

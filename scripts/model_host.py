@@ -169,6 +169,9 @@ def provider_profile(root, step):
     path = w.safe_path(root, relative, internal=True)
     if not path.is_file() or path.stat().st_nlink != 1 or path.stat().st_size > 16384:
         raise ValueError('Provider profile must be bounded and single-link')
+    info = path.stat()
+    if os.name == 'posix' and (info.st_uid != os.getuid() or info.st_mode & 0o077):
+        raise ValueError('Provider profile must be owner-only (chmod 600) and owned by the current user')
     raw = path.read_bytes(); data = json.loads(raw)
     local_provider_config(data, step.get('model'))
     return {'data': data, 'sha256': w.digest(raw), 'prompt_budget_bytes': data['prompt_budget_bytes']}

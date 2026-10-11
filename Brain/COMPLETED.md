@@ -298,3 +298,5 @@
 - 2026-10-11 | Local OpenCode profile support and English guide added. Model-host33 cases pass with actual OpenCode1.18.32 loopback protocol fixture enabled; workflow32 Docker cases pass, including changed-profile publication/reuse refusal. Separate real opencode/space-bunny-free feature attempt failed transport before producing code; retained privately and not scored as model quality. No actual local inference benchmark or universal improvement claim.
 
 - 2026-10-11 | Mandatory merged-source hook passed public structure, syntax, links and all requested regressions. Memory history repaired and revalidated before final PR readiness; final documentation-only commit gate pending.
+
+- 2026-10-11 | PR17 final initial head passed all nine CI checks. Review P2 reproduced acceptance of mode0644 provider files; loader now refuses it and accepts mode0600. Actual OpenCode model-host33 and Docker workflow32 regressions pass after the ownership fix; mandatory review-fix commit gate pending.
