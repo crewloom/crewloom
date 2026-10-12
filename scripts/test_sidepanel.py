@@ -587,6 +587,7 @@ class RealBrowserExtensionTest(unittest.TestCase):
 
     def test_click_by_index_dispatches_a_real_event(self):
         result = self.send_to_tab({'type': 'INDEX_PAGE'})
+        self.assertFalse(self.send_to_tab({'type': 'CLICK_INDEX', 'index': 1})['ok'])
         self.page.evaluate("() => { window.__hits = 0;"
                            " document.addEventListener('click', () => window.__hits++, true); }")
         response = self.send_to_tab({'type': 'CLICK_INDEX', 'index': result['items'][0]['index'], 'generation': result['generation']})

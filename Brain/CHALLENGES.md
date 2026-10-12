@@ -324,3 +324,5 @@
 - 2026-10-12 | Review reproduced page-controlled numeric index spoofing and unguarded/fake API status in old branch. Fix by retaining element references, validating generations/visibility, gating controls in persistent Chrome state and reusing current-main route guards. Success badges and Accessibility claims replaced by unknown. Missing local Node dependencies initially blocked an existing CSS test; npm ci restored the pinned dependencies and all46 tests pass.
 
 - 2026-10-12 | Mandatory hook caught new browser/native-plugin assets missing from the distribution contract. Update explicit public asset patterns and sdist includes, retain Node-only dashboard exclusion, and add native/plugin resource coverage; all18 packaging regressions pass. No gate bypass.
+
+- 2026-10-12 | Direct helper convenience defaults must not become runtime message defaults: CLICK_INDEX now requires an integer generation before dispatch. A real Chrome transport request without it is rejected, while current-generation requests pass.

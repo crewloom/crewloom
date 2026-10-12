@@ -53,10 +53,10 @@
   <!-- Central Computer Use Aperture / Precision Command Diamond -->
   <g filter="url(#masterCoreGlow)">
     <!-- Diamond Frame -->
-    <path d="M 256 160 L 352 256 L 256 352 L 160 256 Z" 
-          fill="#0e1625" 
-          stroke="#40ddbc" 
-          stroke-width="16" 
+    <path d="M 256 160 L 352 256 L 256 352 L 160 256 Z"
+          fill="#0e1625"
+          stroke="#40ddbc"
+          stroke-width="16"
           stroke-linejoin="round"/>
 
     <!-- Inner Core Jewel -->

@@ -274,6 +274,7 @@ function handleMessage(message, sender, sendResponse) {
   }
 
   if (message.type === 'CLICK_INDEX') {
+    if (!Number.isInteger(message.generation)) { sendResponse({ ok: false, error: 'Index generation required; re-index the page' }); return; }
     sendResponse(clickElementByIndex(message.index, message.generation));
     return false;
   }
