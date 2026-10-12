@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const indexBtn = document.getElementById('indexBtn');
   let currentGeneration = null;
   let panelWindowId = null;
-  chrome.windows?.getCurrent((w) => { panelWindowId = w.id; refreshActiveTab(); });
   const captureBtn = document.getElementById('captureBtn');
   const inspectBtn = document.getElementById('inspectBtn');
   const clearBtn = document.getElementById('clearBtn');
@@ -204,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Refresh active tab info
-  function refreshActiveTab() {
+  function refreshActiveTab(onReady) {
     chrome.runtime.sendMessage({ type: 'GET_ACTIVE_TAB', windowId: panelWindowId }, (res) => {
       const tabId = res?.tab?.id;
       const previousId = currentTab?.id;
@@ -227,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         resetIndexState();
       }
+      if (typeof onReady === 'function') onReady();
     });
   }
 
@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function captureFrame() {
     log('logCapture', 'action');
     chrome.runtime.sendMessage(
-      { type: 'CAPTURE_TAB', windowId: currentTab?.windowId ?? null },
+      { type: 'CAPTURE_TAB', windowId: panelWindowId },
       (res) => {
         if (res?.ok && res.dataUrl) {
           visionImg.src = res.dataUrl;
@@ -348,13 +348,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
   captureBtn.addEventListener('click', captureFrame);
 
-  // Context-menu capture requests arrive here, targeted at one window
+  let consumingCapture = false;
+  function consumePendingCapture() {
+    if (consumingCapture || !Number.isInteger(panelWindowId)) return;
+    consumingCapture = true;
+    chrome.runtime.sendMessage({ type: 'PANEL_READY', windowId: panelWindowId }, (res) => {
+      consumingCapture = false;
+      if (!res?.ok || !res.pending) return;
+      refreshActiveTab(() => {
+        // Refuse if the clicked tab changed while the panel was opening.
+        if (currentTab?.id === res.pending.tabId && currentTab.windowId === panelWindowId) captureFrame();
+      });
+    });
+  }
   chrome.runtime.onMessage.addListener((message) => {
-    if (message?.type !== 'CAPTURE_REQUEST') return;
-    const targetWindow = message.windowId;
-    const panelWindow = currentTab?.windowId;
-    if (targetWindow != null && panelWindow != null && targetWindow !== panelWindow) return;
-    captureFrame();
+    if (message?.type === 'CAPTURE_REQUEST' && message.windowId === panelWindowId) consumePendingCapture();
   });
 
   // Hover Inspector
@@ -472,6 +480,8 @@ document.addEventListener('DOMContentLoaded', () => {
       log('logDaemonOffline', 'warn', { error: res?.error || 'connection refused' });
     }
   });
+
+  chrome.windows?.getCurrent((w) => { panelWindowId = w.id; refreshActiveTab(consumePendingCapture); });
 
   // Dynamic tab tracking like Claude/Codex
   if (chrome.tabs?.onActivated) {

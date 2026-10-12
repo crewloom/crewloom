@@ -117,3 +117,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-12 | Evaluate new agent integrations against the portable packet contract before adding automatic dispatch: exact project binding, schema-valid declared artifacts, fresh inputs, preserved failed attempts and independent verification. Contract availability alone proves no model quality gain.
 
 - 2026-10-12 | Native plugin availability, manual browser tools and agent automation are distinct capabilities. Keep activation at action boundaries, trust extension-owned references rather than DOM attributes, and measure readiness instead of translating a successful request into permission or registration.
+
+- 2026-10-13 | Test the lifecycle boundary, not only an already-open panel: worker restart, first initialization, wrong window, changed tab and expired requests are separate capture refusal conditions.

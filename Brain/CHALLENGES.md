@@ -326,3 +326,5 @@
 - 2026-10-12 | Mandatory hook caught new browser/native-plugin assets missing from the distribution contract. Update explicit public asset patterns and sdist includes, retain Node-only dashboard exclusion, and add native/plugin resource coverage; all18 packaging regressions pass. No gate bypass.
 
 - 2026-10-12 | Direct helper convenience defaults must not become runtime message defaults: CLICK_INDEX now requires an integer generation before dispatch. A real Chrome transport request without it is rejected, while current-generation requests pass.
+
+- 2026-10-13 | PR19 review found password values exposed by index fallback and first-open capture lost before listeners existed. Replace value fallback with form labels and queue window/tab-bound requests; reject missing/sentinel capture windows.

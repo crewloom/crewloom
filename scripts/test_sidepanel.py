@@ -26,9 +26,11 @@ try {
 window.__persist = () => sessionStorage.setItem('crewloom.test.store', JSON.stringify(window.__stored));
 window.__sent = [];
 window.__panelMessages = [];
+window.__pendingCapture = %(pending)s;
 window.__tab = %(tab)s;
 window.__indexResult = %(indexResult)s;
 window.chrome = {
+  windows: {getCurrent: callback => queueMicrotask(() => callback({id:7}))},
   runtime: {
     lastError: %(lastError)s,
     getURL: (path) => path,
@@ -38,6 +40,8 @@ window.chrome = {
       if (message.type === 'GET_CONTROL' || message.type === 'SET_CONTROL') { callback({ ok: true, enabled: message.enabled ?? true });
       } else if (message.type === 'CHECK_LOCAL_DAEMON') {
         callback(%(daemon)s);
+      } else if (message.type === 'PANEL_READY') {
+        const pending = window.__pendingCapture; window.__pendingCapture = null; callback({ok:true,pending});
       } else if (message.type === 'GET_ACTIVE_TAB') {
         callback(window.__tab ? { ok: true, tab: window.__tab } : { ok: false, error: 'No active tab' });
       } else if (message.type === 'CAPTURE_TAB') {
@@ -174,7 +178,7 @@ class SidePanelHarness(unittest.TestCase):
             cls.manager.stop()
 
     def open_panel(self, page, tab=SAMPLE_TAB, index_result=None, daemon=None,
-                   capture=None, send_error='null'):
+                   capture=None, send_error='null', pending=None):
         index_result = index_result if index_result is not None else {
             'ok': True, 'count': len(SAMPLE_ITEMS), 'total': len(SAMPLE_ITEMS),
             'truncated': False, 'limit': 400, 'generation': 1, 'items': SAMPLE_ITEMS,
@@ -184,7 +188,7 @@ class SidePanelHarness(unittest.TestCase):
         page.add_init_script(PANEL_MOCK % {
             'tab': json.dumps(tab), 'indexResult': json.dumps(index_result),
             'daemon': json.dumps(daemon), 'capture': json.dumps(capture),
-            'lastError': 'null', 'sendError': send_error,
+            'lastError': 'null', 'sendError': send_error, 'pending': json.dumps(pending),
         })
         page.goto((EXTENSION / 'sidepanel.html').as_uri())
         page.wait_for_timeout(120)
@@ -273,6 +277,17 @@ class SidePanelTest(SidePanelHarness):
         finally:
             context.close()
 
+    def test_first_panel_open_consumes_capture_and_refuses_changed_tab(self):
+        for tab_id, expected in ((101, True), (102, False)):
+            context, page = self.new_page()
+            try:
+                self.open_panel(page, pending={'tabId': tab_id})
+                self.assertEqual(page.locator('#visionImg').is_visible(), expected)
+                count = page.evaluate('window.__sent.filter(m => m.type === "CAPTURE_TAB").length')
+                self.assertEqual(count, int(expected))
+            finally:
+                context.close()
+
     def test_capture_request_only_affects_its_own_window(self):
         context, page = self.new_page()
         try:
@@ -280,7 +295,7 @@ class SidePanelTest(SidePanelHarness):
             page.evaluate('() => window.__panelMessages.forEach((fn) => fn({ type: "CAPTURE_REQUEST", windowId: 99 }))')
             page.wait_for_timeout(80)
             self.assertIn('No capture yet', page.inner_text('#frameMeta'))
-            page.evaluate('() => window.__panelMessages.forEach((fn) => fn({ type: "CAPTURE_REQUEST", windowId: 7 }))')
+            page.evaluate('() => { window.__pendingCapture = {tabId:101}; window.__panelMessages.forEach((fn) => fn({ type: "CAPTURE_REQUEST", windowId: 7 })); }')
             page.wait_for_timeout(120)
             self.assertIn('Captured', page.inner_text('#frameMeta'))
         finally:
@@ -363,6 +378,20 @@ class ContentScriptTest(unittest.TestCase):
     def new_page(self):
         context = self.browser.new_context(viewport={'width': 800, 'height': 600})
         return context, context.new_page()
+
+    def test_index_never_exports_entered_form_values(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 1)
+            page.evaluate("""() => {
+              document.body.insertAdjacentHTML('beforeend', '<input type="password" aria-label="Password"><input type="text" placeholder="Email"><textarea aria-label="Private note"></textarea>');
+              document.querySelectorAll('input,textarea').forEach(el => el.value = 'PRIVATE_SENTINEL_47');
+            }""")
+            result = page.evaluate('indexInteractiveElements()')
+            self.assertNotIn('PRIVATE_SENTINEL_47', json.dumps(result))
+            self.assertIn('Password', json.dumps(result))
+        finally:
+            context.close()
 
     def test_indexing_is_capped_and_reports_totals(self):
         context, page = self.new_page()

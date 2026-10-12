@@ -15,14 +15,47 @@ test('worker persists activation, rejects foreign senders, and gates capture', (
     tabs: {captureVisibleTab: (_: unknown, __: unknown, cb: any) => {captures++;cb('png');}}
   };
   const context = vm.createContext({chrome,console,URL,AbortSignal});
-  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),context);
+  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),vm.createContext({chrome,console,URL,AbortSignal,Date}));
   const panel={id:'owned',url:'chrome-extension://owned/sidepanel.html'};
   const call=(type: string, sender=panel, extra={}) => {let reply: any; handler!({type,...extra},sender,r=>reply=r);return reply;};
   assert.equal(call('CAPTURE_TAB').ok,false); assert.equal(captures,0);
   assert.equal(call('SET_CONTROL',{id:'owned',url:'https://foreign.example'},{enabled:true}).ok,false);
   assert.equal(call('SET_CONTROL',panel,{enabled:true}).enabled,true);
-  assert.equal(call('CAPTURE_TAB').ok,true); assert.equal(captures,1);
-  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),context);
+  assert.equal(call('CAPTURE_TAB').ok,false);
+  assert.equal(call('CAPTURE_TAB',panel,{windowId:-1}).ok,false);
+  assert.equal(captures,0);
+  assert.equal(call('CAPTURE_TAB',panel,{windowId:7}).ok,true); assert.equal(captures,1);
+  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),vm.createContext({chrome,console,URL,AbortSignal,Date}));
   assert.equal(call('GET_CONTROL').enabled,true);
   call('SET_CONTROL',panel,{enabled:false}); assert.equal(call('CAPTURE_TAB').ok,false); assert.equal(captures,1);
+});
+
+
+test('fresh panel consumes queued capture once, only in its requested window', () => {
+  let handler: any, clicked: any;
+  const pending: Record<string, any> = {};
+  const chrome = {
+    runtime: {id:'owned',getURL:(p: string)=>`chrome-extension://owned/${p}`,onInstalled:{addListener(){}},onMessage:{addListener(fn: any){handler=fn;}},sendMessage:()=>Promise.resolve()},
+    sidePanel:{setPanelBehavior:()=>Promise.resolve(),open:()=>Promise.resolve()},
+    contextMenus:{onClicked:{addListener(fn: any){clicked=fn;}}},
+    storage:{local:{get:(defaults: object,cb: any)=>cb(defaults)},session:{
+      set:(values: object,cb: any)=>{Object.assign(pending,values);cb();},
+      get:(key: string,cb: any)=>cb({[key]:pending[key]}),
+      remove:(key: string,cb: any)=>{delete pending[key];cb();}
+    }}
+  };
+  const context=vm.createContext({chrome,console,URL,AbortSignal,Date});
+  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),vm.createContext({chrome,console,URL,AbortSignal,Date}));
+  clicked({menuItemId:'crewloom-capture'},{id:31,windowId:7});
+  // A suspended worker must retain the first request until panel initialization.
+  vm.runInContext(readFileSync('../extensions/chrome/background.js','utf8'),vm.createContext({chrome,console,URL,AbortSignal,Date}));
+  const call=(windowId: number,sender={id:'owned',url:'chrome-extension://owned/sidepanel.html'})=>{let reply: any;handler({type:'PANEL_READY',windowId},sender,(r: any)=>reply=r);return reply;};
+  assert.equal(call(8).pending,null);
+  assert.equal(call(7,{id:'owned',url:'https://foreign.example'}).ok,false);
+  assert.equal(call(7).pending.tabId,31);
+  assert.equal(call(7).pending,null);
+  clicked({menuItemId:'crewloom-capture'},{id:32,windowId:7});
+  pending['crewloom.pendingCapture.7'].createdAt=Date.now()-31000;
+  assert.equal(call(7).pending,null);
+  assert.equal(call(-1).ok,false);
 });

@@ -24,9 +24,11 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+const captureKey = (windowId) => `crewloom.pendingCapture.${windowId}`;
+
 // Handle Context Menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (!tab?.id) return;
+  if (!tab?.id || !Number.isInteger(tab.windowId) || tab.windowId < 0) return;
   const windowId = tab.windowId;
 
   // Open the side panel for this window
@@ -39,8 +41,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
       void chrome.runtime.lastError;
     });
   } else if (info.menuItemId === 'crewloom-capture') {
-    // The panel decides whether the request targets its own window, then captures itself
-    chrome.runtime.sendMessage({ type: 'CAPTURE_REQUEST', windowId }).catch(() => {});
+    // Persist before notifying: a newly opened panel consumes this on readiness.
+    chrome.storage.session.set({ [captureKey(windowId)]: { tabId: tab.id, createdAt: Date.now() } }, () => {
+      chrome.runtime.sendMessage({ type: 'CAPTURE_REQUEST', windowId }).catch(() => {});
+    });
   }
 });
 
@@ -48,7 +52,8 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 function handleMessage(message, sender, sendResponse) {
   // Capture the visible tab. windowId comes from the caller so the right window is captured.
   if (message.type === 'CAPTURE_TAB') {
-    const windowId = message.windowId ?? sender.tab?.windowId ?? null;
+    const windowId = message.windowId;
+    if (!Number.isInteger(windowId) || windowId < 0) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return false; }
     chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {
       if (chrome.runtime.lastError) {
         sendResponse({ ok: false, error: chrome.runtime.lastError.message });
@@ -59,9 +64,19 @@ function handleMessage(message, sender, sendResponse) {
     return true; // Keep channel open for async response
   }
 
+  if (message.type === 'PANEL_READY') {
+    if (!Number.isInteger(message.windowId) || message.windowId < 0) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return false; }
+    const key = captureKey(message.windowId);
+    chrome.storage.session.get(key, (value) => {
+      const pending = value[key];
+      chrome.storage.session.remove(key, () => sendResponse({ ok: true, pending: pending && Date.now() - pending.createdAt < 30000 ? pending : null }));
+    });
+    return true;
+  }
+
   // Get active tab info
   if (message.type === 'GET_ACTIVE_TAB') {
-    if (!Number.isInteger(message.windowId)) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return false; }
+    if (!Number.isInteger(message.windowId) || message.windowId < 0) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return false; }
     chrome.tabs.query({ active: true, windowId: message.windowId }, (tabs) => {
       if (tabs && tabs[0]) {
         sendResponse({ ok: true, tab: tabs[0] });

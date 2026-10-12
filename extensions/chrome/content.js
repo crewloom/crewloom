@@ -133,7 +133,9 @@ function indexInteractiveElements() {
       tag: el.tagName.toLowerCase(),
       type: el.getAttribute('type') || null,
       id: el.id || null,
-      text: (el.textContent || el.value || el.placeholder || el.getAttribute('aria-label') || '')
+      text: (['input', 'textarea', 'select'].includes(el.tagName.toLowerCase())
+        ? (el.getAttribute('aria-label') || el.placeholder || '')
+        : (el.textContent || el.getAttribute('aria-label') || ''))
         .trim()
         .slice(0, 40),
       rect: {
