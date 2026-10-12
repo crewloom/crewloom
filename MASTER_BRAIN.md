@@ -96,3 +96,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-11 | Flexible OpenCode selection now supports private loopback provider contracts without merging global host configuration. Actual protocol compatibility is demonstrated; actual weak-model or Claude-level capability is not.
 
 - 2026-10-12 | Crewloom improvement contracts now include portable task-packet export for external agents alongside five automatic model adapters. Export shares scoped context and evidence rules but grants no execution/acceptance authority; arbitrary automatic host dispatch remains unsupported.
+
+- 2026-10-12 | Crewloom now packages a native Codex entry plugin alongside a manual browser companion. Current-main authorization, persistent default-off activation and reference-bound element checks address the reviewed local issues. Real browser/installed-plugin evidence establishes these integrations only; autonomous desktop/model control remains future scoped work.

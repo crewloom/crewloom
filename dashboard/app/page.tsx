@@ -1,6 +1,7 @@
 'use client';
 import ActivityPanel, { type Activity, type Controls } from './activity-panel';
 import ProjectsPanel from './projects-panel';
+import ComputerUsePanel from './computer-use-panel';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type Skill = { id: string; description: string; lastActivity: string | null; openTasks: number; doneEntries: number; openChallenges: number; ideas: number; tools: string[]; runs: number; failedRuns: number; status: 'healthy' | 'attention' | 'idle' };
@@ -141,6 +142,7 @@ export default function Dashboard() {
       </header>
       <p>{lang === "ar" ? "المشروع الحالي" : "Current project"}: <code dir="ltr">{data?.projectRoot ?? "…"}</code></p>
       {error && <div className="card" role="alert">API: {error}</div>}
+      <ComputerUsePanel language={lang} />
       <ProjectsPanel language={lang} />
       <ActivityPanel activity={data?.activity} controls={data?.controls} language={lang} />
       <section className="tiles" aria-label="Totals">

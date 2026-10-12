@@ -173,3 +173,5 @@ The public context acceptance checker consumes `crewloom-hook-pilot/{context.jso
 
 | [scripts/privacy.py](../scripts/privacy.py) | Private data layout, chained Git index guard and selected publication ZIP; context-guardian | `crewloom privacy check --project /path/to/project` |
 | [scripts/test_privacy.py](../scripts/test_privacy.py) | Real private-commit rejection, clean acceptance and publication boundaries; QA | `python3 -m unittest discover -s scripts -p test_privacy.py` |
+
+| [extensions/chrome/background.js](../extensions/chrome/background.js) | Manual browser companion worker; persistent enable state, explicit panel-window routing, gated capture and measured dashboard handshake; owning role: machine-control-operator. Input: validated extension messages; output: bounded browser response. Unsupported/foreign senders and disabled captures refused. | Load `extensions/chrome` unpacked; enable the panel checkbox; verify with `python3 -m unittest scripts.test_sidepanel` |

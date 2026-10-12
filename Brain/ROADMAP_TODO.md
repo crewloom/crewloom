@@ -209,3 +209,5 @@
 - 2026-10-11 | [x] Initial PR17 nine-check CI and provider ownership regression; [ ] gate/push the reviewed fix, resolve its addressed thread, recheck exact final head, normal merge and runtime installation.
 
 - 2026-10-12 | Completed portable external-agent packet export and34 workflow regressions including Docker; pending publication/install of this change, reviewed automatic adapters for additional hosts, external reply import and frozen real weaker-model comparison. Existing five adapters retain bounded automatic repair; no universal agent support or quality claim.
+
+- 2026-10-12 | [x] Review fixes, current-main integration, native plugin local install, real browser regressions and dashboard build/UI checks. [ ] Exact final gate/PR/CI/merge/runtime rollout; [ ] independently scoped authenticated model/browser command bridge and true native desktop controller, which this manual companion does not implement. Broader P0-P6 quality plan remains separate.

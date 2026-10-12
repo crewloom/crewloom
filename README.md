@@ -73,6 +73,8 @@ crewloom install --host claude --target /path/to/your/project --skill frontend-u
 
 `--host claude` copies roles to `.claude/skills`; `--host agents` copies them to `.agents/skills` for hosts that read that folder (omit `--skill` for all 42). Existing roles are never overwritten without `--force`. Copied roles are static: re-run the command after pulling updates. A normal `pip install .` builds a local wheel with the Python runtime, role resources, adapters and examples. The editable command above keeps a development link to the clone. The optional Node dashboard runs from a source checkout.
 
+Use the optional [native Codex plugin](documentation/CODEX_PLUGIN.md) for role/context/workflow guidance and the separate [manual browser companion](documentation/CHROME_EXTENSION_SIDE_PANEL.md) for element inspection and tab capture.
+
 ## Live dashboard
 
 ```bash

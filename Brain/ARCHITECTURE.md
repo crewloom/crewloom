@@ -74,3 +74,5 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-11 | Private local-provider readers now reject foreign ownership and any group/other permission bits on POSIX, matching the documented chmod600 contract. Non-POSIX ACL ownership remains unverified.
 
 - 2026-10-12 | Portable external-agent generation reuses workflow.py agent-packet for the reserved awaiting task. Packet carries bound project/checkout, plan/input/prompt hashes, schema and existing handoff; same model_host prompt construction and fresh exact-scope managed context apply. Export never dispatches, imports replies or accepts tasks.
+
+- 2026-10-12 | Manual browser companion is now an explicit extensions/ scope entry; native Codex plugin uses one CLI-backed skill under adapters/codex/plugin and a local marketplace. Browser activation is extension-wide persistent storage, default off, enforced at content/capture boundaries. Element clicks use owned references and generation checks. New API routes reuse guard/privateHeaders; native accessibility remains unknown, explicit screen probe is shell-free and bounded.

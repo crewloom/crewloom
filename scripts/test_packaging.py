@@ -114,13 +114,22 @@ class PackagedDataRegressions(unittest.TestCase):
         missing = (declared_files('documentation') | declared_files('assets', skip=('dashboard-demo.mp4', 'dashboard-demo.gif'))) - selected
         self.assertEqual(missing, set(), 'Documentation or public assets missing: ' + ', '.join(sorted(missing)))
 
+    def test_browser_and_native_plugin_install_resources_are_packaged(self):
+        selected = matched_files(pyproject()['tool']['setuptools']['package-data']['crewloom_data'])
+        for directory in ('extensions/chrome', 'adapters/codex/plugin', '.agents/plugins'):
+            self.assertEqual(declared_files(directory) - selected, set(), directory)
+        manifest = ROOT/'adapters/codex/plugin/.codex-plugin/plugin.json'
+        value = json.loads(manifest.read_text()); plugin = manifest.parent.parent
+        self.assertTrue((plugin/value['skills']/'crewloom/SKILL.md').is_file())
+        self.assertTrue((plugin/value['interface']['logo']).is_file())
+
     def test_runtime_registry_and_optional_node_assets_are_declared_separately(self):
         patterns = pyproject()['tool']['setuptools']['package-data']['crewloom_data']
         selected = matched_files(patterns)
         self.assertIn('documentation/TOOLS.json', selected)
         # Node assets are deliberately absent from the wheel; `crewloom dashboard` diagnoses that.
         self.assertFalse([name for name in selected if name.startswith('dashboard/')])
-        self.assertEqual([name for name in selected if name.startswith('assets/')], ['assets/crewloom-banner.svg'])
+        self.assertEqual({name for name in selected if name.startswith('assets/')}, {'assets/crewloom-banner.svg', 'assets/crewloom-computer-use-icon.svg', 'assets/crewloom-computer-use-icon.png', 'assets/crewloom-chrome-extension.zip'})
 
 
 class ResourceResolverRegressions(unittest.TestCase):
