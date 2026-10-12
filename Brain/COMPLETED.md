@@ -304,3 +304,11 @@
 - 2026-10-12 | Added host-neutral agent-packet CLI and English host guide. Workflow34 tests pass with all Docker cases enabled: packet preserves journal/output state, makes no provider call, carries Arabic and identity/schema/hash data, refuses in-flight source changes, cancelled tasks and stale enforced context. PR17 merged at 2b8508b; installed exact snapshot and validate passed42 skills. New packet publication/runtime update pending.
 
 - 2026-10-12 | PR18 late-input mutation review fixed; workflow34 passes all Docker cases again. The new regression verifies a change after the final prompt read is refused; final hook and exact-head CI pending.
+
+- 2026-10-12 | Ported intended other-agent browser source onto current main without modifying dirty original. Dashboard46 tests and production build pass. Actual headed Chromium29 cases pass with one optional screenshot skip: real capture/click/index, disabled actions and persisted state; negative DOM spoof/removal/hidden/stale cases pass. Actual dashboard HTTP refuses foreign Origin before OS probe; English/Arabic/mobile UI tested with unknown connection and no overflow. Codex CLI installed/enabled crewloom@crewloom-local0.1.0; cached manifest/skill/icon verified. No autonomous model/browser bridge claim.
+
+- 2026-10-12 | Installed native Codex plugin and real browser/dashboard checks remain verified; packaging18 cases now pass after public asset contract expansion. Full corrected commit gate pending.
+
+- 2026-10-12 | Initial integrated commit c009813 passed the complete mandatory hook. Final native Chrome test now additionally confirms generation-less click requests are refused; all29 browser checks pass again with one optional screenshot skip. Final fix commit gate pending.
+
+- 2026-10-13 | PR19 review fixes implemented. Dashboard47 tests pass; headed Chrome30 tests pass with one optional screenshot skip, including non-export of entered form values. Added rendered first-open/changed-tab regression; final gate/publication pending.

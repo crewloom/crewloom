@@ -12,7 +12,8 @@
     "documentation",
     "examples",
     "scripts",
-    "workflows"
+    "workflows",
+    "extensions"
   ],
   "files": [
     ".gitignore",
