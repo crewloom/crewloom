@@ -83,3 +83,8 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-12 | Manual browser companion is now an explicit extensions/ scope entry; native Codex plugin uses one CLI-backed skill under adapters/codex/plugin and a local marketplace. Browser activation is extension-wide persistent storage, default off, enforced at content/capture boundaries. Element clicks use owned references and generation checks. New API routes reuse guard/privateHeaders; native accessibility remains unknown, explicit screen probe is shell-free and bounded.
 
 - 2026-10-13 | Capture requests persist in session storage per explicit window with a30-second expiry and original tab identity; panel readiness consumes once. Form index metadata excludes entered input/textarea/select values.
+
+### 2026-10-14 — Bound MCP and external candidate imports
+- Optional official MCP SDK2.3.0 stdio bridge fixes project/root, checkout, policy, task and plan at launch. Read-only tools are the default inventory; import and container verification require explicit launch flags. No tool selects arbitrary roots, commands or providers.
+- External reply import reuses agent_packet, schema validation, project locks and grouped publication. Packet input/prompt/context/binding/output revisions must remain current, including output fingerprints captured before and after staging. Raw replies remain private; imports do not accept task reviews or create execution evidence.
+- A pinned isolated Playwright MCP config provides a separately authorized host browser integration. It does not turn the Chrome manual panel into an autonomous channel or establish native desktop trust.

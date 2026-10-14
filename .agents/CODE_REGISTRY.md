@@ -6,6 +6,8 @@ Core Python tools use the standard library. Commands run from the checkout root.
 
 | Path | Purpose | Command |
 | --- | --- | --- |
+| [scripts/mcp_bridge.py](../scripts/mcp_bridge.py) | Optional official-SDK stdio tools bound to one project/task; default read-only; mcp-integration-builder | `crewloom mcp --project /absolute/project --project-id project-id --task-id task-id` |
+| [scripts/test_mcp_bridge.py](../scripts/test_mcp_bridge.py) | External reply boundary regressions and opt-in live stdio/Docker acceptance; QA | `python3 -m unittest discover -s scripts -p test_mcp_bridge.py` |
 | [scripts/package_browser.py](../scripts/package_browser.py) | Build/check deterministic browser ZIP from the source tree; toolbox-integration-steward | `python3 scripts/package_browser.py` or `python3 scripts/package_browser.py --check` |
 | [dashboard/lib/tool-arguments.ts](../dashboard/lib/tool-arguments.ts) | Bounded quoted-text/JSON argument parsing without shell evaluation; frontend-ux-auditor | Used by the dashboard Run form |
 | [dashboard/test/tool-arguments.test.ts](../dashboard/test/tool-arguments.test.ts) | Quote, invalid-input and dashboard catalog compatibility regressions; QA | `npm test` from `dashboard` |

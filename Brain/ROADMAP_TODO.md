@@ -217,3 +217,7 @@
 ### 2026-10-14 — Defect closure and integration follow-up
 - Done:13 audited defects have concrete fixes and regressions; public acceptance contract, current ZIP, guarded download and separate runtime/project source display added.
 - Remaining: gated local rollout, then project/task-bound MCP browser and desktop integration with real call evidence; retain the manual default and existing host opt-in boundary. Full multi-role and cross-model quality evidence remains distinct from software test results.
+
+### 2026-10-14 — Integration acceptance update
+- Done: bound stdio MCP, candidate reply import preserving reviewer/container gates, and pinned isolated Playwright MCP config with four actual browser calls.10 MCP/import tests, Docker publication43, distribution13 and package20 pass.
+- Remaining: gated local CLI/dashboard rollout and read-only Codex registration. True native desktop control still needs a scoped application adapter and measured OS permissions; automatic chat capture/clarification and full multi-role/cross-model quality require separate acceptance inputs. Do not infer them from offline/unit tests or synthetic browser success.

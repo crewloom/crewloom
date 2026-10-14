@@ -316,3 +316,7 @@
 ### 2026-10-14 — Browser/dashboard defect closure
 - Artifact: existing browser/dashboard modules, source packager and documentation/BROWSER_DASHBOARD_ACCEPTANCE.md.
 - Evidence: original tab/DOM/metrics regressions reject old behavior; Python1123 (1016pass/107skip), dashboard55, TypeScript/build, Docker workflow34/policy43, actual Chromium38pass/1optional skip, distribution12 pass. ZIP rejects stale/unreviewed content and accepts deterministic rebuilds. Local rollout follows the gated commit; autonomous MCP/desktop integration is a separate phase.
+
+### 2026-10-14 — MCP and reply import acceptance
+- Artifact: scripts/mcp_bridge.py, workflow import-reply, documentation/MCP_BRIDGE.md and scoped client templates.
+- Evidence:10 bridge/import tests pass with real stdio and Docker; all five Crewloom tools called, plus actual Playwright navigate/snapshot/click/close against an isolated synthetic fixture. Both configs validate; distribution13 and packaging20 pass, Docker publication43 pass. Native Codex registration/runtime rollout follows the gated commit; no paid generation, desktop or broad model-quality claim.

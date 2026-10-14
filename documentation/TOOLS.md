@@ -52,6 +52,8 @@ Without it the same commands still work and the generated map records that appro
 
 Native host setup and callback boundaries: [Native host lifecycle](HOST_LIFECYCLE.md).
 
+The optional `crewloom mcp` command exposes one project's task through the official Python MCP SDK, with read-only tools by default. It requires `crewloom[mcp]` on Python 3.11+; other core commands remain dependency-free. See [MCP bridge and external reply import](MCP_BRIDGE.md).
+
 ## Dashboard execution contracts
 
 Argument input accepts quoted text or a JSON array of strings. It never invokes a shell or

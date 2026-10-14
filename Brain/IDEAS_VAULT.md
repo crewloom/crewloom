@@ -122,3 +122,6 @@ Keep personal preferences as scoped private input data instead of editing distri
 
 ### 2026-10-14 — Preserve identity across automation layers
 - Carry tab/frame/document/request identity from discovery through execution and return transport. Keep manual activation separate from agent automation consent; test delayed replies, navigation and disabled state in the real transport. Project/task identity must survive the same boundary in a future MCP bridge.
+
+### 2026-10-14 — Host capability separation
+- Keep the task/context/artifact MCP boundary reusable across hosts; attach an independently authorized browser or native desktop provider rather than expanding candidate import into arbitrary host execution. A host-capability matrix should record verified calls, permissions, application targets and unresolved scope.

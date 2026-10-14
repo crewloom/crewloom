@@ -223,7 +223,7 @@ POSITIONAL_PATH_TOOLS = {'workflow-contract', 'delivery-evidence'}
 # Commands whose parser, defaults and exit codes live in another module. They declare no arguments
 # here on purpose: the caller's argv is forwarded untouched, so a new flag on the child needs no
 # change here and cannot be silently dropped by an intermediate list of arguments to keep in step.
-DELEGATED = {'host': 'host_lifecycle', 'readiness': 'agency_readiness', 'queue': 'task_queue', 'budget': 'usage_budget', 'evaluate-bilingual': 'bilingual_evaluation'}
+DELEGATED = {'host': 'host_lifecycle', 'readiness': 'agency_readiness', 'queue': 'task_queue', 'budget': 'usage_budget', 'evaluate-bilingual': 'bilingual_evaluation', 'mcp': 'mcp_bridge'}
 STUDY_ARGUMENTS = ('context', 'study')
 
 
@@ -340,6 +340,7 @@ def main():
     commands.add_parser('queue', help='Durable priority scheduling across registered projects')
     commands.add_parser('budget', help='Shared managed model request and dollar admission controls')
     commands.add_parser('host', help='Install, observe, guard and verify native host callbacks')
+    commands.add_parser('mcp', help='Serve one project task over optional read-only stdio MCP')
     commands.add_parser('readiness', help='Read-only rollout readiness for one registered project')
     install = commands.add_parser('install', help='Copy roles into a project for your agent host')
     install.add_argument('--host', choices=sorted(HOST_DIRS), required=True,

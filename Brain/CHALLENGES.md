@@ -333,3 +333,8 @@
 - Cause: mutable tab identity in callbacks; generation collisions across documents; first400 DOM order; own-element-only interactivity; template/heading-based readiness; whitespace argument splitting.
 - Fix: request/tab/frame/document-bound replies, action fingerprints and hit tests; viewport/frame/shadow inventory with pagination; run-based status and compact-record parsing; bounded quote/JSON argument data and CLI-only external-root tools.
 - Evidence: bad cases reject old behavior, current regressions pass. Browser tests need arrow-function predicates under extension CSP; a bare expression triggered unsafe-eval and was corrected without weakening CSP. ZIP freshness now has bad/clean acceptance and rejects undeclared source files.
+
+### 2026-10-14 — External candidate freshness and MCP schemas
+- Cause: exporting a packet alone left candidate publication to host-specific code; output edits could be overwritten while generation was in progress.
+- Solution: compare project/task/context/input/prompt/output revisions, recheck staged original bytes, reuse transactional publication, retain private replies and require existing review/verification. Tests reject foreign/stale packets, undeclared outputs, links and owner edits before/after staging.
+- SDK lesson: current official SDK uses MCPServer and Python3.11+; dict[str, Any] exposes direct structured results, while typing.Dict wrapped output. Current Playwright click schema requires target, not the older ref argument. Use actual list-tools schemas and live calls.
