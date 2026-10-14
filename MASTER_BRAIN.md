@@ -98,3 +98,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-12 | Crewloom improvement contracts now include portable task-packet export for external agents alongside five automatic model adapters. Export shares scoped context and evidence rules but grants no execution/acceptance authority; arbitrary automatic host dispatch remains unsupported.
 
 - 2026-10-12 | Crewloom now packages a native Codex entry plugin alongside a manual browser companion. Current-main authorization, persistent default-off activation and reference-bound element checks address the reviewed local issues. Real browser/installed-plugin evidence establishes these integrations only; autonomous desktop/model control remains future scoped work.
+
+- 2026-10-14 | Browser/dashboard13-defect closure implemented with rejected old cases and passing current tests: Python1123 (107skip), dashboard55, Docker77, real Chromium38 (1optional skip), distribution12. Manual browser control remains explicit; new MCP/desktop integration requires its own live evidence. Local runtime rollout follows the mandatory commit gate; no public merge or all-role performance claim.

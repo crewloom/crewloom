@@ -15,6 +15,30 @@ test('placeholder brain files count as zero', () => {
   assert.equal(countBrain({ CHALLENGES: '# Challenges\n\nNo local incidents have been recorded.' }).openChallenges, 0);
 });
 
+test('compact memory entries are counted without counting metadata sub-bullets', () => {
+  assert.deepEqual(countBrain({
+    COMPLETED: '### 2026-10-01 — shipped\n- Evidence: tests\n- 2026-10-02 | Fixed parser',
+    IDEAS_VAULT: '- 2026-10-02 | Try a bounded cache',
+    CHALLENGES: '- 2026-10-02 | Status: open; interrupted task\n- 2026-10-03 | Status: resolved; older issue',
+  }), { openTasks: 0, doneEntries: 2, openChallenges: 1, ideas: 1 });
+});
+
+test('a malformed JSON record does not erase valid run history', () => {
+  const runs = parseRuns('{"tool":"a","exit_code":0}\nnull\n[]\n3\n{"tool":"b","exit_code":1}\n');
+  assert.deepEqual(runs.map((run) => run.tool), ['a', 'b']);
+});
+
+test('compact OPEN markers count without inventing status for unmarked history', () => {
+  assert.equal(countBrain({CHALLENGES:'- 2026-10-13 | OPEN: failing import\n- 2026-10-14 | Cause: older failure; fixed'}).openChallenges,1);
+});
+
+test('untested installation templates stay idle', async () => {
+  const { listSkills } = await import('../lib/repo.ts');
+  const roles = await listSkills();
+  assert.ok(roles.length > 0);
+  assert.ok(roles.filter((role) => role.runs === 0 && role.openChallenges === 0).every((role) => role.status === 'idle'));
+});
+
 test('parseRuns skips torn lines', () => {
   const runs = parseRuns('{"tool":"a","exit_code":0}\n{"tool":\n{"tool":"b","exit_code":1}\n');
   assert.deepEqual(runs.map((r) => r.tool), ['a', 'b']);

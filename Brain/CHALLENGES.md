@@ -328,3 +328,8 @@
 - 2026-10-12 | Direct helper convenience defaults must not become runtime message defaults: CLICK_INDEX now requires an integer generation before dispatch. A real Chrome transport request without it is rejected, while current-generation requests pass.
 
 - 2026-10-13 | PR19 review found password values exposed by index fallback and first-open capture lost before listeners existed. Replace value fallback with form labels and queue window/tab-bound requests; reject missing/sentinel capture windows.
+
+### 2026-10-14 — Defect root causes and fixes
+- Cause: mutable tab identity in callbacks; generation collisions across documents; first400 DOM order; own-element-only interactivity; template/heading-based readiness; whitespace argument splitting.
+- Fix: request/tab/frame/document-bound replies, action fingerprints and hit tests; viewport/frame/shadow inventory with pagination; run-based status and compact-record parsing; bounded quote/JSON argument data and CLI-only external-root tools.
+- Evidence: bad cases reject old behavior, current regressions pass. Browser tests need arrow-function predicates under extension CSP; a bare expression triggered unsafe-eval and was corrected without weakening CSP. ZIP freshness now has bad/clean acceptance and rejects undeclared source files.

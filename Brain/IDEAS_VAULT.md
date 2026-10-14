@@ -119,3 +119,6 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-12 | Native plugin availability, manual browser tools and agent automation are distinct capabilities. Keep activation at action boundaries, trust extension-owned references rather than DOM attributes, and measure readiness instead of translating a successful request into permission or registration.
 
 - 2026-10-13 | Test the lifecycle boundary, not only an already-open panel: worker restart, first initialization, wrong window, changed tab and expired requests are separate capture refusal conditions.
+
+### 2026-10-14 — Preserve identity across automation layers
+- Carry tab/frame/document/request identity from discovery through execution and return transport. Keep manual activation separate from agent automation consent; test delayed replies, navigation and disabled state in the real transport. Project/task identity must survive the same boundary in a future MCP bridge.

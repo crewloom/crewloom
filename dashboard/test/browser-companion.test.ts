@@ -59,3 +59,21 @@ test('fresh panel consumes queued capture once, only in its requested window', (
   assert.equal(call(7).pending,null);
   assert.equal(call(-1).ok,false);
 });
+test('extension download refuses anonymous requests and serves only the packaged ZIP', async () => {
+  const {GET}=await import('../app/api/extension/download/route.ts');
+  const previous=process.env.CREWLOOM_DASHBOARD_TOKEN;
+  const token='synthetic-download-credential-with-enough-characters';
+  process.env.CREWLOOM_DASHBOARD_TOKEN=token;
+  try {
+    assert.equal((await GET(new Request('http://127.0.0.1:4317/api/extension/download'))).status,401);
+    const response=await GET(new Request('http://127.0.0.1:4317/api/extension/download',{headers:{authorization:'Bearer '+token}}));
+    assert.equal(response.status,200);
+    assert.equal(response.headers.get('Content-Type'),'application/zip');
+    const bytes=new Uint8Array(await response.arrayBuffer());
+    assert.deepEqual([...bytes.slice(0,2)],[80,75]);
+    assert.ok(bytes.length>100);
+  } finally {
+    if(previous===undefined) delete process.env.CREWLOOM_DASHBOARD_TOKEN;
+    else process.env.CREWLOOM_DASHBOARD_TOKEN=previous;
+  }
+});

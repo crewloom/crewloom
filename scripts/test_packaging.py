@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import unittest
+import tempfile
 from pathlib import Path
 
 try:
@@ -184,6 +185,35 @@ class ResourceResolverRegressions(unittest.TestCase):
 class ArchiveExclusionRegressions(unittest.TestCase):
     def manifest(self):
         return MANIFEST.read_text(encoding='utf-8')
+
+    def test_browser_zip_matches_the_actual_source(self):
+        import package_browser
+        self.assertEqual(package_browser.check(ROOT), [])
+
+    def test_browser_zip_gate_rejects_stale_source_and_accepts_rebuilt_package(self):
+        import contextlib
+        import io
+        import package_browser
+        import shutil
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / 'extensions' / 'chrome'
+            shutil.copytree(ROOT / 'extensions' / 'chrome', source)
+            (root / 'assets').mkdir()
+            script = source / 'content.js'
+            script.write_text('first')
+            package_browser.build(root)
+            before = package_browser.target(root).read_bytes()
+            package_browser.build(root)
+            self.assertEqual(before, package_browser.target(root).read_bytes())
+            script.write_text('changed')
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(package_browser.main(['--check'], root), 1)
+                self.assertEqual(package_browser.main([], root), 0)
+            self.assertEqual(package_browser.check(root), [])
+            (source / 'private-run.json').write_text('{"private":"fixture"}')
+            with self.assertRaisesRegex(ValueError, 'Unreviewed file'):
+                package_browser.build(root)
 
     def test_forbidden_trees_are_excluded_from_the_sdist(self):
         text = self.manifest()

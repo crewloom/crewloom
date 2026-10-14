@@ -40,8 +40,9 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 - **Numbered visual grounding** — indexes buttons, links, inputs, selects, textareas and ARIA
   roles, then draws `[1]`, `[2]`, … tags in a dedicated non-destructive overlay layer. Tags
   re-anchor on scroll and resize.
-- **Bounded indexing** — at most 400 elements per page; the panel reports how many were indexed
-  versus how many were found.
+- **Bounded indexing** — at most 400 targets per tab, prioritized by viewport distance. Readable
+  frames share that budget; open Shadow DOM is traversed. The panel paginates the directory in
+  50-row pages and distinguishes displayed, indexed and found counts.
 - **Click by index** — type a number or use the `Click` button next of a row; the content script
   scrolls the element into view, focuses it, clicks it, and renders a click wave.
 - **Hover inspector** — highlights the element under the cursor with its tag, id, and pixel size.
@@ -50,8 +51,8 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
   stale indices when the tab changes or finishes loading.
 - **Bilingual EN/AR** — instant switch with full RTL flip; the choice is stored in
   `chrome.storage.local` and restored on the next panel open.
-- **Dashboard bridge** — daemon health on `:4317` plus a macOS Accessibility deep link through
-  `/api/system-permissions`.
+- **Dashboard status** — daemon health on `:4317` refreshes every 15 seconds. The settings button
+  opens the authenticated dashboard, where the user can open macOS settings.
 
 ## Permissions and why they are needed
 
@@ -69,15 +70,15 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 
 | Message | From → To | Payload → Response |
 | --- | --- | --- |
-| `GET_ACTIVE_TAB` | panel → background | `{}` → `{ok, tab}` |
+| `GET_ACTIVE_TAB` | panel → background | `{windowId}` → `{ok, tab}` |
 | `CAPTURE_TAB` | panel → background | `{windowId}` → `{ok, dataUrl}` |
 | `CHECK_LOCAL_DAEMON` | panel → background | `{}` → `{ok, connected, data}` |
 | `GET_SYSTEM_PERMISSIONS` | panel → background | `{}` → `{ok, data}` |
-| `OPEN_MACOS_SETTINGS` | panel → background | `{pane}` → `{ok, data}` |
+| `OPEN_MACOS_SETTINGS` | panel → background | `{}` → `{ok, instruction}`; opens the dashboard |
 | `CAPTURE_REQUEST` | background → panel | `{windowId}` → triggers a capture |
-| `INDEX_PAGE` | panel → content | `{}` → `{ok, count, total, truncated, limit, items}` |
+| `INDEX_PAGE` | panel → content | `{includeFrames?, offset?, limit?}` → `{ok, documentToken, generation, count, total, truncated, limit, items}` |
 | `CLEAR_INDEX` | panel → content | `{}` → `{ok}` |
-| `CLICK_INDEX` | panel → content | `{index}` → `{ok, x, y, tag}` |
+| `CLICK_INDEX` | panel → content | `{index, generation, documentToken}` with target `frameId` → `{ok, x, y, tag}` |
 | `TOGGLE_INSPECTOR` | panel or context menu → content | `{}` → `{ok, active}` |
 | `GET_PAGE_SUMMARY` | panel → content | `{}` → `{ok, title, url, elementsCount}` |
 
@@ -85,8 +86,12 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 
 - Browser-internal pages (`chrome://`, the Web Store, PDF viewer) block content scripts; the panel
   reports this instead of failing silently.
-- Indexing is capped at 400 visible elements per page; re-index after scrolling to reach content
-  that was outside the cap.
+- Indexing prioritizes targets in the current viewport, then nearby off-screen targets. Re-index
+  after scrolling to reach later targets. Readable frames receive a share of the 400-target budget;
+  more than 128 frames are refused explicitly. Closed Shadow DOM and restricted pages are unavailable.
+- Clicks require the original document token and generation. Action attributes, ancestor
+  interactivity and hit-test visibility are checked before dispatch. Open a cross-origin frame
+  separately if its parent visibility cannot be verified.
 - Overlay tags are page-global: a page that repaints its own layout can still move elements under
   stale tags until the next re-index.
 
@@ -101,8 +106,7 @@ CREWLOOM_SCREENSHOTS=1 python3 -m unittest scripts.test_sidepanel   # refresh th
 CREWLOOM_REAL_BROWSER=1 python3 -m unittest scripts.test_sidepanel  # load the unpacked extension
 ```
 
-The third form loads this folder into a real Chromium via `--load-extension` and drives it against a
-running dashboard on `:4317`: manifest acceptance, live daemon status, grounding tags and the HUD
-logo in the real page, a real click event from an index, and a real `captureVisibleTab` frame. It
-needs a headed browser (headless Chromium ignores unpacked extensions) and skips itself when the
-dashboard is not running.
+The third form loads this folder into headed Chromium against a synthetic HTTP fixture on an
+ephemeral port. It checks manifest acceptance, grounding tags, the HUD logo, real click events
+and a real `captureVisibleTab` frame. It skips when the runtime is unavailable; no user dashboard
+or private project page is required.

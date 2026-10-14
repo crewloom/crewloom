@@ -1,5 +1,10 @@
 # Repository architecture
 
+### 2026-10-14 — Browser and dashboard correctness
+- Index replies bind tab/navigation request; targets bind frame, document token, generation and action fingerprint. Clicks recheck ancestor interactivity and hit-test visibility. Open Shadow DOM/readable frames share a bounded viewport-prioritized inventory; the directory is paginated.
+- Dashboard role status uses run evidence rather than template headings. Memory counters accept dated compact records; malformed run values are isolated. Tool arguments are data, with bounded quote/JSON parsing and no shell evaluation; external-root tools remain CLI-only.
+- A deterministic source-only browser packager and stale/unreviewed-file regressions prevent ZIP drift. Runtime source and monitored project are displayed separately. These changes do not add autonomous model/browser dispatch or a native desktop controller.
+
 [Public architecture](../documentation/ARCHITECTURE.md) describes the toolkit boundaries. [AGENTS.md](../AGENTS.md) is the single authority for agent behavior. Public role procedures and core tools improve in their existing paths; do not maintain duplicate versioned implementations.
 
 Model generation passes explicit project text to a trusted CLI in a temporary directory; the artifact layer validates writes and the Docker executor verifies code. Host CLI flags are not an OS sandbox. Trial treatment labels remain outside the deterministic scorer.

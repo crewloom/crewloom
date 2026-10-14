@@ -34,7 +34,7 @@ window.chrome = {
   runtime: {
     lastError: %(lastError)s,
     getURL: (path) => path,
-    getManifest: () => ({ version: '2.2.0' }),
+    getManifest: () => ({ version: '2.3.0' }),
     sendMessage: (message, callback) => {
       window.__sent.push(message);
       if (message.type === 'GET_CONTROL' || message.type === 'SET_CONTROL') { callback({ ok: true, enabled: message.enabled ?? true });
@@ -63,7 +63,8 @@ window.chrome = {
   },
   tabs: {
     query: (query, callback) => callback(window.__tab ? [window.__tab] : []),
-    sendMessage: (tabId, message, callback) => {
+    sendMessage: (tabId, message, options, reply) => {
+      const callback = typeof options === 'function' ? options : reply;
       window.chrome.runtime.lastError = %(sendError)s;
       if (message.type === 'INDEX_PAGE' && window.__indexResult) {
         callback(window.__indexResult);
@@ -71,7 +72,7 @@ window.chrome = {
         callback({ ok: true });
       }
     },
-    onActivated: { addListener: () => {} },
+    onActivated: { addListener: (fn) => { window.__activation = fn; } },
     onUpdated: { addListener: () => {} }
   }
 };
@@ -183,6 +184,7 @@ class SidePanelHarness(unittest.TestCase):
             'ok': True, 'count': len(SAMPLE_ITEMS), 'total': len(SAMPLE_ITEMS),
             'truncated': False, 'limit': 400, 'generation': 1, 'items': SAMPLE_ITEMS,
         }
+        index_result.setdefault('documentToken', 'synthetic-document')
         daemon = daemon if daemon is not None else {'ok': True, 'connected': True, 'data': {'ok': True}}
         capture = capture if capture is not None else CAPTURE_OK
         page.add_init_script(PANEL_MOCK % {
@@ -210,8 +212,74 @@ class SidePanelTest(SidePanelHarness):
             self.assertEqual(page.inner_text('#daemonLabel'), 'Online :4317')
             logs = page.inner_text('#terminalLogs')
             self.assertIn('Panel ready', logs)
-            self.assertIn('2.2.0', logs)
+            self.assertIn('2.3.0', logs)
             self.assertIn('Local Crewloom daemon handshake verified', logs)
+        finally:
+            context.close()
+
+    def test_late_index_reply_cannot_move_to_another_tab(self):
+        context, page = self.new_page()
+        try:
+            self.open_panel(page)
+            page.evaluate("""() => {
+              const original = chrome.tabs.sendMessage;
+              window.__clicks = [];
+              chrome.tabs.sendMessage = (tab, message, callback) => {
+                if (message.type === 'INDEX_PAGE') { window.__pendingIndex = callback; return; }
+                if (message.type === 'CLICK_INDEX') window.__clicks.push({tab,message});
+                original(tab,message,callback);
+              };
+            }""")
+            page.click('#indexBtn')
+            page.evaluate("""() => {
+              window.__tab={id:202,windowId:7,title:'Different tab',url:'https://example.test/other'};
+              window.__activation();
+              window.__pendingIndex(window.__indexResult);
+            }""")
+            self.assertEqual(page.locator('.directory-item').count(), 0)
+            page.fill('#elementInput', '1')
+            page.press('#elementInput', 'Enter')
+            self.assertEqual(page.evaluate('window.__clicks'), [])
+        finally:
+            context.close()
+
+    def test_directory_pagination_exposes_every_indexed_target(self):
+        context, page = self.new_page()
+        try:
+            self.open_panel(page, index_result={
+                'ok': True, 'count': 120, 'total': 450, 'generation': 1,
+                'truncated': True, 'limit': 400,
+                'items': [{'index':i+1,'tag':'button','text':f'Target {i+1}'} for i in range(120)]})
+            page.click('#indexBtn')
+            self.assertEqual(page.locator('.directory-item').count(), 50)
+            page.click('#directoryNext')
+            self.assertIn('Target 100', page.inner_text('#directoryList'))
+            page.click('#directoryNext')
+            self.assertIn('Target 120', page.inner_text('#directoryList'))
+            self.assertEqual(page.locator('.directory-item').count(), 20)
+            self.assertIn('101', page.inner_text('.directory-note'))
+        finally:
+            context.close()
+
+    def test_daemon_status_refreshes_without_reopening_panel(self):
+        context, page = self.new_page()
+        try:
+            page.add_init_script("""const interval = window.setInterval;
+              window.__timers=[]; window.setInterval=(fn,ms)=>{
+                window.__timers.push({fn,ms}); return interval(fn,ms);
+              };""")
+            self.open_panel(page, daemon={'ok':False,'connected':False})
+            page.evaluate("""() => {
+              const original=chrome.runtime.sendMessage;
+              chrome.runtime.sendMessage=(message,callback)=> message.type==='CHECK_LOCAL_DAEMON'
+                ? callback({connected:window.__online}) : original(message,callback);
+              window.__online=true;
+              window.__timers.find(timer=>timer.ms===15000).fn();
+            }""")
+            self.assertEqual(page.inner_text('#daemonLabel'), 'Online :4317')
+            page.evaluate("""() => { window.__online=false;
+              window.__timers.find(timer=>timer.ms===15000).fn(); }""")
+            self.assertEqual(page.inner_text('#daemonLabel'), 'Standalone')
         finally:
             context.close()
 
@@ -223,7 +291,7 @@ class SidePanelTest(SidePanelHarness):
             page.wait_for_timeout(120)
             self.assertEqual(page.inner_text('#elemCountBadge'), '3')
             self.assertEqual(page.locator('.directory-item').count(), 3)
-            self.assertIn('Showing first 3 of 3 elements.', page.inner_text('.directory-note'))
+            self.assertIn('Showing 1–3 of 3 indexed', page.inner_text('.directory-note'))
             self.assertIn('Indexed 3 interactive elements.', page.inner_text('#terminalLogs'))
             self.assertIn('Computer Use Toggle', page.inner_text('.directory-item'))
         finally:
@@ -243,7 +311,7 @@ class SidePanelTest(SidePanelHarness):
             page.click('#indexBtn')
             page.wait_for_timeout(150)
             self.assertIn('limit 400 reached', page.inner_text('#terminalLogs'))
-            self.assertIn('400 of 900', page.inner_text('.directory-note'))
+            self.assertIn('1–50 of 400', page.inner_text('.directory-note'))
             self.assertEqual(page.locator('.directory-item').count(), 50)
         finally:
             context.close()
@@ -393,6 +461,82 @@ class ContentScriptTest(unittest.TestCase):
         finally:
             context.close()
 
+    def test_changed_target_and_inert_or_invisible_ancestors_refuse_clicks(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 3)
+            result = page.evaluate("""() => {
+              const outcomes = {};
+              const el = document.getElementById('b0');
+              window.hits = 0; el.onclick = () => window.hits++;
+              let index = indexInteractiveElements();
+              el.textContent = 'Different action';
+              outcomes.changed = clickElementByIndex(1, index.generation);
+              index = indexInteractiveElements(); el.parentElement.inert = true;
+              outcomes.inert = clickElementByIndex(1, index.generation);
+              el.parentElement.inert = false;
+              index = indexInteractiveElements(); el.parentElement.style.opacity = '0';
+              outcomes.invisible = clickElementByIndex(1, index.generation);
+              return {outcomes, hits: window.hits};
+            }""")
+            self.assertEqual(result['hits'], 0)
+            for outcome in result['outcomes'].values():
+                self.assertFalse(outcome['ok'])
+        finally:
+            context.close()
+
+    def test_scrolling_reindexes_targets_after_the_cap(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 450)
+            page.evaluate('indexInteractiveElements()')
+            page.locator('#b449').scroll_into_view_if_needed()
+            result = page.evaluate('indexInteractiveElements()')
+            self.assertIn('b449', [item['id'] for item in result['items']])
+            self.assertLessEqual(len(result['items']), 400)
+        finally:
+            context.close()
+
+    def test_modal_cover_prevents_clicking_the_underlying_target(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 1)
+            result = page.evaluate("""() => {
+              const el=document.getElementById('b0'); el.style.top='200px'; el.style.left='200px';
+              window.hits=0; el.onclick=()=>window.hits++;
+              const scan=indexInteractiveElements();
+              const cover=document.createElement('div');
+              cover.style.cssText='position:fixed;left:200px;top:200px;width:120px;height:24px;z-index:999999;background:black';
+              document.body.appendChild(cover);
+              const item=scan.items.find(item=>item.id==='b0');
+              return {click:clickElementByIndex(item.index,scan.generation),hits:window.hits};
+            }""")
+            self.assertFalse(result['click']['ok']); self.assertEqual(result['hits'],0)
+        finally:
+            context.close()
+
+    def test_open_shadow_dom_and_accessible_frames_are_indexed_and_clicked(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 0)
+            page.evaluate("""() => {
+              document.body.innerHTML = '<div id="host"></div><iframe srcdoc="<button id=framed>Frame action</button>"></iframe>';
+              document.getElementById('host').attachShadow({mode:'open'}).innerHTML = '<button id="shadowed">Shadow action</button>';
+            }""")
+            page.frame_locator('iframe').locator('#framed').wait_for()
+            result = page.evaluate('indexInteractiveElements()')
+            self.assertIn('shadowed', [item['id'] for item in result['items']])
+            self.assertIn('framed', [item['id'] for item in result['items']])
+            outcome = page.evaluate("""(scan) => {
+              const el = document.getElementById('host').shadowRoot.querySelector('button');
+              window.hits=0; el.onclick=()=>window.hits++;
+              const item=scan.items.find(item=>item.id==='shadowed');
+              return {click:clickElementByIndex(item.index,scan.generation), hits:window.hits};
+            }""", result)
+            self.assertTrue(outcome['click']['ok']); self.assertEqual(outcome['hits'], 1)
+        finally:
+            context.close()
+
     def test_indexing_is_capped_and_reports_totals(self):
         context, page = self.new_page()
         try:
@@ -522,7 +666,19 @@ class RealBrowserExtensionTest(unittest.TestCase):
         import threading
         class Fixture(BaseHTTPRequestHandler):
             def do_GET(self):
-                data = b'<html><body><button id="fixture-button">Synthetic fixture</button><input placeholder="fixture"></body></html>'
+                if self.path == '/frames':
+                    port = self.server.server_port
+                    data = (f'<html><body><div id="shadow-host"></div>'
+                            f'<iframe src="/same-frame"></iframe>'
+                            f'<iframe src="http://localhost:{port}/cross-frame"></iframe>'
+                            '<script>document.querySelector("#shadow-host").attachShadow({mode:"open"})'
+                            '.innerHTML="<button id=shadow-action>Shadow action</button>";</script>'
+                            '</body></html>').encode()
+                elif self.path in ('/same-frame', '/cross-frame'):
+                    label = 'Same frame action' if self.path == '/same-frame' else 'Cross frame action'
+                    data = f'<html><body><button id="frame-action">{label}</button></body></html>'.encode()
+                else:
+                    data = b'<html><body><button id="fixture-button">Synthetic fixture</button><input placeholder="fixture"></body></html>'
                 self.send_response(200); self.send_header('Content-Type','text/html'); self.end_headers(); self.wfile.write(data)
             def log_message(self, *args): pass
         cls.server = ThreadingHTTPServer(('127.0.0.1', 0), Fixture)
@@ -599,6 +755,22 @@ class RealBrowserExtensionTest(unittest.TestCase):
         self.assertIn('<all_urls>', manifest['host_permissions'],
                       'captureVisibleTab needs <all_urls> or a transient activeTab grant')
 
+    def test_real_panel_indexes_frames_and_routes_same_origin_click(self):
+        self.page.goto(self.DASHBOARD + 'frames')
+        self.page.wait_for_timeout(600)
+        self.page.bring_to_front()
+        self.panel.wait_for_function("() => document.querySelector('#tabUrl').textContent==='127.0.0.1'")
+        same = next(frame for frame in self.page.frames if frame.url.endswith('/same-frame'))
+        same.evaluate('window.__hits=0; document.querySelector("button").onclick=()=>window.__hits++')
+        self.panel.evaluate("document.querySelector('#indexBtn').click()")
+        self.panel.wait_for_function("() => document.querySelector('#directoryList').textContent.includes('Cross frame action')")
+        for label in ('Shadow action','Same frame action','Cross frame action'):
+            self.assertIn(label, self.panel.inner_text('#directoryList'))
+        self.panel.evaluate("""() => [...document.querySelectorAll('.directory-item')]
+          .find(row=>row.textContent.includes('Same frame action')).querySelector('button').click()""")
+        self.panel.wait_for_timeout(200)
+        self.assertEqual(same.evaluate('window.__hits'), 1)
+
     def test_panel_reports_the_live_dashboard(self):
         self.assertIn(self.panel.inner_text('#daemonLabel'), ('Online :4317', 'Standalone'))
         self.assertIn('Panel ready', self.panel.inner_text('#terminalLogs'))
@@ -617,9 +789,12 @@ class RealBrowserExtensionTest(unittest.TestCase):
     def test_click_by_index_dispatches_a_real_event(self):
         result = self.send_to_tab({'type': 'INDEX_PAGE'})
         self.assertFalse(self.send_to_tab({'type': 'CLICK_INDEX', 'index': 1})['ok'])
+        self.assertFalse(self.send_to_tab({'type': 'CLICK_INDEX', 'index': 1,
+                         'generation':result['generation'], 'documentToken':'another-document'})['ok'])
         self.page.evaluate("() => { window.__hits = 0;"
                            " document.addEventListener('click', () => window.__hits++, true); }")
-        response = self.send_to_tab({'type': 'CLICK_INDEX', 'index': result['items'][0]['index'], 'generation': result['generation']})
+        response = self.send_to_tab({'type': 'CLICK_INDEX', 'index': result['items'][0]['index'],
+                                    'generation': result['generation'], 'documentToken': result['documentToken']})
         self.assertTrue(response['ok'])
         self.page.wait_for_timeout(500)
         self.assertGreaterEqual(self.page.evaluate('() => window.__hits'), 1)

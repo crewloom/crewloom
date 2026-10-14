@@ -117,7 +117,9 @@ function handleMessage(message, sender, sendResponse) {
   }
 
   if (message.type === 'OPEN_MACOS_SETTINGS') {
-    chrome.tabs.create({ url: 'http://127.0.0.1:4317/' }, () => sendResponse({ ok: true, instruction: 'Open Settings from the authenticated dashboard' }));
+    chrome.tabs.create({ url: 'http://127.0.0.1:4317/' }, () => sendResponse(chrome.runtime.lastError
+      ? {ok:false,error:chrome.runtime.lastError.message}
+      : { ok: true, instruction: 'Open Settings from the authenticated dashboard' }));
     return true;
   }
 

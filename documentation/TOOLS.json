@@ -115,7 +115,7 @@
       "skill": "context-guardian",
       "path": ".agents/skills/context-guardian/scripts/context_pack.py",
       "description": "Bounded English or Arabic context pack",
-      "example_args": "--skill context-guardian --out /tmp/context.md",
+      "example_args": "--skill context-guardian --out context.md",
       "dependencies": [
         "Python standard library"
       ],
@@ -166,7 +166,8 @@
         "Python standard library",
         "Git project for navigation indexing"
       ],
-      "effect": "writes-project-configuration-and-runtime-state"
+      "effect": "writes-project-configuration-and-runtime-state",
+      "dashboard": "cli"
     },
     {
       "id": "project-lessons",
@@ -178,14 +179,15 @@
         "Python standard library",
         "Recorded workflow evidence for promotion"
       ],
-      "effect": "writes-project-runtime-state"
+      "effect": "writes-project-runtime-state",
+      "dashboard": "cli"
     },
     {
       "id": "context-pilot",
       "skill": "context-guardian",
       "path": "scripts/context_pilot.py",
       "description": "Reproducible cold and warm context pilot with byte comparison",
-      "example_args": "--out /tmp/crewloom-pilot.json",
+      "example_args": "--out context-pilot.json",
       "dependencies": [
         "Python standard library"
       ],
@@ -200,7 +202,8 @@
       "dependencies": [
         "Python standard library"
       ],
-      "effect": "reads-project-and-agency-registry"
+      "effect": "reads-project-and-agency-registry",
+      "dashboard": "cli"
     }
   ]
 }

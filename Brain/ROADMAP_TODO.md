@@ -213,3 +213,7 @@
 - 2026-10-12 | [x] Review fixes, current-main integration, native plugin local install, real browser regressions and dashboard build/UI checks. [ ] Exact final gate/PR/CI/merge/runtime rollout; [ ] independently scoped authenticated model/browser command bridge and true native desktop controller, which this manual companion does not implement. Broader P0-P6 quality plan remains separate.
 
 - 2026-10-13 | [x] Password-value refusal and persistent first-capture readiness fixes; [ ] final gate, exact-head CI, normal merge and installed runtime update.
+
+### 2026-10-14 — Defect closure and integration follow-up
+- Done:13 audited defects have concrete fixes and regressions; public acceptance contract, current ZIP, guarded download and separate runtime/project source display added.
+- Remaining: gated local rollout, then project/task-bound MCP browser and desktop integration with real call evidence; retain the manual default and existing host opt-in boundary. Full multi-role and cross-model quality evidence remains distinct from software test results.

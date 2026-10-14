@@ -46,6 +46,7 @@ export default function ComputerUsePanel({ language }: { language: 'en' | 'ar' }
       </button>
     </div>
     <p>{ar ? 'التفعيل عام للإضافة في هذا المتصفح. التحكم عبر DOM لا يحتاج صلاحية Accessibility.' : 'Activation applies to this browser extension. DOM controls do not require macOS Accessibility.'}</p>
+    <p><a href="/api/extension/download">{ar ? 'تحميل إضافة المتصفح' : 'Download browser extension'}</a></p>
     <button onClick={inspect}>{ar ? 'فحص التقاط الشاشة على macOS' : 'Check macOS screen capture'}</button>{' '}
     <button onClick={() => open('Privacy_ScreenCapture')}>{ar ? 'فتح إعدادات الشاشة' : 'Open screen settings'}</button>
     {permissions.map(p => <p key={p.id}>{p.id}: {p.granted === null ? (ar ? 'غير متحقق' : 'Unknown') : p.granted ? (ar ? 'تم التحقق من الفحص' : 'Probe verified') : (ar ? 'الفحص لم ينجح' : 'Probe failed')}{p.error ? ` — ${p.error}` : ''}</p>)}

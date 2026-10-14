@@ -312,3 +312,7 @@
 - 2026-10-12 | Initial integrated commit c009813 passed the complete mandatory hook. Final native Chrome test now additionally confirms generation-less click requests are refused; all29 browser checks pass again with one optional screenshot skip. Final fix commit gate pending.
 
 - 2026-10-13 | PR19 review fixes implemented. Dashboard47 tests pass; headed Chrome30 tests pass with one optional screenshot skip, including non-export of entered form values. Added rendered first-open/changed-tab regression; final gate/publication pending.
+
+### 2026-10-14 — Browser/dashboard defect closure
+- Artifact: existing browser/dashboard modules, source packager and documentation/BROWSER_DASHBOARD_ACCEPTANCE.md.
+- Evidence: original tab/DOM/metrics regressions reject old behavior; Python1123 (1016pass/107skip), dashboard55, TypeScript/build, Docker workflow34/policy43, actual Chromium38pass/1optional skip, distribution12 pass. ZIP rejects stale/unreviewed content and accepts deterministic rebuilds. Local rollout follows the gated commit; autonomous MCP/desktop integration is a separate phase.

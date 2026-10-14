@@ -9,7 +9,7 @@ export const RUN_LOG = path.join(PROJECT, '.crewloom', 'runs.jsonl');
 export const BRAIN_FILES = ['ARCHITECTURE', 'COMPLETED', 'CHALLENGES', 'IDEAS_VAULT', 'ROADMAP_TODO'] as const;
 const SKILL_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
-export type Tool = { id: string; skill: string; path: string; description: string; example_args: string; effect: string };
+export type Tool = { id: string; skill: string; path: string; description: string; example_args: string; effect: string; dashboard?: 'cli' | 'project' };
 export type Run = { ts: string; tool: string; skill: string; exit_code: number; duration_ms: number; source: 'cli' | 'dashboard'; project_root?: string; output?: string };
 export type SkillSummary = {
   id: string; description: string; lastActivity: string | null;
@@ -22,15 +22,18 @@ export const isSkillId = (value: string) => SKILL_ID.test(value);
 /** Count `- [ ]` backlog items, dated `###` entries, and unresolved challenges. */
 export function countBrain(files: Partial<Record<(typeof BRAIN_FILES)[number], string>>) {
   const count = (text: string | undefined, re: RegExp) => (text?.match(re) ?? []).length;
-  const challenges = files.CHALLENGES ?? '';
-  const entries = challenges.split(/^### /m).slice(1);
-  const statusLine = (e: string) => e.split('\n').find((l) => /(الحالة|status)/i.test(l)) ?? '';
-  const openChallenges = entries.filter((e) => /(مفتوح|\bopen\b)/i.test(statusLine(e))).length;
+  const records = (text = '') => text.split(/(?=^### |^\s*- \d{4}-\d{2}-\d{2}\b)/m)
+    .filter((record) => /^(### |\s*- \d{4}-\d{2}-\d{2}\b)/.test(record));
+  const entries = records(files.CHALLENGES);
+  const statusLine = (entry: string) => entry.split('\n').find((line) =>
+    /(الحالة|status|(?:^|\|)\s*(?:open|مفتوح)\s*:)/i.test(line)) ?? '';
+  const openChallenges = entries.filter((entry) => /(مفتوح|\bopen\b)/i.test(statusLine(entry)) &&
+    !/(resolved|closed|مغلق|محلول)/i.test(statusLine(entry))).length;
   return {
     openTasks: count(files.ROADMAP_TODO, /^\s*- \[ \]/gm),
-    doneEntries: count(files.COMPLETED, /^### /gm),
+    doneEntries: records(files.COMPLETED).length,
     openChallenges,
-    ideas: count(files.IDEAS_VAULT, /^### /gm),
+    ideas: records(files.IDEAS_VAULT).length,
   };
 }
 
@@ -48,7 +51,12 @@ export function parseRuns(text: string): Run[] {
   const runs: Run[] = [];
   for (const line of text.split('\n')) {
     if (!line.trim()) continue;
-    try { runs.push(JSON.parse(line) as Run); } catch { /* skip a torn line */ }
+    try {
+      const value = JSON.parse(line);
+      if (value && typeof value === 'object' && !Array.isArray(value) &&
+          typeof value.tool === 'string' && Number.isInteger(value.exit_code) &&
+          (value.project_root === undefined || typeof value.project_root === 'string')) runs.push(value as Run);
+    } catch { /* skip this malformed record only */ }
   }
   return runs;
 }
@@ -121,7 +129,7 @@ export async function listSkills(): Promise<SkillSummary[]> {
     const mine = runs.filter((r) => r.skill === id);
     const failedRuns = mine.filter((r) => r.exit_code !== 0).length;
     const counts = countBrain(files);
-    const status = failedRuns > 0 || counts.openChallenges > 0 ? 'attention' : mine.length || counts.doneEntries ? 'healthy' : 'idle';
+    const status = failedRuns > 0 || counts.openChallenges > 0 ? 'attention' : mine.length ? 'healthy' : 'idle';
     out.push({
       id, description: meta.description ?? '', lastActivity: latest ? new Date(latest).toISOString() : null,
       ...counts, tools: tools.filter((t) => t.skill === id).map((t) => t.id), runs: mine.length, failedRuns, status,
@@ -156,6 +164,8 @@ function exec(args: string[], timeoutMs: number, cwd = PROJECT): Promise<ExecRes
 export async function runTool(toolId: string, args: string[]): Promise<ExecResult & { error?: string }> {
   const tool = (await readTools()).find((t) => t.id === toolId);
   if (!tool) return { exit_code: 2, output: '', duration_ms: 0, error: 'Unknown tool' };
+  if (tool.dashboard === 'cli') return { exit_code: 2, output: '', duration_ms: 0,
+    error: 'This tool needs explicit CLI project/account inputs; use its documented CLI command' };
   for (const arg of args) {
     if (arg.includes('\0') || (!arg.startsWith('-') && /(^|\/)\.\.(\/|$)/.test(arg)) || path.isAbsolute(arg)) {
       return { exit_code: 2, output: '', duration_ms: 0, error: `Rejected argument: ${arg}` };

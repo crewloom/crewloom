@@ -1,9 +1,14 @@
 # Reusable code registry
 
+
+
 Core Python tools use the standard library. Commands run from the checkout root. Host tools for specialist tasks are not bundled.
 
 | Path | Purpose | Command |
 | --- | --- | --- |
+| [scripts/package_browser.py](../scripts/package_browser.py) | Build/check deterministic browser ZIP from the source tree; toolbox-integration-steward | `python3 scripts/package_browser.py` or `python3 scripts/package_browser.py --check` |
+| [dashboard/lib/tool-arguments.ts](../dashboard/lib/tool-arguments.ts) | Bounded quoted-text/JSON argument parsing without shell evaluation; frontend-ux-auditor | Used by the dashboard Run form |
+| [dashboard/test/tool-arguments.test.ts](../dashboard/test/tool-arguments.test.ts) | Quote, invalid-input and dashboard catalog compatibility regressions; QA | `npm test` from `dashboard` |
 | [scripts/crewloom.py](../scripts/crewloom.py) | Role discovery, validation, and context CLI | `python3 scripts/crewloom.py list` |
 | [scripts/check_repository.py](../scripts/check_repository.py) | Public checkout structure, syntax, links, and regressions | `python3 scripts/check_repository.py` |
 | [.agents/skills/skill-forge-recruiter/scripts/validate_skill.py](../.agents/skills/skill-forge-recruiter/scripts/validate_skill.py) | Bilingual procedure structure | `python3 .agents/skills/skill-forge-recruiter/scripts/validate_skill.py --skill context-guardian` |
