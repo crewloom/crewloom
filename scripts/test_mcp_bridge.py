@@ -190,11 +190,11 @@ class LiveProtocolTest(unittest.TestCase):
                     async with Client(StdioServerParameters(command=sys.executable, args=args), mode='legacy') as client:
                         listed = await client.list_tools()
                         names = {tool.name for tool in listed.tools}
-                        expected = {'crewloom_status', 'crewloom_context', 'crewloom_task_packet'}
+                        expected = {'crewloom_status', 'crewloom_context', 'crewloom_task_packet', 'crewloom_questions'}
                         if writable:
                             expected |= {'crewloom_import_reply', 'crewloom_verify'}
                         self.assertEqual(names, expected)
-                        for name in ('crewloom_status', 'crewloom_context'):
+                        for name in ('crewloom_status', 'crewloom_context', 'crewloom_questions'):
                             result = await client.call_tool(name, {})
                             self.assertFalse(result.is_error, result)
                         bad = await client.call_tool('crewloom_status', {'project': '/foreign/project'})

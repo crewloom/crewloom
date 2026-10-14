@@ -328,3 +328,7 @@
 ### 2026-10-14 — Typed run-history follow-up
 - Artifact: dashboard/lib/repo.ts and dashboard/test/repo.test.ts.
 - Evidence: regression rejects the prior parser (10 rows accepted instead of2);56 dashboard tests and TypeScript now pass. Required timestamp/role/duration/source fields and optional output/root are validated before history can reach metrics or React. All547 existing local rows have the required fields. Operational installation evidence remains project-private.
+
+### 2026-10-14 — Capture and bounded capability continuation
+- Artifact: existing user-context/native lifecycle/MCP modules; scripts/native_desktop.py, synthetic Swift target and documentation/NATIVE_DESKTOP.md.
+- Evidence: capture8 incl real SDK answer protocol; lifecycle75 (2optional skips), OpenCode36, packaging20, native mock4 pass; Swift fixture compiles. Two requested CLI models each yield selected-context4/4 versus raw-history2/4 on two bilingual scenarios; actual backend model identity unreported. Configured model rejection preserved. Full commit gate/local installation pending; human manifest approval/live Accessibility proof pending.

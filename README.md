@@ -182,3 +182,5 @@ See the [Arabic/English developer pilot](examples/bilingual-evaluation/README.md
 [Source-linked user context](documentation/USER_CONTEXT.md) adds project-local quoted statements, labelled assumptions and explicit task interpretations to frozen model context. Corrections retain history; changed sources invalidate reuse. This is provenance checking, not proof of speaker identity or model accuracy.
 
 [Private customization and selected publication](documentation/PRIVACY.md) keeps conversation inputs and project memory local, chains commit guards and builds reviewed file-selection packets. Known-pattern scanning does not prove content is safe to publish.
+
+Optional [native prompt capture](documentation/USER_CONTEXT.md) preserves exact private user messages after task opt-in and blocks actions on unresolved source-linked questions. The separate [scoped native AX acceptance](documentation/NATIVE_DESKTOP.md) client targets an account-free synthetic application; live control requires human-approved driver capabilities and actual Accessibility verification.

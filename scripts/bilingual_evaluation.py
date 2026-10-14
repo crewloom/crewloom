@@ -201,7 +201,7 @@ def verify_understanding():
             'model_trials': 0, 'model_improvement_measured': False}
 
 
-def run_understanding(project, output, hosts, models, timeout=120, seed=20261011):
+def run_understanding(project, output, hosts, models, timeout=120, seed=20261011, case_ids=None):
     """One preserved, project-bound private study; failures are never replaced."""
     import project_binding as pb
     import privacy
@@ -222,6 +222,12 @@ def run_understanding(project, output, hosts, models, timeout=120, seed=20261011
     if folder.exists() or folder.is_symlink():
         raise ValueError('Existing study cannot be overwritten or restarted')
     cases = understanding_cases()
+    all_ids = [case['id'] for case in cases]
+    if case_ids is not None:
+        if (not isinstance(case_ids, list) or not case_ids or len(set(case_ids)) != len(case_ids)
+                or any(case_id not in all_ids for case_id in case_ids)):
+            raise ValueError('Case selection must contain distinct known understanding cases')
+        cases = [case for case in cases if case['id'] in case_ids]
     prepared = []
     for host in hosts:
         for case in cases:
@@ -245,6 +251,8 @@ def run_understanding(project, output, hosts, models, timeout=120, seed=20261011
     report = {'protocol': 'crewloom-user-understanding-pilot-v1', 'binding': binding,
               'seed': seed, 'timeout': timeout, 'models_requested': models,
               'frozen_inputs': frozen, 'planned_trials': [], 'trials': [], 'complete': False,
+              'coverage': {'case_ids': [case['id'] for case in cases], 'available_case_ids': all_ids,
+                           'full_suite': len(cases) == len(all_ids)},
               'limits': 'Synthetic classification only. Native CLI exception, not an OS sandbox. No general agency-performance claim.'}
     for index, trial in enumerate(prepared):
         privacy.private_write(root, str(relative / ('prompt-%02d.txt' % index)), trial['prompt'])
@@ -307,6 +315,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output')
     parser.add_argument('--understanding', action='store_true')
+    parser.add_argument('--case-id', action='append', help='Preselect a bounded understanding pilot; omitted runs all cases')
     parser.add_argument('--project')
     parser.add_argument('--verify-understanding', action='store_true', help='Verify frozen synthetic user-understanding contracts; no model calls')
     parser.add_argument('--host', action='append', choices=sorted(model_host.CLI_HOSTS), default=[])
@@ -316,7 +325,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.verify_understanding:
-            if args.host or args.output or args.model or args.understanding or args.project:
+            if args.host or args.output or args.model or args.understanding or args.project or args.case_id:
                 raise ValueError('Offline understanding verification does not accept provider/output arguments')
             print(json.dumps(verify_understanding(), ensure_ascii=False)); return 0
         if not args.output or not args.host:
@@ -330,9 +339,9 @@ def main(argv=None):
         if args.understanding:
             if not args.project:
                 raise ValueError('Understanding collection requires --project')
-            report = run_understanding(args.project, args.output, args.host, models, args.timeout)
+            report = run_understanding(args.project, args.output, args.host, models, args.timeout, case_ids=args.case_id)
         else:
-            if args.project:
+            if args.project or args.case_id:
                 raise ValueError('--project is supported only with --understanding')
             report = run(args.output, args.host, args.timeout, args.image, models=models)
         return 0 if report['complete'] else 2

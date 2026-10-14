@@ -31,6 +31,8 @@ An equivalent client JSON template is in [the example config](../examples/mcp/cr
 | --- | --- |
 | `crewloom_status` | Read the selected binding, task progress and enabled capabilities |
 | `crewloom_context` | Read the task's frozen context; missing, foreign or stale context is refused |
+| `crewloom_questions` | Read source-linked capture status and questions even when context is blocked |
+| `crewloom_answer` | Available only with `--allow-context-update`; resolve one question against a later captured exact quote |
 | `crewloom_task_packet` | Available with `--plan`; read the next awaiting task's prompt, response schema and fingerprints |
 | `crewloom_import_reply` | Available only with explicit `--allow-import`; validate and publish exactly the packet's declared candidate files |
 | `crewloom_verify` | Available only with explicit `--allow-verify`; run pending command steps through the existing Docker executor |
@@ -72,3 +74,5 @@ The [Chrome side panel](CHROME_EXTENSION_SIDE_PANEL.md) remains a manually opera
 For an agent-controlled test browser, Microsoft's [Playwright MCP server](https://github.com/microsoft/playwright-mcp) is an existing integration. The [isolated browser config](../examples/mcp/playwright-isolated.json) pins the tested server version, keeps the browser profile in memory, disables page-supplied WebMCP tools and routes artifacts into the selected project's private directory. Replace the output path before use, launch from the project root and validate the config through `mcp-config`. The template does not attach to the operator's authenticated browser session.
 
 Configure host permissions separately; Playwright's browser connection is not Crewloom's task/publication boundary. Its origin filters do not sandbox redirects. Desktop accessibility, Screen Recording consent and application targeting require an actual native-host adapter and live verification before desktop control can be claimed.
+
+The separate [scoped native AX acceptance](NATIVE_DESKTOP.md) client requires a reviewed bounded driver manifest and actual Accessibility verification. It does not add desktop tools to the task bridge.

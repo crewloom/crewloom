@@ -102,6 +102,15 @@ class UnderstandingContracts(unittest.TestCase):
                 self.assertEqual(len(report['trials']), 36)
                 self.assertTrue(report['complete'])
                 self.assertEqual(sum(g['planned'] for g in report['summary']), 36)
+                self.assertTrue(report['coverage']['full_suite'])
+                subset = pilot.run_understanding(root, relative + '-subset', ['codex'], {'codex': 'fixture-model'},
+                                                 case_ids=['latest-correction'])
+                self.assertEqual(len(subset['trials']), 4)
+                self.assertEqual(subset['coverage']['case_ids'], ['latest-correction'])
+                self.assertFalse(subset['coverage']['full_suite'])
+                with self.assertRaisesRegex(ValueError, 'distinct known'):
+                    pilot.run_understanding(root, relative + '-unknown', ['codex'], {'codex': 'fixture-model'},
+                                            case_ids=['unknown'])
                 for path in (root / relative).iterdir():
                     self.assertEqual(path.stat().st_mode & 0o777, 0o700 if path.is_dir() else 0o600)
                 with self.assertRaisesRegex(ValueError, 'overwritten'):

@@ -346,3 +346,8 @@
 ### 2026-10-14 — Parsed JSON is not a typed run
 - Cause: the first malformed-row fix excluded null/scalars but cast objects after checking only tool/exit/root. An object-valued source/duration could still reach React, and invalid dates could count toward role health.
 - Solution: validate every Run field at the parsing boundary and skip only the bad row. Reject wrong types, nonfinite/negative durations and invalid dates; use realistic timestamped log fixtures. Known violation rejected before the change;56-test clean suite and TypeScript pass.
+
+### 2026-10-14 — Clarification and native scope boundaries
+- Cause: source-linked context needed explicit recording; preserving questions without blocking native tools could still allow an edit. Fix: task opt-in, literal-source capture, unanswered-question guard and later-message exact answers; disabling capture preserves history. Ordinals survive canonical JSON key sorting.
+- Native lesson: short project-private sockets are required by macOS; refuse long paths, autostart and broad-daemon fallback. CuaDriver bounded startup requires actual human manifest approval; prepare and test before requesting it. Driver schemas and TCC readiness need live acceptance.
+- Evaluation: a cached/configured model ID was rejected by the actual authenticated CLI. Retain the two transport failures and blocked trials, then record an explicitly different available model in a separate run. Requested IDs are not verified backend identity.

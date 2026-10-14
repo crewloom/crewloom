@@ -227,3 +227,12 @@
 - Remaining capabilities: a native desktop application adapter with measured OS trust, automatic chat capture/clarification, and independently scoped real multi-role/cross-model acceptance. These are feature/acceptance gaps, not closed by the13 software defect fixes or isolated browser test. Remote publication/merge has not been performed.
 
 - 2026-10-14 | [x] Additional typed-history corruption regression, complete Run boundary validation,56 dashboard tests and TypeScript. Keep verified runtime/check receipts private; existing native-desktop/chat-capture/multi-model acceptance gaps remain explicit.
+
+### 2026-10-14 — Capability continuation
+- [x] Per-task opt-in native prompt capture, exact private source statements, bounded history and disable-with-preservation.
+- [x] Source-linked heuristic questions, native action refusal, later captured answers and read/opt-in-write MCP tools.
+- [x] Preserved bilingual pilot: two requested usable CLI models, two scenarios each; configured model rejection retained.
+- [x] Scoped native AX client, fixture-only bounded manifest, synthetic Swift application and negative mock checks.
+- [ ] Human approval of the exact native manifest; actual Accessibility observe/press/reobserve and negative target proof.
+- [ ] Broader representative role quality evaluation, verified backend identity, measured cost and native host capture acceptance beyond protocol fixtures.
+- [ ] Mandatory final commit gate and installed source refresh for this continuation.

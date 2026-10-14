@@ -18,7 +18,7 @@ class Bridge:
     """One immutable launch scope; revalidate local authority before every call."""
 
     def __init__(self, project, project_id, task_id, plan=None, allow_import=False,
-                 allow_verify=False, image=w.DEFAULT_IMAGE):
+                 allow_verify=False, image=w.DEFAULT_IMAGE, allow_context_update=False):
         path = Path(project)
         if not path.is_absolute() or path.resolve(strict=True) != path:
             raise ValueError('MCP requires an absolute canonical project root without symlinks')
@@ -46,6 +46,7 @@ class Bridge:
             raise ValueError('MCP write tools require one explicit reviewed workflow plan')
         self.allow_import = allow_import
         self.allow_verify = allow_verify
+        self.allow_context_update = allow_context_update
         self.image = image
 
     def guard(self):
@@ -74,6 +75,7 @@ class Bridge:
         value['tasks'] = [task for task in value['tasks'] if task['task_id'] == self.task_id]
         return {**value, 'task_id': self.task_id, 'transport': 'stdio',
                 'capabilities': {'import_reply': self.allow_import, 'verify': self.allow_verify,
+                                 'answer_question': self.allow_context_update,
                                  'desktop_control': False, 'model_generation': False}}
 
     def context(self) -> Dict[str, Any]:
@@ -92,6 +94,18 @@ class Bridge:
         if not path.is_file():
             raise ValueError('Start the selected workflow through the CLI before requesting a packet')
         return w.agent_packet(self.root, self.plan, self.fingerprint)
+
+    def questions(self) -> Dict[str, Any]:
+        self.guard()
+        import user_context
+        return user_context.capture_status(self.root, self.task_id)
+
+    def answer(self, question_id, source, quote) -> Dict[str, Any]:
+        if not self.allow_context_update:
+            raise ValueError('Question answers require explicit --allow-context-update at launch')
+        self.guard()
+        import user_context
+        return user_context.answer_question(self.root, self.task_id, question_id, source, quote)
 
     def import_candidate(self, packet, response) -> Dict[str, Any]:
         if not self.allow_import:
@@ -135,11 +149,22 @@ def server(bridge):
         """Read the selected task's frozen context; stale or foreign context is refused."""
         return invoke(bridge.context)
 
+    @mcp.tool(annotations=read)
+    def crewloom_questions() -> dict[str, Any]:
+        """Read this task's capture status and unresolved source-linked clarification questions."""
+        return invoke(bridge.questions)
+
     if bridge.plan is not None:
         @mcp.tool(annotations=read)
         def crewloom_task_packet() -> dict[str, Any]:
             """Read the next awaiting task's prompt/schema; grants no write or acceptance permission."""
             return invoke(bridge.packet)
+
+    if bridge.allow_context_update:
+        @mcp.tool(annotations=write)
+        def crewloom_answer(question_id: str, source: str, quote: str) -> dict[str, Any]:
+            """Resolve one question using an exact quote from a later captured user message."""
+            return invoke(bridge.answer, question_id, source, quote)
 
     if bridge.allow_import:
         @mcp.tool(annotations=write)
@@ -163,11 +188,12 @@ def main(argv=None):
     parser.add_argument('--plan')
     parser.add_argument('--allow-import', action='store_true')
     parser.add_argument('--allow-verify', action='store_true')
+    parser.add_argument('--allow-context-update', action='store_true')
     parser.add_argument('--image', default=w.DEFAULT_IMAGE)
     args = parser.parse_args(argv)
     try:
         bridge = Bridge(args.project, args.project_id, args.task_id, args.plan,
-                        args.allow_import, args.allow_verify, args.image)
+                        args.allow_import, args.allow_verify, args.image, args.allow_context_update)
         server(bridge).run(transport='stdio')
         return 0
     except (ValueError, OSError) as exc:
