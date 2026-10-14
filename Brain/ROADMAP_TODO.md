@@ -221,3 +221,7 @@
 ### 2026-10-14 — Integration acceptance update
 - Done: bound stdio MCP, candidate reply import preserving reviewer/container gates, and pinned isolated Playwright MCP config with four actual browser calls.10 MCP/import tests, Docker publication43, distribution13 and package20 pass.
 - Remaining: gated local CLI/dashboard rollout and read-only Codex registration. True native desktop control still needs a scoped application adapter and measured OS permissions; automatic chat capture/clarification and full multi-role/cross-model quality require separate acceptance inputs. Do not infer them from offline/unit tests or synthetic browser success.
+
+### 2026-10-14 — Local delivery completed
+- Done: mandatory hooks passed for browser/dashboard and MCP commits; immutable local CLI/dashboard updated, packaged extension download checked, rendered bilingual desktop/mobile checked, read-only Codex connection registered and exact-command live calls verified. Dirty original checkout retained.
+- Remaining capabilities: a native desktop application adapter with measured OS trust, automatic chat capture/clarification, and independently scoped real multi-role/cross-model acceptance. These are feature/acceptance gaps, not closed by the13 software defect fixes or isolated browser test. Remote publication/merge has not been performed.

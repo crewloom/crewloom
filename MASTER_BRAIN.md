@@ -102,3 +102,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-14 | Browser/dashboard13-defect closure implemented with rejected old cases and passing current tests: Python1123 (107skip), dashboard55, Docker77, real Chromium38 (1optional skip), distribution12. Manual browser control remains explicit; new MCP/desktop integration requires its own live evidence. Local runtime rollout follows the mandatory commit gate; no public merge or all-role performance claim.
 
 - 2026-10-14 | Browser/dashboard13-defect fixes are committed behind the mandatory hook. Optional bound MCP and external candidate import now pass real stdio/Docker acceptance; isolated Playwright navigation/snapshot/click/close verified. Local runtime rollout pending final gate; native desktop and general model quality remain unverified.
+
+- 2026-10-14 | Local13-defect closure delivered: gated commits, immutable CLI/dashboard snapshot, Chrome2.3.0 ZIP and read-only Codex MCP registration. Runtime HTTP, rendered English/Arabic and exact installed MCP command verified. Native desktop and cross-model/full-role quality remain explicit acceptance work.

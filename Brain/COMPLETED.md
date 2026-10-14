@@ -320,3 +320,7 @@
 ### 2026-10-14 — MCP and reply import acceptance
 - Artifact: scripts/mcp_bridge.py, workflow import-reply, documentation/MCP_BRIDGE.md and scoped client templates.
 - Evidence:10 bridge/import tests pass with real stdio and Docker; all five Crewloom tools called, plus actual Playwright navigate/snapshot/click/close against an isolated synthetic fixture. Both configs validate; distribution13 and packaging20 pass, Docker publication43 pass. Native Codex registration/runtime rollout follows the gated commit; no paid generation, desktop or broad model-quality claim.
+
+### 2026-10-14 — Verified local runtime rollout
+- Artifact: immutable Git snapshot bb6c68fb5c0bac5ed69500316edd6cb990015064 installed through pipx with the MCP extra; dashboard serves the same snapshot and preserves its monitored project. Prior snapshot retained.
+- Evidence: actual CLI source and SDK2.3.0 confirmed; HTTP overview/page/extension ZIP200, foreign-origin ZIP403, exact ZIP2.3.0 checksum matches source. Rendered English1440px/Arabic390px pass without horizontal overflow or page errors. Codex read-only config registered; its exact installed launch command lists/calls crewloom_status and crewloom_context successfully. Current chats require a new host connection to load tools.

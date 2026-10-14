@@ -338,3 +338,7 @@
 - Cause: exporting a packet alone left candidate publication to host-specific code; output edits could be overwritten while generation was in progress.
 - Solution: compare project/task/context/input/prompt/output revisions, recheck staged original bytes, reuse transactional publication, retain private replies and require existing review/verification. Tests reject foreign/stale packets, undeclared outputs, links and owner edits before/after staging.
 - SDK lesson: current official SDK uses MCPServer and Python3.11+; dict[str, Any] exposes direct structured results, while typing.Dict wrapped output. Current Playwright click schema requires target, not the older ref argument. Use actual list-tools schemas and live calls.
+
+### 2026-10-14 — Local package manager backend
+- Cause: pipx's default uv backend rejected an older installed uv before changing the Crewloom environment.
+- Solution: use the supported pip backend for the same editable immutable snapshot and pinned MCP extra, then verify the installed module source, actual stdio tools, dashboard source and downloadable ZIP. Preserve the previous snapshot for rollback.
