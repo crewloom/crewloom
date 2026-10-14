@@ -332,3 +332,5 @@
 ### 2026-10-14 — Capture and bounded capability continuation
 - Artifact: existing user-context/native lifecycle/MCP modules; scripts/native_desktop.py, synthetic Swift target and documentation/NATIVE_DESKTOP.md.
 - Evidence: capture8 incl real SDK answer protocol; lifecycle75 (2optional skips), OpenCode36, packaging20, native mock4 pass; Swift fixture compiles. Two requested CLI models each yield selected-context4/4 versus raw-history2/4 on two bilingual scenarios; actual backend model identity unreported. Configured model rejection preserved. Full commit gate/local installation pending; human manifest approval/live Accessibility proof pending.
+
+- 2026-10-14 | Continuation commit ef7782a passed the mandatory99-suite/1207-test repository gate (optional live suites retain their skips). Immutable source installed with pinned MCP extra; exact installed stdio command lists/calls all three read tools. No native driver launch or automatic host capture activation; approval remains pending.

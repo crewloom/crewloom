@@ -235,4 +235,4 @@
 - [x] Scoped native AX client, fixture-only bounded manifest, synthetic Swift application and negative mock checks.
 - [ ] Human approval of the exact native manifest; actual Accessibility observe/press/reobserve and negative target proof.
 - [ ] Broader representative role quality evaluation, verified backend identity, measured cost and native host capture acceptance beyond protocol fixtures.
-- [ ] Mandatory final commit gate and installed source refresh for this continuation.
+- [x] Mandatory commit gate passed on ef7782a; installed source and all three read-only MCP tools verified. Final memory-only snapshot refresh follows the same gate.
