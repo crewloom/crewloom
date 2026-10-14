@@ -342,3 +342,7 @@
 ### 2026-10-14 — Local package manager backend
 - Cause: pipx's default uv backend rejected an older installed uv before changing the Crewloom environment.
 - Solution: use the supported pip backend for the same editable immutable snapshot and pinned MCP extra, then verify the installed module source, actual stdio tools, dashboard source and downloadable ZIP. Preserve the previous snapshot for rollback.
+
+### 2026-10-14 — Parsed JSON is not a typed run
+- Cause: the first malformed-row fix excluded null/scalars but cast objects after checking only tool/exit/root. An object-valued source/duration could still reach React, and invalid dates could count toward role health.
+- Solution: validate every Run field at the parsing boundary and skip only the bad row. Reject wrong types, nonfinite/negative durations and invalid dates; use realistic timestamped log fixtures. Known violation rejected before the change;56-test clean suite and TypeScript pass.

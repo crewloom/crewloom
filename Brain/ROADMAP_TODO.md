@@ -225,3 +225,5 @@
 ### 2026-10-14 — Local delivery completed
 - Done: mandatory hooks passed for browser/dashboard and MCP commits; immutable local CLI/dashboard updated, packaged extension download checked, rendered bilingual desktop/mobile checked, read-only Codex connection registered and exact-command live calls verified. Dirty original checkout retained.
 - Remaining capabilities: a native desktop application adapter with measured OS trust, automatic chat capture/clarification, and independently scoped real multi-role/cross-model acceptance. These are feature/acceptance gaps, not closed by the13 software defect fixes or isolated browser test. Remote publication/merge has not been performed.
+
+- 2026-10-14 | [x] Additional typed-history corruption regression, complete Run boundary validation,56 dashboard tests and TypeScript. Keep verified runtime/check receipts private; existing native-desktop/chat-capture/multi-model acceptance gaps remain explicit.

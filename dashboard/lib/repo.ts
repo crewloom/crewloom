@@ -54,8 +54,14 @@ export function parseRuns(text: string): Run[] {
     try {
       const value = JSON.parse(line);
       if (value && typeof value === 'object' && !Array.isArray(value) &&
-          typeof value.tool === 'string' && Number.isInteger(value.exit_code) &&
-          (value.project_root === undefined || typeof value.project_root === 'string')) runs.push(value as Run);
+          typeof value.tool === 'string' && value.tool.trim() &&
+          typeof value.skill === 'string' && value.skill.trim() &&
+          typeof value.ts === 'string' && Number.isFinite(Date.parse(value.ts)) &&
+          Number.isInteger(value.exit_code) &&
+          typeof value.duration_ms === 'number' && Number.isFinite(value.duration_ms) && value.duration_ms >= 0 &&
+          (value.source === 'cli' || value.source === 'dashboard') &&
+          (value.output === undefined || typeof value.output === 'string') &&
+          (value.project_root === undefined || (typeof value.project_root === 'string' && value.project_root.trim()))) runs.push(value as Run);
     } catch { /* skip this malformed record only */ }
   }
   return runs;

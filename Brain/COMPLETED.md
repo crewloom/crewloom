@@ -324,3 +324,7 @@
 ### 2026-10-14 — Verified local runtime rollout
 - Artifact: immutable Git snapshot bb6c68fb5c0bac5ed69500316edd6cb990015064 installed through pipx with the MCP extra; dashboard serves the same snapshot and preserves its monitored project. Prior snapshot retained.
 - Evidence: actual CLI source and SDK2.3.0 confirmed; HTTP overview/page/extension ZIP200, foreign-origin ZIP403, exact ZIP2.3.0 checksum matches source. Rendered English1440px/Arabic390px pass without horizontal overflow or page errors. Codex read-only config registered; its exact installed launch command lists/calls crewloom_status and crewloom_context successfully. Current chats require a new host connection to load tools.
+
+### 2026-10-14 — Typed run-history follow-up
+- Artifact: dashboard/lib/repo.ts and dashboard/test/repo.test.ts.
+- Evidence: regression rejects the prior parser (10 rows accepted instead of2);56 dashboard tests and TypeScript now pass. Required timestamp/role/duration/source fields and optional output/root are validated before history can reach metrics or React. All547 existing local rows have the required fields. Operational installation evidence remains project-private.
