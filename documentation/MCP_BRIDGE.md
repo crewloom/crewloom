@@ -4,14 +4,18 @@ Crewloom exposes project context and workflow packets through the official Pytho
 
 ## Install and bind
 
+From the cloned source checkout in an activated Python 3.11+ environment:
+
 ```bash
-python3 -m pip install 'crewloom[mcp]'
+python3 -m pip install '.[mcp]'
 crewloom project setup --project /absolute/project --project-id example-project
 crewloom install --host agents --target /absolute/project --skill fullstack-mvp-engineer
 crewloom project enter --project /absolute/project --project-id example-project --task-id feature-task --role fullstack-mvp-engineer --seed contract.txt
 ```
 
 Supply an existing project and real task inputs. For workflow packets, the selected plan must have the same ID as the task. Start it through `crewloom workflow run --project /absolute/project --plan workflow.json`; task steps pause for an agent response. The bridge accepts task/command plans and refuses model steps. Tool arguments cannot select an alternative project, plan or command.
+
+This development snapshot is installed from source; these instructions do not assume a PyPI release.
 
 ## Connect Codex
 

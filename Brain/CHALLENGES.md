@@ -7,7 +7,7 @@
 
 ### 2026-10-15 — Setup and dependency contracts drifted
 - Cause: first launch used npm install despite a reviewed lockfile; Arabic/release login and health prose predated implementation changes.
-- Solution: npm ci with failure-stop regression, Node/ES module metadata and current bilingual setup/release checklist.
+- Solution: npm ci with failure-stop regression, Node/ES module metadata, source-install commands for unpublished extras and current bilingual setup/release checklist.
 - Status: Resolved locally; dashboard56, TypeScript/build and package acceptance pass.
 
 ### 2026-10-01 — Separate public tooling from private operations
