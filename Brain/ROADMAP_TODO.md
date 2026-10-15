@@ -233,6 +233,8 @@
 - [x] Source-linked heuristic questions, native action refusal, later captured answers and read/opt-in-write MCP tools.
 - [x] Preserved bilingual pilot: two requested usable CLI models, two scenarios each; configured model rejection retained.
 - [x] Scoped native AX client, fixture-only bounded manifest, synthetic Swift application and negative mock checks.
-- [ ] Human approval of the exact native manifest; actual Accessibility observe/press/reobserve and negative target proof.
+- [x] Human approval of the exact native manifest; actual Accessibility observe/press/reobserve and negative target proof (recorded 2026-10-15).
 - [ ] Broader representative role quality evaluation, verified backend identity, measured cost and native host capture acceptance beyond protocol fixtures.
 - [x] Mandatory commit gate passed on ef7782a; installed source and all three read-only MCP tools verified. Final memory-only snapshot refresh follows the same gate.
+
+- 2026-10-15 | [x] Fixed explicit-PID targeting and scoped window/static-text projection; live fixture acceptance and seven offline regressions pass. [ ] Gated corrected runtime installation and installed native acceptance.

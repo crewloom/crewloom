@@ -334,3 +334,5 @@
 - Evidence: capture8 incl real SDK answer protocol; lifecycle75 (2optional skips), OpenCode36, packaging20, native mock4 pass; Swift fixture compiles. Two requested CLI models each yield selected-context4/4 versus raw-history2/4 on two bilingual scenarios; actual backend model identity unreported. Configured model rejection preserved. Full commit gate/local installation pending; human manifest approval/live Accessibility proof pending.
 
 - 2026-10-14 | Continuation commit ef7782a passed the mandatory99-suite/1207-test repository gate (optional live suites retain their skips). Immutable source installed with pinned MCP extra; exact installed stdio command lists/calls all three read tools. No native driver launch or automatic host capture activation; approval remains pending.
+
+- 2026-10-15 | Artifact: native_desktop.py, opt-in live regression and native guide. Real approved CuaDriver/SDK acceptance passed: counter0→1→0, stale/unobserved handles and foreign PID refused. Seven offline tests pass; live suite skips unless explicitly enabled. Expired session and denied global-discovery attempts retained privately; installed rollout follows the mandatory gate.

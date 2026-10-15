@@ -127,3 +127,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - Keep the task/context/artifact MCP boundary reusable across hosts; attach an independently authorized browser or native desktop provider rather than expanding candidate import into arbitrary host execution. A host-capability matrix should record verified calls, permissions, application targets and unresolved scope.
 
 - 2026-10-14 | Keep native acceptance scoped to an account-free synthetic target before expanding actions. Independent mock refusal, human-approved driver capability, actual Accessibility state and a re-observed application postcondition are separate evidence.
+
+- 2026-10-15 | Keep live native acceptance opt-in and preserve a unique receipt for every attempt. Separate source and installed-runtime receipts; test foreign PID refusal and stale handles alongside visible state transitions.

@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import json
 import os
+import re
 import uuid
 from pathlib import Path
 from typing import Any
@@ -62,7 +63,7 @@ def prepare(project, project_id, task_id):
 
 
 class Controller:
-    def __init__(self, project, project_id, task_id, policy_file, client):
+    def __init__(self, project, project_id, task_id, policy_file, client, pid=None):
         self.root = pb.project_root(project)
         self.binding = pb.load_binding(self.root)
         self.task_id = task_id
@@ -87,6 +88,9 @@ class Controller:
         socket_path = w.safe_path(self.root, str(Path(p['socket']).relative_to(self.root)), internal=True)
         if socket_path.parent != self.policy_file.parent or socket_path.name != 'driver.sock':
             raise ValueError('Native socket must stay beside the selected private policy')
+        if type(pid) is not int or not 0 < pid <= 2147483647:
+            raise ValueError('Native serving requires an explicit positive observed app PID')
+        self.pid = pid
         self.client = client
         self.tokens = {}
         self.observation = 0
@@ -119,12 +123,11 @@ class Controller:
         permissions = await self.call('check_permissions', {'prompt': False})
         if permissions.get('accessibility') is not True:
             raise ValueError('Accessibility permission is missing; human setup is required')
-        apps = (await self.call('list_apps', {})).get('apps')
-        if not isinstance(apps, list): raise ValueError('Native app inventory is malformed')
-        matches = [app for app in apps if app.get('bundle_id') == self.policy['bundle_id'] and app.get('running') is True]
-        if len(matches) != 1 or type(matches[0].get('pid')) is not int or matches[0]['pid'] <= 0:
-            raise ValueError('Exactly one running allowed app must be observed')
-        pid = matches[0]['pid']
+        # Global list_apps requires desktop observation, which the reviewed
+        # manifest intentionally denies. The trusted launcher supplies the
+        # observed PID; the bounded driver checks its actual bundle before
+        # listing any window. Never discover a replacement PID automatically.
+        pid = self.pid
         windows = (await self.call('list_windows', {'pid': pid})).get('windows')
         if not isinstance(windows, list): raise ValueError('Native window inventory is malformed')
         matches = [window for window in windows if window.get('pid') == pid and window.get('title') == self.policy['window_title']]
@@ -142,19 +145,50 @@ class Controller:
         value = await self.call('get_window_state', {'pid': pid, 'window_id': window,
             'include_screenshot': False, 'max_elements': 200, 'max_depth': 12})
         if not isinstance(value.get('elements'), list): raise ValueError('Native AX inventory is malformed')
+        if (value.get('pid') != pid or value.get('window_id') != window
+                or value.get('window_title') != self.policy['window_title']):
+            raise ValueError('Native snapshot identity differs from the requested window')
+        # CuaDriver also includes the app menu bar and indexes only actionable
+        # rows. Restrict structured rows to the actual window ancestry, and
+        # retain its Markdown text so non-actionable labels remain observable.
+        rows = value['elements']
+        if any(not isinstance(row, dict) or type(row.get('element_index')) is not int for row in rows):
+            raise ValueError('Native AX row identity is malformed')
+        indices = {row['element_index'] for row in rows}
+        if len(indices) != len(rows): raise ValueError('Native AX row identities are ambiguous')
+        windows = [row for row in rows if row.get('role') == 'AXWindow'
+                   and row.get('label') == self.policy['window_title']]
+        if len(windows) != 1: raise ValueError('Native snapshot lacks one exact window root')
+        window_index = windows[0]['element_index']
+        selected = {window_index}
+        for _ in rows:
+            children = {row['element_index'] for row in rows if row.get('parent_index') in selected}
+            if children <= selected: break
+            selected.update(children)
+        elements = [row for row in rows if row['element_index'] in selected]
+        lines = value.get('tree_markdown', '').splitlines()
+        starts = [i for i, line in enumerate(lines) if re.match(r'^- \[' + str(window_index) + r'\] AXWindow(?:\s|$)', line)]
+        if len(starts) != 1: raise ValueError('Native window text is unavailable or ambiguous')
+        start = starts[0]
+        end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith('- ')), len(lines))
+        if end == len(lines) and value.get('elements_complete') is not True:
+            raise ValueError('Native window observation may be truncated')
+        window_text = '\n'.join(lines[start:end])
         self.observation += 1
         buttons = []
-        for element in value['elements']:
+        for element in elements:
             label = element.get('label')
             token = element.get('element_token')
             if (label in self.policy['allowed_buttons'] and element.get('role') == 'AXButton'
+                    and element.get('enabled') is True
                     and 'AXPress' in element.get('actions', []) and isinstance(token, str) and token):
                 handle = str(self.observation) + '-' + w.digest(token.encode())[:20]
                 self.tokens[handle] = (pid, window, token, label)
                 buttons.append({'handle': handle, 'label': label})
         # Only this exact allowed window is returned; no screenshot or global app inventory.
         return {'observation': self.observation, 'pid': pid, 'window_id': window, 'buttons': buttons,
-                'elements': value['elements'], 'scope': dict(self.binding, task_id=self.task_id)}
+                'elements': [{k: v for k, v in element.items() if k != 'element_token'} for element in elements],
+                'window_text': window_text, 'scope': dict(self.binding, task_id=self.task_id)}
 
     async def click(self, handle):
         async with self.lock:
@@ -193,7 +227,7 @@ async def serve(args):
     from mcp.server import MCPServer
     from mcp.server.mcpserver.exceptions import ToolError
     root = pb.project_root(args.project)
-    controller = Controller(args.project, args.project_id, args.task_id, args.policy, None)
+    controller = Controller(args.project, args.project_id, args.task_id, args.policy, None, args.pid)
     p = controller.policy
     sock = w.safe_path(root, str(Path(p['socket']).relative_to(root)), internal=True)
     import stat
@@ -225,6 +259,7 @@ def main(argv=None):
     parser.add_argument('--project-id', required=True)
     parser.add_argument('--task-id', required=True)
     parser.add_argument('--policy')
+    parser.add_argument('--pid', type=int, help='Observed allowed-app process fixed for this server; required for serve')
     args = parser.parse_args(argv)
     try:
         if args.action == 'prepare': print(json.dumps(prepare(args.project, args.project_id, args.task_id)))
