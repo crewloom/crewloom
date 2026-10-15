@@ -353,3 +353,5 @@
 - Evaluation: a cached/configured model ID was rejected by the actual authenticated CLI. Retain the two transport failures and blocked trials, then record an explicitly different available model in a separate run. Requested IDs are not verified backend identity.
 
 - 2026-10-15 | Cause: bounded app scope denies global list_apps, while get_window_state indexes only actionable rows and appends unrelated menu history. Solution: bind observed PID, rely on bounded driver bundle validation, filter exact window ancestry and retain only window text for static state. Real counter acceptance passed without widening the reviewed manifest.
+
+- 2026-10-15 | Real paired Ledgerline execution exposed package-relative imports under a top-level CLI, and root user context absent from task worktrees. Clarify runtime imports without changing verifiers; freeze selected source-linked context into each task checkout. GitHub Python3.9 found eager asyncio.Lock construction outside an event loop; initialize it lazily in async actions.

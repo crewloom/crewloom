@@ -448,6 +448,70 @@ def select(root, task_id):
     return result
 
 
+def inherit_task(parent, child, task_id, *, verify_only=False):
+    """Freeze only selected task context into a sibling checkout of the same project.
+
+    The parent remains authoritative. A changed selection requires a fresh batch;
+    resumption never silently replaces the child context or its source bytes.
+    """
+    import privacy
+    import repo_map
+    import subprocess
+    parent_scope, child_scope = scope(parent), scope(child)
+    if (parent_scope['project_id'] != child_scope['project_id']
+            or parent_scope['checkout_id'] == child_scope['checkout_id']):
+        raise ValueError('Inherited context needs distinct checkouts of the same project')
+    def common(root):
+        return Path(subprocess.check_output(['git','rev-parse','--path-format=absolute','--git-common-dir'],
+                    cwd=root,env=repo_map.git_environment(),text=True).strip()).resolve()
+    if common(parent) != common(child):
+        raise ValueError('Inherited context needs worktrees of the same repository')
+    selected = select(parent, task_id)
+    fingerprint = w.digest(pl.canonical(selected).encode())
+    relative = '.crewloom/private/inherited-context/' + task_id + '.json'
+    receipt = w.safe_path(child, relative, internal=True)
+    if receipt.exists():
+        proof = privacy.read_private(child,relative,None)
+        current = select(child,task_id)
+        if (proof.get('parent') != parent_scope or proof.get('child') != child_scope
+                or proof.get('selection_sha256') != fingerprint
+                or proof.get('child_sha256') != w.digest(pl.canonical(current).encode())):
+            raise ValueError('Inherited task context changed; use a fresh reviewed batch')
+        return fingerprint
+    if selected is None:
+        return None
+    if verify_only:
+        raise ValueError('Inherited task context receipt is missing')
+    with w.project_lock(w.safe_path(child,'.crewloom',internal=True),reentrant=True):
+        store = load(child)
+        if store['records'] or store['contracts']:
+            raise ValueError('Existing child context cannot be overwritten by inheritance')
+        contract = copy.deepcopy(selected['contract'])
+        records = copy.deepcopy(selected['memories'])
+        for item in [contract] + records:
+            source = item['source']
+            fresh(parent,source)
+            raw = w.safe_path(parent,source['path'],internal=source['path'].startswith('.crewloom/')).read_bytes()
+            if w.digest(raw) != source['sha256']:
+                raise ValueError('Parent context source changed during transfer')
+            destination = '.crewloom/private/inputs/inherited/' + source['sha256'] + '.txt'
+            target = w.safe_path(child,destination,internal=True)
+            if target.exists() and target.read_bytes() != raw:
+                raise ValueError('Inherited source bytes changed')
+            if not target.exists():privacy.private_write(child,destination,raw)
+            item['source'] = evidence(child,destination,source['quote'])
+        for index,item in enumerate(records,1):
+            item.update(id=index,task_id=task_id,supersedes=None)
+        if select(parent,task_id) != selected:
+            raise ValueError('Parent context changed during transfer')
+        store.update(records=records,contracts={task_id:contract})
+        save(child,store)
+        proof={'parent':parent_scope,'child':child_scope,'task_id':task_id,
+               'selection_sha256':fingerprint,'child_sha256':w.digest(pl.canonical(select(child,task_id)).encode())}
+        privacy.private_write(child,relative,pl.canonical(proof)+'\n')
+    return fingerprint
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('record', 'contract', 'inspect', 'configure-capture', 'disable-capture', 'capture', 'questions', 'answer'))

@@ -14,7 +14,8 @@
       "timeout_seconds": 300,
       "inputs": [
         "contracts/planning.md",
-        "src/scheduling_support.py"
+        "src/scheduling_support.py",
+        "criteria.md"
       ],
       "outputs": [
         "src/planning.py"

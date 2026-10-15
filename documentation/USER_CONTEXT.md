@@ -86,3 +86,7 @@ crewloom evaluate-bilingual --understanding --project /absolute/project \
 ```
 
 The requested model is explicit; a host that does not report its actual backend identity cannot establish that identity. A small synthetic pilot does not rank model intelligence, agency delivery or billing. Preserve unavailable models as failures rather than silently substituting another model within the same run.
+
+## Coordinator worktree delivery
+
+Before generation, the coordinator transfers only the selected workflow's contract and current user records into its distinct checkout of the same repository and project. Source bytes remain private and are hash checked; unrelated tasks are excluded. A private receipt binds parent and child identities and both selections. The coordinator rechecks it after execution and during resumption. A changed parent correction, modified child source or missing receipt refuses reuse and requires a fresh batch. Existing child context is never silently overwritten. This is context delivery, not permission or proof of speaker identity.

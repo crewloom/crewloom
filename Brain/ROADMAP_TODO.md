@@ -240,3 +240,5 @@
 - 2026-10-15 | [x] Fixed explicit-PID targeting and scoped window/static-text projection; live fixture acceptance and seven offline regressions pass. [x] Gated corrected runtime installation and installed native acceptance at ae387fe.
 
 - 2026-10-15 | [x] Gated corrected runtime installation and exact installed native acceptance at ae387fe; scoped daemon/fixture cleanup completed. General apps, broad role-quality and native host capture beyond protocol fixtures remain separate acceptance work.
+
+- 2026-10-15 | [x] PR20 opened for audited fixes. [x] Repair missing worktree user-context delivery and Python3.9 native lock startup. [x] Explicit app targets and read-only native policy. [ ] Finish paired real-project acceptance, browser-profile install, approved app trials, exact-head CI/merge and final rollout.

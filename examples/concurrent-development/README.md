@@ -46,7 +46,7 @@ planning  (independent) ─┘
 
 | Task | Generates | Verified by |
 | --- | --- | --- |
-| `billing` | `src/billing.py` | `tools/check_billing.py` in a container: 21 cases |
+| `billing` | `src/billing.py` | `tools/check_billing.py` in a container: 23 cases |
 | `planning` | `src/planning.py` | `tools/check_planning.py` in a container: 20 cases |
 | `report` | `src/report.py`, `src/app.py` | `tools/check_report.py` in a container: 14 cases |
 | integration | — | `tools/check_combined.py` and `tools/run_helper_tests.py`: 13 cases and the frozen helper tests |

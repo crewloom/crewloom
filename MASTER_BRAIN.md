@@ -112,3 +112,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-15 | Approved fixture-scoped native control now has real observe/press/reobserve evidence (0→1→0), plus stale-handle and foreign-process refusal. Global-discovery and menu-projection defects repaired within the unchanged manifest. General desktop automation and broad role-quality claims remain unverified.
 
 - 2026-10-15 | Native fixture correction is gated (99 suites/1211 tests with optional skips) and verified through the installed CLI. Approved test processes were closed after acceptance. No claim of general desktop control or full-role quality follows from this result.
+
+- 2026-10-15 | Delivery continuation now exercises two independent model-generated Ledgerline projects. Actual failures exposed context delivery and import-contract gaps; their fixes preserve verifier bytes. PR20 is open; general app acceptance and final publication remain pending until verified.

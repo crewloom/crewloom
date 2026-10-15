@@ -95,3 +95,5 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - The existing understanding collector supports explicit preselected cases and reports subset coverage; failures and all paired trials remain preserved.
 
 - 2026-10-15 | Fixed observed PID replaces global app discovery under the fixture-only manifest. AX rows are projected by exact window ancestry; static counter text comes from its bounded tree block. Ambiguous identity/rows and potentially truncated blocks fail closed; menu history and raw tokens never leave the adapter.
+
+- 2026-10-15 | Coordinator task context is now projected into same-project Git worktrees with private source copies and parent/child selection receipts. Recheck before commit and on resume refuses changed corrections. Native preparation accepts an explicit exact app/window/button set or observation-only scope; no implicit new application authority.

@@ -129,3 +129,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-14 | Keep native acceptance scoped to an account-free synthetic target before expanding actions. Independent mock refusal, human-approved driver capability, actual Accessibility state and a re-observed application postcondition are separate evidence.
 
 - 2026-10-15 | Keep live native acceptance opt-in and preserve a unique receipt for every attempt. Separate source and installed-runtime receipts; test foreign PID refusal and stale handles alongside visible state transitions.
+
+- 2026-10-15 | Use real generation failures to refine explicit runtime contracts without altering the frozen verifier. Freeze task-source context at the worktree boundary as well as inside model prompts. Report quality per attempted role and task, with failed and blocked runs retained.

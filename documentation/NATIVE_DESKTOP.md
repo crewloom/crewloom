@@ -1,10 +1,10 @@
 # Scoped native AX acceptance
 
-Crewloom includes an optional CuaDriver client for a synthetic macOS application. It is separate from the project task MCP server. The exposed tools observe one configured application window and press explicitly allowed accessibility buttons. The current acceptance target is `com.crewloom.NativeFixture`, with the title `Crewloom Native Acceptance` and the buttons `Increment` and `Reset`.
+Crewloom includes an optional CuaDriver client for one explicitly selected macOS application window. It is separate from the project task MCP server. The exposed tools observe one configured application window and press explicitly allowed accessibility buttons. The current acceptance target is `com.crewloom.NativeFixture`, with the title `Crewloom Native Acceptance` and the buttons `Increment` and `Reset`.
 
 ## Contract and dependencies
 
-Inputs: one bound canonical project/task, an owner-only private policy and its unchanged manifest, an existing private CuaDriver socket, an explicitly observed fixture PID, and a freshly observed button handle. Outputs: scoped AX observations, private action records and an observation after delivery. Dependencies: macOS, the optional `crewloom[mcp]` extra, CuaDriver 0.28.2, and human-granted Accessibility permission. The synthetic fixture needs Apple's Swift compiler. No model provider is required.
+Inputs: one bound canonical project/task, an owner-only private policy and its unchanged manifest, an existing private CuaDriver socket, an explicitly observed target PID, and a freshly observed button handle. Outputs: scoped AX observations, private action records and an observation after delivery. Dependencies: macOS, the optional `crewloom[mcp]` extra, CuaDriver 0.28.2, and human-granted Accessibility permission. The synthetic fixture needs Apple's Swift compiler. No model provider is required.
 
 The client never launches the driver, requests OS permissions, uses screen coordinates, switches focus, types arbitrary text or executes a command received through MCP. It connects with `mcp --embedded --socket` and has no broad-daemon fallback. `check_permissions` always receives `prompt:false`. Missing access, malformed structured output, a foreign or missing app/window, changed binding/policy/manifest, expired handles and unresolved captured task questions refuse the action. Transport errors preserve an uncertain action and consume its handle; there is no automatic retry. Re-observation does not by itself prove the user's postcondition.
 
@@ -16,7 +16,17 @@ crewloom native prepare --project /absolute/project --project-id example-project
 
 Preparation writes an owner-only manifest and policy under `.crewloom/private/native/`. Existing policies cannot be overwritten. The private Unix socket path must be below macOS's 104-byte limit; a longer project path is refused explicitly. Preparation grants no authority and does not start a process.
 
-Read the resulting manifest. [CuaDriver bounded mode](https://cua.ai/docs/cua-driver/guides/permissions) requires human approval of the exact manifest before starting with `--approve-capability-manifest`. Do not assert approval on behalf of the human or fall back to standard mode. If macOS requires Accessibility setup, the human grants it; Crewloom does not click system permission controls. The prepared manifest limits driver tools, expires after one hour, times out when idle, allows only the synthetic application and denies desktop display access.
+For a real application, prepare an explicit target instead of the default fixture:
+
+```sh
+crewloom native prepare --project /absolute/project --project-id example-project \
+  --task-id calculator-task --bundle-id com.apple.calculator --window-title Calculator \
+  --button 7 --button Add --button 5 --button Equals --button 'All Clear'
+```
+
+Every custom scope needs the exact bundle ID, window title and unique allowed button labels. Use `--read-only` with no buttons to omit both driver click authority and the MCP click tool. Serving cannot change a prepared target. Preparation does not establish compatibility: record actual AX observations and results for each application and OS version. Arbitrary typing, coordinates, menus and commands remain outside this adapter.
+
+Read the resulting manifest. [CuaDriver bounded mode](https://cua.ai/docs/cua-driver/guides/permissions) requires human approval of the exact manifest before starting with `--approve-capability-manifest`. Do not assert approval on behalf of the human or fall back to standard mode. If macOS requires Accessibility setup, the human grants it; Crewloom does not click system permission controls. The prepared manifest limits driver tools, expires after one hour, times out when idle, allows only the selected application and denies desktop display access.
 
 After that review and approval, the operator starts the bounded daemon:
 

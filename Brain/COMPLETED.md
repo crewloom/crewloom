@@ -338,3 +338,5 @@
 - 2026-10-15 | Artifact: native_desktop.py, opt-in live regression and native guide. Real approved CuaDriver/SDK acceptance passed: counter0→1→0, stale/unobserved handles and foreign PID refused. Seven offline tests pass; live suite skips unless explicitly enabled. Expired session and denied global-discovery attempts retained privately; installed rollout follows the mandatory gate.
 
 - 2026-10-15 | Corrected immutable release ae387fe passed the mandatory99-suite/1211-test gate (optional skips). Exact installed Crewloom native CLI passed real counter0→1→0 and stale/unobserved/foreign-process refusal. Approved daemon stopped and owned fixture closed; receipts remain project-private.
+
+- 2026-10-15 | Artifact: coordinator/user_context delivery guard, native exact target/read-only preparation, import-contract clarification. User-context18 and native10 tests pass (native live case remains opt-in); real Docker coordinator49 passed. Public PR20 opened for the prior gated fixes. Paired model delivery and broader live application acceptance continue with preserved failures.

@@ -128,6 +128,31 @@ class NativeScopeTests(unittest.TestCase):
         with patch.object(self.driver, 'call_tool', disabled):
             self.assertEqual(asyncio.run(self.controller.snapshot())['buttons'], [])
 
+    def test_custom_scope_requires_complete_exact_target_before_writing(self):
+        nd.pb.cancel(self.root,'sample-project','understand-task','Prepare another explicitly scoped test')
+        directory = self.root / '.crewloom/private/native' / nd.w.digest(b'custom-task')[:8]
+        invalid = [dict(bundle_id='com.apple.calculator'), dict(bundle_id='com.apple.calculator', window_title='Calculator'),
+                   dict(bundle_id='com.apple.calculator\nallow: all',window_title='Calculator',buttons=['7']),
+                   dict(bundle_id='com.apple.calculator',window_title='Calculator\nOther',buttons=['7']),
+                   dict(bundle_id='com.apple.calculator',window_title='Calculator',buttons=['7','7']),
+                   dict(bundle_id='com.apple.calculator',window_title='Calculator',buttons=['7'],read_only=True)]
+        for kwargs in invalid:
+            with self.subTest(kwargs=kwargs), self.assertRaises(ValueError):
+                nd.prepare(str(self.root),'sample-project','custom-task',**kwargs)
+            self.assertFalse(directory.exists())
+        result=nd.prepare(str(self.root),'sample-project','custom-task',bundle_id='com.apple.calculator',window_title='Calculator',buttons=['7','Equals'])
+        manifest=Path(result['manifest']).read_text()
+        self.assertIn('bundle_id: com.apple.calculator',manifest)
+        self.assertNotIn('list_apps',manifest)
+
+    def test_read_only_policy_has_no_click_authority(self):
+        nd.pb.cancel(self.root,'sample-project','understand-task','Prepare another explicitly scoped test')
+        result=nd.prepare(str(self.root),'sample-project','read-task',bundle_id='com.apple.calculator',window_title='Calculator',read_only=True)
+        self.assertNotIn('"click"',Path(result['manifest']).read_text())
+        controller=nd.Controller(str(self.root),'sample-project','read-task',result['policy'],self.driver,pid=42)
+        with self.assertRaisesRegex(ValueError,'observation only'):asyncio.run(controller.click('arbitrary'))
+        self.assertEqual(self.driver.calls,[])
+
 
 @unittest.skipUnless(os.environ.get('CREWLOOM_NATIVE_LIVE') == '1', 'opt in to human-approved native fixture acceptance')
 class LiveNativeAcceptance(unittest.TestCase):
