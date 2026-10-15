@@ -3,8 +3,8 @@
 
 The panel and the content script are loaded in headless Chromium with a mocked
 `chrome` API surface, so the assertions cover real rendered behavior instead of
-source text. Playwright is optional: when it or its Chromium build is missing the
-suite skips instead of failing the repository gate.
+source text. Playwright is optional for the core gate. Explicit acceptance with
+CREWLOOM_REAL_BROWSER=1 fails when Playwright or Chromium cannot start.
 """
 import json
 import os
@@ -12,6 +12,8 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTENSION = ROOT / 'extensions' / 'chrome'
@@ -110,7 +112,9 @@ window.__contentMessages = [];
 def _playwright():
     try:
         from playwright.sync_api import sync_playwright
-    except ImportError:
+    except ImportError as exc:
+        if os.environ.get('CREWLOOM_REAL_BROWSER') == '1':
+            raise RuntimeError('Playwright is required for explicit browser acceptance') from exc
         return None
     return sync_playwright
 
@@ -119,7 +123,47 @@ def _launch(playwright):
     try:
         return playwright.chromium.launch(headless=True)
     except Exception as exc:  # pragma: no cover - depends on local browser install
+        if os.environ.get('CREWLOOM_REAL_BROWSER') == '1':
+            raise RuntimeError('Chromium is required for explicit browser acceptance') from exc
         raise unittest.SkipTest(f'Chromium unavailable for Playwright: {exc}')
+
+
+class BrowserPrerequisiteTest(unittest.TestCase):
+    def test_explicit_browser_acceptance_cannot_skip_a_missing_dependency(self):
+        with patch.dict('sys.modules', {'playwright.sync_api': None}):
+            with patch.dict(os.environ, {'CREWLOOM_REAL_BROWSER': '0'}):
+                self.assertIsNone(_playwright())
+            with patch.dict(os.environ, {'CREWLOOM_REAL_BROWSER': '1'}):
+                with self.assertRaisesRegex(RuntimeError, 'Playwright'):
+                    _playwright()
+
+    def test_explicit_browser_acceptance_cannot_skip_a_launch_failure(self):
+        browser = SimpleNamespace(chromium=SimpleNamespace(launch=Mock(side_effect=OSError('missing browser'))))
+        with patch.dict(os.environ, {'CREWLOOM_REAL_BROWSER': '0'}):
+            with self.assertRaises(unittest.SkipTest):
+                _launch(browser)
+        with patch.dict(os.environ, {'CREWLOOM_REAL_BROWSER': '1'}):
+            with self.assertRaisesRegex(RuntimeError, 'Chromium'):
+                try:
+                    _launch(browser)
+                except unittest.SkipTest:
+                    self.fail('Explicit browser acceptance skipped its launch failure')
+
+    def test_failed_extension_launch_fails_acceptance_and_cleans_resources(self):
+        manager = Mock()
+        manager.chromium.launch_persistent_context.side_effect = OSError('missing display')
+        factory = Mock(return_value=SimpleNamespace(start=lambda: manager))
+        try:
+            with patch(__name__ + '._playwright', return_value=factory):
+                with self.assertRaisesRegex(RuntimeError, 'extension'):
+                    try:
+                        RealBrowserExtensionTest.setUpClass()
+                    except unittest.SkipTest:
+                        self.fail('Explicit extension acceptance skipped its launch failure')
+        finally:
+            RealBrowserExtensionTest.doClassCleanups()
+        manager.stop.assert_called_once()
+        self.assertFalse(Path(RealBrowserExtensionTest.profile).exists())
 
 
 class ManifestContractTest(unittest.TestCase):
@@ -662,6 +706,12 @@ class RealBrowserExtensionTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        cls.context = cls.manager = cls.server = cls.profile = None
+        cls.addClassCleanup(cls.cleanup)
+        cls.playwright = _playwright()
+        if cls.playwright is None:
+            raise RuntimeError('Playwright is required for explicit extension acceptance')
+        cls.manager = cls.playwright().start()
         from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
         import threading
         class Fixture(BaseHTTPRequestHandler):
@@ -684,10 +734,6 @@ class RealBrowserExtensionTest(unittest.TestCase):
         cls.server = ThreadingHTTPServer(('127.0.0.1', 0), Fixture)
         cls.DASHBOARD = 'http://127.0.0.1:' + str(cls.server.server_port) + '/'
         cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True); cls.server_thread.start()
-        cls.playwright = _playwright()
-        if cls.playwright is None:
-            raise unittest.SkipTest('Playwright is not installed')
-        cls.manager = cls.playwright().start()
         cls.profile = tempfile.mkdtemp(prefix='crewloom-extension-')
         try:
             cls.context = cls.manager.chromium.launch_persistent_context(
@@ -698,11 +744,10 @@ class RealBrowserExtensionTest(unittest.TestCase):
                       f'--load-extension={EXTENSION}'],
             )
         except Exception as exc:  # pragma: no cover - depends on local browser build
-            cls.manager.stop()
-            raise unittest.SkipTest(f'could not launch a browser for extension loading: {exc}')
+            raise RuntimeError(f'Could not launch Chromium for explicit extension acceptance: {exc}') from exc
 
     @classmethod
-    def tearDownClass(cls):
+    def cleanup(cls):
         if getattr(cls, 'context', None):
             cls.context.close()
         if getattr(cls, 'manager', None):

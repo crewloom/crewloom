@@ -1,5 +1,15 @@
 # Challenges
 
+### 2026-10-15 — Explicit acceptance skipped prerequisites
+- Cause: browser launch/build backend failures raised SkipTest during explicit acceptance; hosted CI omitted real MCP/browser protocols.
+- Solution: fail explicit prerequisite errors, clean browser setup, add actual SDK/headed-extension CI. Bad/clean regressions and live acceptance pass.
+- Status: Resolved locally; hosted evidence belongs to the proposed commit.
+
+### 2026-10-15 — Setup and dependency contracts drifted
+- Cause: first launch used npm install despite a reviewed lockfile; Arabic/release login and health prose predated implementation changes.
+- Solution: npm ci with failure-stop regression, Node/ES module metadata and current bilingual setup/release checklist.
+- Status: Resolved locally; dashboard56, TypeScript/build and package acceptance pass.
+
 ### 2026-10-01 — Separate public tooling from private operations
 - Cause: The upstream workspace mixes reusable roles with client data and agency-specific contracts.
 - Solution: Publish English public adaptations, clean memory, and selected inspected tools in a new repository without upstream Git history.

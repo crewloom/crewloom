@@ -1,5 +1,7 @@
 # Crewloom shared memory
 
+- 2026-10-15: Repository review retains the prior defect-closure work and adds explicit-prerequisite refusal, real MCP/browser CI, lockfile dashboard startup, reviewed dependency proposals and synchronized bilingual setup. Local component acceptance passes; source proposal/hosted CI and stable-release rollout are distinct. See [review evidence](documentation/PROFESSIONAL_REVIEW.md).
+
 [Architecture](Brain/ARCHITECTURE.md) · [Completed](Brain/COMPLETED.md) · [Challenges](Brain/CHALLENGES.md) · [Ideas](Brain/IDEAS_VAULT.md) · [Backlog](Brain/ROADMAP_TODO.md)
 
 The public edition contains clean role memory and shared repository memory. It has no imported customer or agency execution history. See [the constitution](AGENTS.md) for the memory lifecycle and [the release notes](documentation/RELEASE.md) for validation scope.

@@ -1,5 +1,8 @@
 # Ideas
 
+### 2026-10-15 — Make skipped acceptance visible
+Optional core coverage and explicit integration acceptance need separate outcomes. When an operator enables an integration, unavailable prerequisites should produce a failed run with a setup diagnosis. Keep screenshot/provider/native opt-ins individually labelled so a passing job cannot imply acceptance of every capability.
+
 Evaluate repeatable role tasks in both Arabic and English across target agent hosts. Keep provider-specific evidence separate from structural checks and local tool tests. Add optional components only with clean setup instructions and meaningful behavioral tests.
 
 

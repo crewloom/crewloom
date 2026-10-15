@@ -1,5 +1,11 @@
 # Current backlog — 2026-10-10
 
+### 2026-10-15 — Repository review status
+- [x] Reuse existing defect closure; fail explicit acceptance on missing prerequisites; verify actual MCP/browser/distribution paths.
+- [x] Lock dashboard first-install dependencies; align bilingual setup, status rules and release checks; pin CI actions and schedule dependency proposals.
+- [ ] Review and merge the proposed branch after exact-head hosted CI — priority: high.
+- [ ] Representative role/model acceptance and deliberate stable-release/runtime rollout remain separate — priority: medium.
+
 - [x] Durable explicit-catalog priority queue; root reservations, interruption records, and reviewed publication preserved.
 - [x] Shared managed-generation admission across processes/projects/worktrees; conservative unknown-cost accounting.
 - [x] Bounded project-local dashboard charts, role history, queue and admission status.

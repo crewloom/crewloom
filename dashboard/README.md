@@ -1,10 +1,10 @@
 # Crewloom Dashboard
 
-A standalone Next.js web app that monitors a Crewloom checkout live. The Python toolkit stays standard-library only; the dashboard is optional and needs Node 20+.
+A standalone Next.js web app that monitors a Crewloom checkout live. The Python toolkit stays standard-library only; the dashboard is optional and needs Node 24+.
 
 ```bash
 cd dashboard
-npm install
+npm ci
 CREWLOOM_DASHBOARD_LOCAL=1 npm run dev -- --hostname 127.0.0.1  # no password
 npm test           # parser and validation tests
 ```
@@ -26,8 +26,8 @@ Updates arrive through Server-Sent Events (`/api/events`): editing a memory file
 ## Status rules
 
 - `attention`: a failed run is recorded for the role, or a challenge entry has status open (`Status: open` / `الحالة: مفتوح`).
-- `healthy`: no attention signal and at least one run or completed entry.
-- `idle`: no runs and no completed entries.
+- `healthy`: no attention signal and at least one recorded tool run for the role.
+- `idle`: no recorded tool runs and no attention signal. Template completion entries do not prove runtime health.
 
 ## Authentication
 

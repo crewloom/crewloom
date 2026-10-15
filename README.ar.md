@@ -39,12 +39,18 @@ python3 scripts/crewloom.py context frontend-ux-auditor --language ar --out /tmp
 ## استخدمه داخل مشروعك
 
 ```bash
-pip install -e .
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
 crewloom install --host claude --target /path/to/project --skill frontend-ux-auditor
 crewloom dashboard
 ```
 
-`--host claude` ينسخ الأدوار إلى `.claude/skills`، و`--host agents` إلى `.agents/skills`. لا يكتب فوق دور موجود بدون `--force`. الداشبورد يحتاج Node 20+، وكل مسارات الـ API وبث الأحداث تتطلب مصادقة: `crewloom dashboard` يكتب رمزًا مولّدًا في ملف للمالك وحده ويطبع مساره فقط، أو اضبط `CREWLOOM_DASHBOARD_TOKEN` صراحةً. اترك الربط الافتراضي على `127.0.0.1` ما لم تُهيّئ رمزًا. انظر [الداشبورد](dashboard/README.md).
+أوامر تفعيل البيئة أعلاه لـmacOS وLinux. `--host claude` ينسخ الأدوار إلى `.claude/skills`، و`--host agents` إلى `.agents/skills`. لا يكتب فوق دور موجود بدون `--force`. الداشبورد يحتاج Node 24+؛ يفتح `crewloom dashboard` محليًا على `127.0.0.1` دون كلمة مرور أو توليد رمز. تظل فحوص العنوان المحلي ومصدر الطلب مفعّلة. الاستضافة على واجهة غير محلية تتطلب ضبط `CREWLOOM_DASHBOARD_TOKEN` صراحةً. انظر [الداشبورد](dashboard/README.md).
+
+الجسر الاختياري [Project Task MCP](documentation/MCP_BRIDGE.md) يربط الأدوات بمشروع ومهمة محددين؛ يحتاج Python 3.11+ وتثبيت `python -m pip install '.[mcp]'`. القراءة هي الوضع الافتراضي، واستيراد الملفات والتحقق يحتاجان تفعيلًا صريحًا. [إضافة المتصفح](documentation/CHROME_EXTENSION_SIDE_PANEL.md) أدوات يدوية، و[قبول سطح المكتب](documentation/NATIVE_DESKTOP.md) محدود بتطبيق الاختبار المصرّح به.
+
+إصدار المصدر الحالي `0.6.0.dev0` تطويري. [قائمة التحقق للإصدار](documentation/RELEASE.md) تفصل اختبارات الكود عن أدلة جودة الأدوار وعن النشر الفعلي.
 
 ## مسار برمجي قابل للتشغيل
 

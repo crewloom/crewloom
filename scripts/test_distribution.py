@@ -17,6 +17,7 @@ import unittest
 import venv
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 import repo_map
 
@@ -31,6 +32,23 @@ def run(argv, cwd=None, env=None, timeout=900):
     result = subprocess.run([str(item) for item in argv], cwd=None if cwd is None else str(cwd),
                             env=merged, capture_output=True, text=True, timeout=timeout)
     return result
+
+
+class DistributionPrerequisiteTests(unittest.TestCase):
+    def test_explicit_distribution_acceptance_fails_without_its_backend(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            fixture = type('BuildFixture', (InstalledDistributionTests,),
+                           {'work': Path(temporary), 'reports': []})
+            failure = subprocess.CompletedProcess([], 1, '', 'backend unavailable')
+            with patch(__name__ + '.venv.EnvBuilder'), patch(__name__ + '.run', return_value=failure):
+                try:
+                    fixture._build_and_install()
+                except unittest.SkipTest:
+                    self.fail('Explicit distribution acceptance skipped its missing backend')
+                except AssertionError as exc:
+                    self.assertIn('build backend', str(exc))
+                else:
+                    self.fail('Missing build backend was accepted')
 
 
 @unittest.skipUnless(os.environ.get('CREWLOOM_DISTRIBUTION_TESTS') == '1',
@@ -59,14 +77,14 @@ class InstalledDistributionTests(unittest.TestCase):
         installed = run([cls.builder / 'bin' / 'python', '-m', 'pip', 'install',
                          '--disable-pip-version-check', '--no-input', BUILD_REQUIREMENTS])
         if installed.returncode:
-            raise unittest.SkipTest('Pinned build backend is unavailable: ' + installed.stderr[-400:])
+            raise AssertionError('Required build backend is unavailable: ' + installed.stderr[-400:])
         # Build from a pristine copy so a stale egg-info or build directory cannot mask a
         # packaging omission, and so the artifacts provably come from the declared sources.
         source = cls.work / 'source'
         shutil.copytree(ROOT, source, symlinks=True,
                         ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '*.pyo', 'node_modules',
                                                       '.next', '.crewloom', 'build', 'dist',
-                                                      '*.egg-info', '.git', '.tmp'))
+                                                      '*.egg-info', '.git', '.tmp', '.venv', '.tox'))
         cls.dists = cls.work / 'dist'
         cls.dists.mkdir()
         # Wheel and sdist are built by separate interpreters. Building both through one
