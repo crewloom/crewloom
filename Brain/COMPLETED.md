@@ -336,3 +336,5 @@
 - 2026-10-14 | Continuation commit ef7782a passed the mandatory99-suite/1207-test repository gate (optional live suites retain their skips). Immutable source installed with pinned MCP extra; exact installed stdio command lists/calls all three read tools. No native driver launch or automatic host capture activation; approval remains pending.
 
 - 2026-10-15 | Artifact: native_desktop.py, opt-in live regression and native guide. Real approved CuaDriver/SDK acceptance passed: counter0→1→0, stale/unobserved handles and foreign PID refused. Seven offline tests pass; live suite skips unless explicitly enabled. Expired session and denied global-discovery attempts retained privately; installed rollout follows the mandatory gate.
+
+- 2026-10-15 | Corrected immutable release ae387fe passed the mandatory99-suite/1211-test gate (optional skips). Exact installed Crewloom native CLI passed real counter0→1→0 and stale/unobserved/foreign-process refusal. Approved daemon stopped and owned fixture closed; receipts remain project-private.

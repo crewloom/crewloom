@@ -110,3 +110,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-14 | Capture/clarification/native-client continuation is gated at ef7782a (99 suites,1207 tests with optional skips), installed locally and verified through all three actual read-only MCP tools. Native control remains unverified pending human manifest approval; synthetic quality evidence does not establish full agency delivery.
 
 - 2026-10-15 | Approved fixture-scoped native control now has real observe/press/reobserve evidence (0→1→0), plus stale-handle and foreign-process refusal. Global-discovery and menu-projection defects repaired within the unchanged manifest. General desktop automation and broad role-quality claims remain unverified.
+
+- 2026-10-15 | Native fixture correction is gated (99 suites/1211 tests with optional skips) and verified through the installed CLI. Approved test processes were closed after acceptance. No claim of general desktop control or full-role quality follows from this result.

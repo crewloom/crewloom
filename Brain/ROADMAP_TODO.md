@@ -237,4 +237,6 @@
 - [ ] Broader representative role quality evaluation, verified backend identity, measured cost and native host capture acceptance beyond protocol fixtures.
 - [x] Mandatory commit gate passed on ef7782a; installed source and all three read-only MCP tools verified. Final memory-only snapshot refresh follows the same gate.
 
-- 2026-10-15 | [x] Fixed explicit-PID targeting and scoped window/static-text projection; live fixture acceptance and seven offline regressions pass. [ ] Gated corrected runtime installation and installed native acceptance.
+- 2026-10-15 | [x] Fixed explicit-PID targeting and scoped window/static-text projection; live fixture acceptance and seven offline regressions pass. [x] Gated corrected runtime installation and installed native acceptance at ae387fe.
+
+- 2026-10-15 | [x] Gated corrected runtime installation and exact installed native acceptance at ae387fe; scoped daemon/fixture cleanup completed. General apps, broad role-quality and native host capture beyond protocol fixtures remain separate acceptance work.
