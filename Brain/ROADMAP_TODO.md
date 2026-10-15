@@ -1,6 +1,7 @@
 # Current backlog — 2026-10-10
 
 ### 2026-10-15 — Repository review status
+- [x] Diagnose the hosted Python 3.9 event-loop failure and verify lazy native locking/serialization on both supported interpreter endpoints.
 - [x] Reuse existing defect closure; fail explicit acceptance on missing prerequisites; verify actual MCP/browser/distribution paths.
 - [x] Lock dashboard first-install dependencies; align bilingual setup, status rules and release checks; pin CI actions and schedule dependency proposals.
 - [ ] Review and merge the proposed branch after exact-head hosted CI — priority: high.

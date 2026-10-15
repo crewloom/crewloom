@@ -12,6 +12,8 @@
 
 ## Unreleased
 
+- Allocate native operation locks inside the running event loop for Python 3.9 compatibility; retain serialized actions and refuse foreign-loop reuse.
+
 - Run official MCP round trips and real headed Chrome extension acceptance in CI; fail explicit browser/distribution acceptance when prerequisites are unavailable.
 - Use the dashboard lockfile on first launch, require Node 24+, and declare ES modules for its TypeScript test runner.
 - Schedule reviewed dependency updates, bound CI job duration, and cancel superseded pull-request runs.

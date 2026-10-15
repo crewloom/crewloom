@@ -94,8 +94,20 @@ class Controller:
         self.client = client
         self.tokens = {}
         self.observation = 0
-        self.lock = asyncio.Lock()
+        self.lock = None
+        self.loop = None
         self.guard()
+
+    def operation_lock(self):
+        # Python 3.9 binds locks at construction, unlike newer runtimes. A
+        # synchronous constructor must not allocate an implicit event loop.
+        loop = asyncio.get_running_loop()
+        if self.lock is None:
+            self.loop = loop
+            self.lock = asyncio.Lock()
+        elif self.loop is not loop:
+            raise ValueError('Native controller cannot move to another event loop')
+        return self.lock
 
     def guard(self):
         if (pb.load_binding(self.root) != self.binding or self.policy_file.read_bytes() != self.policy_bytes
@@ -136,7 +148,7 @@ class Controller:
         return pid, matches[0]['window_id']
 
     async def snapshot(self):
-        async with self.lock:
+        async with self.operation_lock():
             return await self._snapshot()
 
     async def _snapshot(self):
@@ -191,7 +203,7 @@ class Controller:
                 'window_text': window_text, 'scope': dict(self.binding, task_id=self.task_id)}
 
     async def click(self, handle):
-        async with self.lock:
+        async with self.operation_lock():
             return await self._click(handle)
 
     async def _click(self, handle):

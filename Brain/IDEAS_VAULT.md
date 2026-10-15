@@ -1,5 +1,8 @@
 # Ideas
 
+### 2026-10-15 — Construct async authority inside its execution loop
+Keep synchronous scope validation independent from event-loop allocation. Create async serialization primitives only during actual asynchronous use and bind the controller to that loop. Test real contention and reject foreign-loop reuse rather than relying on newer runtimes' lazy behavior.
+
 ### 2026-10-15 — Make skipped acceptance visible
 Optional core coverage and explicit integration acceptance need separate outcomes. When an operator enables an integration, unavailable prerequisites should produce a failed run with a setup diagnosis. Keep screenshot/provider/native opt-ins individually labelled so a passing job cannot imply acceptance of every capability.
 

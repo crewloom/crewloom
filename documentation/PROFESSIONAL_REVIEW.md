@@ -15,6 +15,7 @@ the installed runtime are preserved. The package remains `0.6.0.dev0`.
 | Arabic/release login instructions and status rules lagged behind implementation | Align setup with verified loopback access and actual role-run evidence | Existing authorization/metrics regressions and documentation link checks |
 | Optional-extra commands assumed an unpublished PyPI package | Install MCP/syntax extras from the source checkout in an activated environment | Fresh local source/extra installation and wheel/sdist acceptance |
 | Mutable CI action tags and no scheduled dependency review | Pin reviewed v6 action commits, schedule Dependabot proposals and bound CI duration | Official action refs and parsed YAML; no automatic merge |
+| Python 3.9 required an event loop while constructing the native controller lock | Allocate the operation lock on first asynchronous use and refuse reuse on another loop | Python 3.9/3.14 regressions cover synchronous construction, contended serialization and foreign-loop refusal |
 
 Inherited fixes cover delayed cross-tab responses, changed/inert/covered targets, viewport
 reachability, open Shadow DOM/readable frames, directory pagination, memory counters,
@@ -29,7 +30,8 @@ Docker acceptance; it does not repeat the human-approved macOS fixture session.
 
 | Check | Result |
 | --- | --- |
-| Full repository and mandatory commit gate | 1,104 pass; 112 optional skips across 99 suite invocations |
+| Baseline repository / mandatory commit gate (`720dff2`) | 1,104 pass; 112 optional skips across 99 suite invocations |
+| Native compatibility follow-up | Nine pass, one live-fixture skip on Python 3.9 and 3.14 |
 | Dashboard | 56/56; TypeScript and production build pass |
 | Browser extension and rendered fixtures | 41 pass; one optional screenshot-refresh skip |
 | Task MCP | Nine pass including SDK/Docker; one separate browser-provider skip |

@@ -1,5 +1,10 @@
 # Challenges
 
+### 2026-10-15 — Python 3.9 native lock construction
+- Cause: asyncio.Lock was created by a synchronous controller constructor; Python 3.9 eagerly binds it to an absent/old loop after asyncio.run, causing six hosted errors.
+- Solution: lazy allocation inside the running operation loop, explicit foreign-loop refusal and contended serialization regression; nine offline cases pass on actual Python 3.9 and 3.14, one approved-live case remains opt-in.
+- Status: Resolved locally; rerun exact-head hosted matrix before merge.
+
 ### 2026-10-15 — Explicit acceptance skipped prerequisites
 - Cause: browser launch/build backend failures raised SkipTest during explicit acceptance; hosted CI omitted real MCP/browser protocols.
 - Solution: fail explicit prerequisite errors, clean browser setup, add actual SDK/headed-extension CI. Bad/clean regressions and live acceptance pass.
