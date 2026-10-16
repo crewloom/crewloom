@@ -18,3 +18,5 @@ CREWLOOM_REAL_BROWSER=1 python3 -m unittest scripts.test_sidepanel
 ```
 
 Default rendered checks use mocked Chrome APIs; real browser checks are opt-in and skip when dependencies or the fixture dashboard are unavailable. Screenshots from mocked APIs are layout previews only. New tests reproduce spoofed attributes, stale generations, removed/hidden elements and disabled controls. Dashboard tests exercise actual request authorization and persistent worker state with a controlled Chrome transport.
+
+Version 2.3.1 clears all contacted frame overlays and HUDs after Clear, tab changes or partial scan failures. Unused frame quota remains available under the shared cap. Unverifiable cross-origin embeddings are omitted with a warning instead of exposing unusable click handles; open those frames separately. Permissions are unchanged. Use a stable unpacked-installation directory for future updates.

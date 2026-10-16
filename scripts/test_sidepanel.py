@@ -34,7 +34,7 @@ window.chrome = {
   runtime: {
     lastError: %(lastError)s,
     getURL: (path) => path,
-    getManifest: () => ({ version: '2.3.0' }),
+    getManifest: () => ({ version: '2.3.1' }),
     sendMessage: (message, callback) => {
       window.__sent.push(message);
       if (message.type === 'GET_CONTROL' || message.type === 'SET_CONTROL') { callback({ ok: true, enabled: message.enabled ?? true });
@@ -212,7 +212,7 @@ class SidePanelTest(SidePanelHarness):
             self.assertEqual(page.inner_text('#daemonLabel'), 'Online :4317')
             logs = page.inner_text('#terminalLogs')
             self.assertIn('Panel ready', logs)
-            self.assertIn('2.3.0', logs)
+            self.assertIn('2.3.1', logs)
             self.assertIn('Local Crewloom daemon handshake verified', logs)
         finally:
             context.close()
@@ -224,10 +224,11 @@ class SidePanelTest(SidePanelHarness):
             page.evaluate("""() => {
               const original = chrome.tabs.sendMessage;
               window.__clicks = [];
-              chrome.tabs.sendMessage = (tab, message, callback) => {
+              chrome.tabs.sendMessage = (tab, message, options, reply) => {
+                const callback = typeof options === 'function' ? options : reply;
                 if (message.type === 'INDEX_PAGE') { window.__pendingIndex = callback; return; }
                 if (message.type === 'CLICK_INDEX') window.__clicks.push({tab,message});
-                original(tab,message,callback);
+                original(tab,message,options,reply);
               };
             }""")
             page.click('#indexBtn')
@@ -674,6 +675,11 @@ class RealBrowserExtensionTest(unittest.TestCase):
                             '<script>document.querySelector("#shadow-host").attachShadow({mode:"open"})'
                             '.innerHTML="<button id=shadow-action>Shadow action</button>";</script>'
                             '</body></html>').encode()
+                elif self.path == '/sparse-frames':
+                    data = ('<html><body>' + ''.join('<button>Control '+str(i)+'</button>' for i in range(300))
+                            + '<iframe src="/empty-frame"></iframe>'*20 + '</body></html>').encode()
+                elif self.path == '/empty-frame':
+                    data = b'<html><body></body></html>'
                 elif self.path in ('/same-frame', '/cross-frame'):
                     label = 'Same frame action' if self.path == '/same-frame' else 'Cross frame action'
                     data = f'<html><body><button id="frame-action">{label}</button></body></html>'.encode()
@@ -763,13 +769,62 @@ class RealBrowserExtensionTest(unittest.TestCase):
         same = next(frame for frame in self.page.frames if frame.url.endswith('/same-frame'))
         same.evaluate('window.__hits=0; document.querySelector("button").onclick=()=>window.__hits++')
         self.panel.evaluate("document.querySelector('#indexBtn').click()")
-        self.panel.wait_for_function("() => document.querySelector('#directoryList').textContent.includes('Cross frame action')")
-        for label in ('Shadow action','Same frame action','Cross frame action'):
+        self.panel.wait_for_function("() => document.querySelector('#directoryList').textContent.includes('Same frame action')")
+        for label in ('Shadow action','Same frame action'):
             self.assertIn(label, self.panel.inner_text('#directoryList'))
+        self.assertNotIn('Cross frame action',self.panel.inner_text('#directoryList'))
+        self.assertIn('Skipped 1 frames',self.panel.inner_text('#terminalLogs'))
         self.panel.evaluate("""() => [...document.querySelectorAll('.directory-item')]
           .find(row=>row.textContent.includes('Same frame action')).querySelector('button').click()""")
         self.panel.wait_for_timeout(200)
         self.assertEqual(same.evaluate('window.__hits'), 1)
+
+    def test_unused_frame_quota_is_available_to_the_dense_main_document(self):
+        self.page.goto(self.DASHBOARD+'sparse-frames')
+        self.page.wait_for_timeout(600);self.page.bring_to_front()
+        self.panel.evaluate("() => document.querySelector('#indexBtn').click()")
+        self.panel.wait_for_function("() => Number(document.querySelector('#elemCountBadge').textContent)>0")
+        self.assertEqual(self.panel.inner_text('#elemCountBadge'),'300')
+        self.assertEqual(self.page.locator('.crewloom-indexed-tag').count(),300)
+
+    def test_panel_clear_and_tab_switch_remove_all_frame_overlays(self):
+        self.page.goto(self.DASHBOARD+'frames');self.page.wait_for_timeout(600);self.page.bring_to_front()
+        same=next(frame for frame in self.page.frames if frame.url.endswith('/same-frame'))
+        def index():
+            self.panel.evaluate("() => document.querySelector('#indexBtn').click()")
+            self.panel.wait_for_function("() => document.querySelector('#directoryList').textContent.includes('Same frame action')")
+            self.assertGreater(same.locator('.crewloom-indexed-tag').count(),0)
+        index()
+        self.panel.evaluate("() => document.querySelector('#clearBtn').click()")
+        same.wait_for_function("() => document.querySelectorAll('.crewloom-indexed-tag').length===0")
+        self.assertEqual(same.locator('.crewloom-agent-hud').count(),0)
+        self.assertEqual(self.page.locator('.crewloom-indexed-tag').count(),0)
+        index()
+        other=self.context.new_page();self.addCleanup(other.close);other.goto(self.DASHBOARD)
+        same.wait_for_function("() => document.querySelectorAll('.crewloom-indexed-tag').length===0")
+        self.assertEqual(same.locator('.crewloom-agent-hud').count(),0)
+
+    def test_partial_scan_failure_cleans_frames_that_already_painted(self):
+        self.page.goto(self.DASHBOARD+'frames');self.page.wait_for_timeout(600);self.page.bring_to_front()
+        same=next(frame for frame in self.page.frames if frame.url.endswith('/same-frame'))
+        self.panel.evaluate("""async () => {
+          const [tab]=await chrome.tabs.query({active:true,currentWindow:true});
+          const frames=await chrome.scripting.executeScript({target:{tabId:tab.id,allFrames:true},func:()=>location.href});
+          const id=frames.find(f=>f.result.endsWith('/same-frame')).frameId;
+          const send=chrome.tabs.sendMessage.bind(chrome.tabs);
+          chrome.tabs.sendMessage=(tabId,message,options,reply)=>{
+            if(message.type==='INDEX_PAGE' && options.frameId===id)
+              return send(tabId,message,options,()=>reply({ok:false,error:'Injected partial scan failure'}));
+            return send(tabId,message,options,reply);
+          };
+          document.querySelector('#indexBtn').click();
+        }""")
+        self.panel.wait_for_function("() => document.querySelector('#terminalLogs').textContent.includes('Index failed')")
+        same.wait_for_function("() => document.querySelectorAll('.crewloom-indexed-tag').length===0")
+        self.assertEqual(same.locator('.crewloom-agent-hud').count(),0)
+        self.assertEqual(self.page.locator('.crewloom-indexed-tag').count(),0)
+        self.assertEqual(self.page.locator('.crewloom-agent-hud').count(),0)
+        self.assertEqual(self.panel.inner_text('#elemCountBadge'),'0')
 
     def test_panel_reports_the_live_dashboard(self):
         self.assertIn(self.panel.inner_text('#daemonLabel'), ('Online :4317', 'Standalone'))

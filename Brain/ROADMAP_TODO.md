@@ -242,3 +242,7 @@
 - 2026-10-15 | [x] Gated corrected runtime installation and exact installed native acceptance at ae387fe; scoped daemon/fixture cleanup completed. General apps, broad role-quality and native host capture beyond protocol fixtures remain separate acceptance work.
 
 - 2026-10-15 | [x] PR20 opened for audited fixes. [x] Repair missing worktree user-context delivery and Python3.9 native lock startup. [x] Explicit app targets and read-only native policy. [ ] Finish paired real-project acceptance, browser-profile install, approved app trials, exact-head CI/merge and final rollout.
+
+- 2026-10-16 | [x] Paired real model attempts and retained failure/assisted phases. [x] Complete primary delivery, source-linked worktree context, reviewed local publication, stop/resume, scoped Arabic correction and foreign-project refusals. [x] Actual Chrome profile install/index/click/capture; Calculator and read-only TextEdit acceptance; bounded sessions stopped. [x]0.6.0 wheel/sdist distribution13. [ ] Final release commit, required exact-head CI, normal PR20 merge, release assets and installed runtime smoke. Separate future scope: representative business-domain quality and additional app-specific actions.
+
+- 2026-10-16 | [x] Three browser review findings fixed with known-bad rejection and clean42-test acceptance; actual Chrome profile2.3.1 upgrade smoke passed and disabled. [ ] Final mandatory gate, exact-head CI, normal merge, release and installed runtime smoke.

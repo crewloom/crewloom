@@ -68,3 +68,9 @@ python3 -m unittest discover -s scripts -p test_native_desktop.py
 ```
 
 Live acceptance on 2026-10-14 passed with CuaDriver 0.28.2 and the synthetic fixture. The initial expired session and denied global discovery attempt were retained. This proves the scoped fixture flow only; arbitrary apps and general desktop workflows remain outside this acceptance.
+
+### Additional application acceptance, 2026-10-15
+
+Exact-target preparation was exercised on Calculator (`7 + 5`, exact static result `12`, stale handle refused) and TextEdit (one owned test document, snapshot tool only, unchanged file bytes). Their independently approved bounded sessions were stopped after verification. These are per-application acceptance results, not compatibility with every macOS application. The real Chrome profile separately passed extension 2.3.0 index/click/vision capture and was returned to disabled after the test.
+
+The 2026-10-16 browser follow-up verified the actual profile upgrade to2.3.1 with the same permissions: index, click, capture and clear passed; the companion was disabled afterward. The earlier2.3.0 evidence remains historical.

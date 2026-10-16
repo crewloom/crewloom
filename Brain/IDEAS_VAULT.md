@@ -131,3 +131,7 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-15 | Keep live native acceptance opt-in and preserve a unique receipt for every attempt. Separate source and installed-runtime receipts; test foreign PID refusal and stale handles alongside visible state transitions.
 
 - 2026-10-15 | Use real generation failures to refine explicit runtime contracts without altering the frozen verifier. Freeze task-source context at the worktree boundary as well as inside model prompts. Report quality per attempted role and task, with failed and blocked runs retained.
+
+- 2026-10-16 | Close an operational acceptance with a published code candidate, a post-delivery correction completed from executor evidence, a per-role coverage inventory and retained failed phases. Unknown backend identity/cost and untested domains remain explicit fields, rather than blocking delivery of verified toolkit capabilities.
+
+- 2026-10-16 | Keep the manually installed browser companion in a stable reviewed directory so reloads retain its Chrome ID; immutable toolkit releases remain separate. Upgrade2.3.1 keeps the existing permissions and explicit enable boundary.

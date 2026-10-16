@@ -150,6 +150,19 @@ function scheduleReposition() {
 // Index all interactive elements with numbered labels [1], [2], [3]
 function indexInteractiveElements(options = {}) {
   clearAllIndexTags();
+  // A cross-origin boundary hides frameElement, so the embedding hit test
+  // cannot prove that a target is exposed. Do not advertise unusable handles.
+  let view = window;
+  while (view !== window.top) {
+    let frame;
+    try { frame = view.frameElement; } catch { frame = null; }
+    if (!frame) {
+      hudElement?.remove(); hudElement = null;
+      return {generation:indexGeneration,documentToken,items:[],total:0,blockedFrames:1,
+        truncated:false,limit:0};
+    }
+    view = frame.ownerDocument.defaultView;
+  }
   const overlay = getGroundingOverlay();
   overlay.style.display = 'block';
   overlay.style.width = `${Math.max(document.documentElement.scrollWidth, window.innerWidth)}px`;
@@ -360,6 +373,7 @@ function handleMessage(message, sender, sendResponse) {
 
   if (message.type === 'CLEAR_INDEX') {
     clearAllIndexTags();
+    hudElement?.remove(); hudElement = null;
     sendResponse({ ok: true });
     return false;
   }

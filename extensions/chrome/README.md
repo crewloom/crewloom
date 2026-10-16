@@ -87,7 +87,7 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 - Browser-internal pages (`chrome://`, the Web Store, PDF viewer) block content scripts; the panel
   reports this instead of failing silently.
 - Indexing prioritizes targets in the current viewport, then nearby off-screen targets. Re-index
-  after scrolling to reach later targets. Readable frames receive a share of the 400-target budget;
+  after scrolling to reach later targets. Readable frames consume the remaining shared 400-target budget without reserving space for empty frames;
   more than 128 frames are refused explicitly. Closed Shadow DOM and restricted pages are unavailable.
 - Clicks require the original document token and generation. Action attributes, ancestor
   interactivity and hit-test visibility are checked before dispatch. Open a cross-origin frame
@@ -110,3 +110,9 @@ The third form loads this folder into headed Chromium against a synthetic HTTP f
 ephemeral port. It checks manifest acceptance, grounding tags, the HUD logo, real click events
 and a real `captureVisibleTab` frame. It skips when the runtime is unavailable; no user dashboard
 or private project page is required.
+
+### 2.3.1 frame corrections
+
+Clear Overlays, tab changes and failed partial scans clear every contacted frame, including its HUD. Indexing carries unused capacity forward under the shared limit. Frames behind an origin boundary whose embedding hit test cannot be verified are omitted with a visible warning; open the target frame separately. The extension does not advertise handles it cannot safely click. No new permissions are required.
+
+For unpacked installations, keep one stable installation directory and reload the existing extension after reviewed updates. A new directory produces a different unpacked Chrome extension ID. Immutable Crewloom release directories remain unchanged.
