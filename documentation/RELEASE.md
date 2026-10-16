@@ -48,7 +48,7 @@ Workflow task actions require an explicit project root. Project ownership persis
 
 ## 0.6.0 development metadata
 
-`version = "0.6.0.dev0"`. This is a development version, not a tag or a published release.
+The preceding development snapshots used `version = "0.6.0.dev0"`. The reviewed release candidate now uses `0.6.0`; metadata alone does not assert a published tag.
 
 - Installable distributions: a standard wheel and an sdist build from `pyproject.toml` with a pinned `setuptools>=77,<81` backend and no runtime dependencies. One explicit resolver (`scripts/crewloom_resources.py`) maps repository paths to either a checkout or the installed data package, so `list`, `show`, `install`, `context`, `validate`, `project` and `workflow` all work outside the source checkout without duplicating the role tree, reading the working directory, or relying on an editable path.
 - The flat runtime is declared as `py-modules`, including `js_syntax`, which `repo_map` imports at module scope so an installed navigation index always has it. The one optional extra, `crewloom[syntax]`, pins `tree-sitter==0.23.2`, `tree-sitter-javascript==0.23.1` and `tree-sitter-typescript==0.23.2`. Without it every command still works and the generated map records that approximate extraction was used.
@@ -57,3 +57,9 @@ Workflow task actions require an explicit project root. Project ownership persis
 - Dashboard authentication is required on every API read, write and the event stream. The generated token is written to an owner-only runtime file and only its path is printed.
 
 `CREWLOOM_DISTRIBUTION_TESTS=1` builds and installs both artifacts and exercises them outside the checkout. It is opt-in and never part of the commit gate.
+
+## 0.6.0 release scope
+
+The 0.6.0 candidate packages the integrated workflow, coordinator, source-context, MCP, browser and scoped native functionality described in the current guides. The [operational acceptance record](../examples/evaluation/agency-acceptance-20261015.json) records real model-generated delivery, actual isolated checks and scoped Chrome/Calculator/TextEdit results; it also preserves failures and coverage limits. The core remains dependency-free. The optional MCP extra uses the pinned official SDK; the dashboard remains a source/sdist component with its own Node dependencies. Loopback dashboard access follows the current [dashboard guide](../README.md#live-dashboard).
+
+A release tag is created only after the final-head required GitHub checks pass and the reviewed PR is normally merged. Wheel, sdist and extension ZIP are reviewed local build outputs; no package-index upload is implied. Broad specialist quality, all-app desktop control and unknown provider cost/model identity are not release claims.

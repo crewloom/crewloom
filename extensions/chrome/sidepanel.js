@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const RESTRICTED_URL = /^(chrome|edge|brave|about|chrome-extension|devtools|view-source):/i;
 
   let currentTab = null;
+  let navigationEpoch = 0;
+  let refreshRequest = 0;
+  let indexRequest = 0;
+  let indexedTargets = new Map();
+  const overlayFrames = new Map();
+  let directoryResult = null;
+  let directoryPage = 0;
+  let daemonConnected = null;
   let language = 'en';
   let directoryEmptyKey = 'dirIdle';
   let lastDirectoryNote = null;
@@ -64,8 +72,10 @@ document.addEventListener('DOMContentLoaded', () => {
       dirIdle: 'Click "Auto-Index Page" to detect interactive elements.',
       dirEmpty: 'No interactive elements detected.',
       dirCleared: 'Overlays cleared.',
-      dirShowing: 'Showing first {shown} of {total} elements.',
-      dirTruncated: 'Page limit reached: {shown} of {total} indexed (limit {limit}).',
+      dirShowing: 'Showing {start}–{end} of {indexed} indexed; {total} found.',
+      dirTruncated: 'Showing {start}–{end} of {indexed} indexed; {total} found (limit {limit}).',
+      previous: 'Previous', next: 'Next',
+      itemClick: 'Click',
       logInit: 'Panel ready. Extension version {version}.',
       logTab: 'Focused tab: {title}',
       logNoTab: 'No readable tab.',
@@ -73,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
       logIndexed: 'Indexed {count} interactive elements.',
       logIndexLimited: 'Indexed {shown} of {total} elements; page limit {limit} reached.',
       logIndexFailed: 'Index failed: {error}',
+      logSkippedFrames: 'Skipped {count} frames whose embedding cannot be verified; open the target frame separately.',
       logRestricted: 'This page blocks extensions (browser settings page).',
       logCleared: 'In-page grounding tags cleared.',
       logClearFailed: 'Clear failed: {error}',
@@ -118,8 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
       dirIdle: 'اضغط "ترقيم الصفحة" لاكتشاف العناصر التفاعلية.',
       dirEmpty: 'لم يتم العثور على عناصر تفاعلية.',
       dirCleared: 'تم مسح الإشارات.',
-      dirShowing: 'عرض أول {shown} من {total} عنصر.',
-      dirTruncated: 'بلغت حدود الصفحة: تم ترقيم {shown} من {total} (الحد {limit}).',
+      dirShowing: 'عرض {start}–{end} من {indexed} مفهرس؛ {total} موجود.',
+      dirTruncated: 'عرض {start}–{end} من {indexed} مفهرس؛ {total} موجود (الحد {limit}).',
+      previous: 'السابق', next: 'التالي',
+      itemClick: 'اضغط',
       logInit: 'اللوحة جاهزة. إصدار الإضافة {version}.',
       logTab: 'التبويب النشط: {title}',
       logNoTab: 'لا يوجد تبويب قابل للقراءة.',
@@ -127,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       logIndexed: 'تم ترقيم {count} عنصر تفاعلي.',
       logIndexLimited: 'تم ترقيم {shown} من {total} عنصر؛ تم بلوغ حد الصفحة {limit}.',
       logIndexFailed: 'فشل الترقيم: {error}',
+      logSkippedFrames: 'تم تجاوز {count} إطار لا يمكن التحقق من موضعه؛ افتح الإطار المطلوب في تبويب منفصل.',
       logRestricted: 'هذه الصفحة تمنع الإضافات (صفحة إعدادات المتصفح).',
       logCleared: 'تم مسح أرقام العناصر من الصفحة.',
       logClearFailed: 'فشل المسح: {error}',
@@ -196,7 +210,32 @@ document.addEventListener('DOMContentLoaded', () => {
     directoryList.insertBefore(note, directoryList.firstChild);
   }
 
+  function rememberFrame(tabId, frameId) {
+    if (!overlayFrames.has(tabId)) overlayFrames.set(tabId, new Set());
+    overlayFrames.get(tabId).add(frameId);
+  }
+
+  function clearFrameOverlays(tabId, done = () => {}) {
+    const ids = overlayFrames.get(tabId) || new Set([0]);
+    let pending = ids.size, failed = false;
+    if (!pending) return done(true);
+    for (const frameId of [...ids]) {
+      chrome.tabs.sendMessage(tabId, {type:'CLEAR_INDEX'}, {frameId}, (res) => {
+        if (chrome.runtime.lastError || !res?.ok) failed = true;
+        else ids.delete(frameId);
+        if (--pending === 0) {
+          if (!ids.size) overlayFrames.delete(tabId);
+          done(!failed);
+        }
+      });
+    }
+  }
+
   function resetIndexState() {
+    navigationEpoch += 1;
+    indexRequest += 1;
+    indexedTargets.clear();
+    directoryResult = null;
     currentGeneration = null;
     elemCountBadge.textContent = '0';
     setDirectoryText('dirIdle');
@@ -204,12 +243,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Refresh active tab info
   function refreshActiveTab(onReady) {
+    if (!Number.isInteger(panelWindowId)) return;
+    const request = ++refreshRequest;
     chrome.runtime.sendMessage({ type: 'GET_ACTIVE_TAB', windowId: panelWindowId }, (res) => {
-      const tabId = res?.tab?.id;
+      if (request !== refreshRequest) return;
       const previousId = currentTab?.id;
+      const previousUrl = currentTab?.url;
       currentTab = res?.tab ?? null;
 
       if (!currentTab?.id) {
+        resetIndexState();
         tabTitle.textContent = t('logNoTab');
         tabUrl.textContent = '—';
         return;
@@ -219,11 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
       tabUrl.textContent = currentTab.url ? new URL(currentTab.url).hostname : '—';
       log('logTab', 'info', { title: tabTitle.textContent });
 
-      if (previousId && previousId !== currentTab.id) {
+      if (previousId && (previousId !== currentTab.id || previousUrl !== currentTab.url)) {
         // Indices from the previous page no longer describe this tab
-        chrome.tabs.sendMessage(previousId, { type: 'CLEAR_INDEX' }, () => {
-          void chrome.runtime.lastError;
-        });
+        clearFrameOverlays(previousId);
         resetIndexState();
       }
       if (typeof onReady === 'function') onReady();
@@ -233,15 +274,29 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auto-Index Page
   indexBtn.addEventListener('click', () => {
     if (!currentTab?.id) return refreshActiveTab();
+    const tabId = currentTab.id;
+    const url = currentTab.url;
+    const epoch = navigationEpoch;
+    const request = ++indexRequest;
+    indexedTargets.clear();
+    currentGeneration = null;
+    const fresh = () => request === indexRequest && epoch === navigationEpoch &&
+      currentTab?.id === tabId && currentTab?.url === url;
     log('logIndexing', 'action');
-    chrome.tabs.sendMessage(currentTab.id, { type: 'INDEX_PAGE' }, (res) => {
+    const accept = (res) => {
+      if (!fresh()) return;
       if (chrome.runtime.lastError || !res?.ok) {
+        clearFrameOverlays(tabId);
         currentGeneration = null;
     elemCountBadge.textContent = '0';
         setDirectoryText('dirIdle');
         return describeError(res?.error);
       }
       currentGeneration = res.generation;
+      indexedTargets = new Map((res.items || []).map(item => [item.index, {
+        tabId, frameId: item.frameId ?? 0, documentToken: item.documentToken ?? res.documentToken,
+        generation: item.generation ?? res.generation
+      }]));
       elemCountBadge.textContent = res.count;
       if (res.truncated) {
         log('logIndexLimited', 'warn', {
@@ -253,11 +308,50 @@ document.addEventListener('DOMContentLoaded', () => {
         log('logIndexed', 'success', { count: res.count });
       }
       renderDirectory(res);
+      if (res.blockedFrames) log('logSkippedFrames', 'warn', {count:res.blockedFrames});
+    };
+    if (!chrome.scripting?.executeScript) {
+      rememberFrame(tabId, 0);
+      chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE' }, accept);
+      return;
+    }
+    const discover = () => chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: () => true }, (frames) => {
+      if (!fresh()) return;
+      if (chrome.runtime.lastError || !frames?.length) return accept(null);
+      const ids = [...new Set(frames.map(frame => frame.frameId))].sort((a,b) => a-b);
+      if (ids.length > 128) return accept({ok:false,error:'Too many frames; open the target frame separately'});
+      const combined = { ok: true, items: [], total: 0, limit: 400, generation: null, truncated: false, blockedFrames: 0 };
+      function scan(position) {
+        if (!fresh()) return;
+        if (position === ids.length) {
+          combined.count = combined.items.length;
+          combined.truncated = combined.count < combined.total;
+          accept(combined); return;
+        }
+        const frameId = ids[position];
+        rememberFrame(tabId, frameId); // Also retain frames whose indexing reply fails.
+        chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE', includeFrames: false,
+          offset: combined.items.length, limit: Math.max(0,400-combined.items.length) }, {frameId}, (res) => {
+          if (!fresh()) return;
+          if (chrome.runtime.lastError || !res?.ok) {
+            return accept({ok:false,error:'A frame could not be indexed; reload and retry'});
+          }
+          combined.total += res.total;
+          combined.blockedFrames += res.blockedFrames || 0;
+          combined.items.push(...res.items.map(item => ({...item,frameId,
+            generation:res.generation,documentToken:res.documentToken})));
+          scan(position+1);
+        });
+      }
+      scan(0);
     });
+    clearFrameOverlays(tabId, () => { if (fresh()) discover(); });
   });
 
   // Render directory list
-  function renderDirectory(res) {
+  function renderDirectory(res, page = 0) {
+    directoryResult = res;
+    directoryPage = page;
     const items = res.items || [];
     directoryList.innerHTML = '';
     if (!items.length) {
@@ -265,14 +359,15 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const shown = Math.min(items.length, MAX_DIRECTORY_ROWS);
+    const start = page * MAX_DIRECTORY_ROWS;
+    const shown = Math.min(items.length-start, MAX_DIRECTORY_ROWS);
     setDirectoryNote(res.truncated ? 'dirTruncated' : 'dirShowing', {
-      shown: res.truncated ? items.length : shown,
+      shown, start:start+1, end:start+shown, indexed:items.length,
       total: res.total ?? items.length,
       limit: res.limit ?? items.length
     });
 
-    items.slice(0, shown).forEach((item) => {
+    items.slice(start, start+shown).forEach((item) => {
       const row = document.createElement('div');
       row.className = 'directory-item';
 
@@ -288,19 +383,37 @@ document.addEventListener('DOMContentLoaded', () => {
       const click = document.createElement('button');
       click.className = 'btn-item-click';
       click.dataset.index = item.index;
-      click.textContent = 'Click';
+      click.textContent = t('itemClick');
       click.addEventListener('click', () => executeClick(item.index));
 
       row.append(idx, desc, click);
       directoryList.appendChild(row);
     });
+    if (items.length > MAX_DIRECTORY_ROWS) {
+      const controls = document.createElement('div');
+      controls.className = 'directory-pagination';
+      controls.setAttribute('role','group');
+      for (const [id, label, delta, disabled] of [
+        ['directoryPrevious','previous',-1,page===0],
+        ['directoryNext','next',1,start+shown===items.length]
+      ]) {
+        const button = document.createElement('button');
+        button.className='btn-ghost';
+        button.id=id; button.textContent=t(label); button.disabled=disabled;
+        button.addEventListener('click',()=>renderDirectory(res,page+delta));
+        controls.appendChild(button);
+      }
+      directoryList.appendChild(controls);
+    }
   }
 
   // Execute Click on Element Index
   function executeClick(index) {
-    if (!currentTab?.id) return;
+    const target = indexedTargets.get(index);
+    if (!currentTab?.id || !target || target.tabId !== currentTab.id) return;
     log('logClick', 'action', { index });
-    chrome.tabs.sendMessage(currentTab.id, { type: 'CLICK_INDEX', index, generation: currentGeneration }, (res) => {
+    const message = { type: 'CLICK_INDEX', index, generation: target.generation, documentToken:target.documentToken };
+    const reply = (res) => {
       if (res?.ok) {
         log('logClicked', 'success', {
           tag: res.tag,
@@ -310,7 +423,8 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         log('logClickFailed', 'warn', { error: res?.error || 'element not found' });
       }
-    });
+    };
+    chrome.tabs.sendMessage(target.tabId,message,{frameId:target.frameId},reply);
   }
 
   clickElementBtn.addEventListener('click', () => {
@@ -379,9 +493,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clear Overlays
   clearBtn.addEventListener('click', () => {
     if (!currentTab?.id) return;
-    chrome.tabs.sendMessage(currentTab.id, { type: 'CLEAR_INDEX' }, (res) => {
-      if (chrome.runtime.lastError || !res?.ok) {
-        return describeError(res?.error, 'logClearFailed');
+    const tabId = currentTab.id;
+    resetIndexState();
+    const epoch = navigationEpoch;
+    clearFrameOverlays(tabId, (ok) => {
+      if (currentTab?.id !== tabId || epoch !== navigationEpoch) return;
+      if (!ok) {
+        return describeError('One or more frames could not be cleared; reload and retry', 'logClearFailed');
       }
       currentGeneration = null;
     elemCountBadge.textContent = '0';
@@ -441,6 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (empty) empty.textContent = t(directoryEmptyKey);
     const note = directoryList.querySelector('.directory-note');
     if (note && lastDirectoryNote) note.textContent = t(lastDirectoryNote.key, lastDirectoryNote.vars);
+    if (directoryResult) renderDirectory(directoryResult,directoryPage);
+    if (daemonConnected !== null) daemonLabel.textContent = t(daemonConnected ? 'daemonOnline' : 'daemonStandalone');
   }
 
   // Language Toggle (English <-> Arabic) persisted across panel sessions
@@ -469,27 +589,46 @@ document.addEventListener('DOMContentLoaded', () => {
   control.addEventListener('change', () => chrome.runtime.sendMessage({ type: 'SET_CONTROL', enabled: control.checked }, (res) => showControl(res?.ok && res.enabled)));
   chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes['crewloom.enabled']) showControl(changes['crewloom.enabled'].newValue); });
 
-  // Check Local Daemon status
-  chrome.runtime.sendMessage({ type: 'CHECK_LOCAL_DAEMON' }, (res) => {
+  // Refresh measured status without overlapping requests or repeating unchanged logs.
+  let daemonCheckPending = false;
+  function checkDaemon() {
+    if (daemonCheckPending) return;
+    daemonCheckPending = true;
+    chrome.runtime.sendMessage({ type: 'CHECK_LOCAL_DAEMON' }, (res) => {
+    daemonCheckPending = false;
+    const connected = res?.connected === true;
+    const changed = connected !== daemonConnected;
+    daemonConnected = connected;
+    daemonLabel.title = new Date().toISOString();
     if (res?.connected) {
       daemonLabel.textContent = t('daemonOnline');
-      log('logDaemon', 'success');
+      daemonLabel.style.color = '';
+      if (changed) log('logDaemon', 'success');
     } else {
       daemonLabel.textContent = t('daemonStandalone');
       daemonLabel.style.color = 'var(--warn)';
-      log('logDaemonOffline', 'warn', { error: res?.error || 'connection refused' });
+      if (changed) log('logDaemonOffline', 'warn', { error: res?.error || 'connection refused' });
     }
   });
+  }
+  checkDaemon();
+  const daemonTimer = setInterval(checkDaemon, 15000);
+  window.addEventListener('unload',()=>clearInterval(daemonTimer));
 
   chrome.windows?.getCurrent((w) => { panelWindowId = w.id; refreshActiveTab(consumePendingCapture); });
 
   // Dynamic tab tracking like Claude/Codex
   if (chrome.tabs?.onActivated) {
-    chrome.tabs.onActivated.addListener(() => refreshActiveTab());
+    chrome.tabs.onActivated.addListener((info) => {
+      if (info && info.windowId !== panelWindowId) return;
+      resetIndexState();
+      refreshActiveTab();
+    });
   }
   if (chrome.tabs?.onUpdated) {
     chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
-      if (currentTab && tabId === currentTab.id && changeInfo.status === 'complete') {
+      if (currentTab && tabId === currentTab.id && (changeInfo.status || changeInfo.url)) {
+        clearFrameOverlays(tabId);
         resetIndexState();
         refreshActiveTab();
       }

@@ -108,6 +108,16 @@ class InstalledDistributionTests(unittest.TestCase):
 
     # ------------------------------------------------------------------ archives
 
+    def test_optional_mcp_cli_and_resources_work_without_the_extra(self):
+        result = self.crewloom('mcp', '--help')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('--allow-import', result.stdout)
+        names = zipfile.ZipFile(self.wheel).namelist()
+        self.assertIn('mcp_bridge.py', names)
+        self.assertIn('crewloom_data/documentation/MCP_BRIDGE.md', names)
+        self.assertIn('crewloom_data/examples/mcp/crewloom-task.json', names)
+        self.assertIn('crewloom_data/examples/mcp/playwright-isolated.json', names)
+
     def test_wheel_and_sdist_contain_the_declared_public_material_only(self):
         wheel_names = zipfile.ZipFile(self.wheel).namelist()
         sdist_names = tarfile.open(self.sdist).getnames()

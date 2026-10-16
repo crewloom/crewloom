@@ -51,3 +51,13 @@ python3 -m pip install 'crewloom[syntax]'   # tree-sitter 0.23.2, javascript 0.2
 Without it the same commands still work and the generated map records that approximate extraction was used, so a missing extra is reported rather than hidden. `map --help` and the map metadata name the parser that produced each index.
 
 Native host setup and callback boundaries: [Native host lifecycle](HOST_LIFECYCLE.md).
+
+The optional `crewloom mcp` command exposes one project's task through the official Python MCP SDK, with read-only tools by default. It requires `crewloom[mcp]` on Python 3.11+; other core commands remain dependency-free. See [MCP bridge and external reply import](MCP_BRIDGE.md).
+
+## Dashboard execution contracts
+
+Argument input accepts quoted text or a JSON array of strings. It never invokes a shell or
+expands variables. Paths remain project-relative. Context report defaults use `context.md` and
+`context-pilot.json` within the selected project. Project lifecycle, lesson and agency-readiness
+tools require explicit identities/external roots via their documented CLI; the dashboard labels
+these tools CLI-only and refuses execution rather than presenting incompatible Run defaults.

@@ -14,7 +14,8 @@
       "timeout_seconds": 300,
       "inputs": [
         "contracts/invoicing.md",
-        "src/money.py"
+        "src/money.py",
+        "criteria.md"
       ],
       "outputs": [
         "src/billing.py"

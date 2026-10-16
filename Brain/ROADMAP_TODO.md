@@ -213,3 +213,36 @@
 - 2026-10-12 | [x] Review fixes, current-main integration, native plugin local install, real browser regressions and dashboard build/UI checks. [ ] Exact final gate/PR/CI/merge/runtime rollout; [ ] independently scoped authenticated model/browser command bridge and true native desktop controller, which this manual companion does not implement. Broader P0-P6 quality plan remains separate.
 
 - 2026-10-13 | [x] Password-value refusal and persistent first-capture readiness fixes; [ ] final gate, exact-head CI, normal merge and installed runtime update.
+
+### 2026-10-14 — Defect closure and integration follow-up
+- Done:13 audited defects have concrete fixes and regressions; public acceptance contract, current ZIP, guarded download and separate runtime/project source display added.
+- Remaining: gated local rollout, then project/task-bound MCP browser and desktop integration with real call evidence; retain the manual default and existing host opt-in boundary. Full multi-role and cross-model quality evidence remains distinct from software test results.
+
+### 2026-10-14 — Integration acceptance update
+- Done: bound stdio MCP, candidate reply import preserving reviewer/container gates, and pinned isolated Playwright MCP config with four actual browser calls.10 MCP/import tests, Docker publication43, distribution13 and package20 pass.
+- Remaining: gated local CLI/dashboard rollout and read-only Codex registration. True native desktop control still needs a scoped application adapter and measured OS permissions; automatic chat capture/clarification and full multi-role/cross-model quality require separate acceptance inputs. Do not infer them from offline/unit tests or synthetic browser success.
+
+### 2026-10-14 — Local delivery completed
+- Done: mandatory hooks passed for browser/dashboard and MCP commits; immutable local CLI/dashboard updated, packaged extension download checked, rendered bilingual desktop/mobile checked, read-only Codex connection registered and exact-command live calls verified. Dirty original checkout retained.
+- Remaining capabilities: a native desktop application adapter with measured OS trust, automatic chat capture/clarification, and independently scoped real multi-role/cross-model acceptance. These are feature/acceptance gaps, not closed by the13 software defect fixes or isolated browser test. Remote publication/merge has not been performed.
+
+- 2026-10-14 | [x] Additional typed-history corruption regression, complete Run boundary validation,56 dashboard tests and TypeScript. Keep verified runtime/check receipts private; existing native-desktop/chat-capture/multi-model acceptance gaps remain explicit.
+
+### 2026-10-14 — Capability continuation
+- [x] Per-task opt-in native prompt capture, exact private source statements, bounded history and disable-with-preservation.
+- [x] Source-linked heuristic questions, native action refusal, later captured answers and read/opt-in-write MCP tools.
+- [x] Preserved bilingual pilot: two requested usable CLI models, two scenarios each; configured model rejection retained.
+- [x] Scoped native AX client, fixture-only bounded manifest, synthetic Swift application and negative mock checks.
+- [x] Human approval of the exact native manifest; actual Accessibility observe/press/reobserve and negative target proof (recorded 2026-10-15).
+- [ ] Broader representative role quality evaluation, verified backend identity, measured cost and native host capture acceptance beyond protocol fixtures.
+- [x] Mandatory commit gate passed on ef7782a; installed source and all three read-only MCP tools verified. Final memory-only snapshot refresh follows the same gate.
+
+- 2026-10-15 | [x] Fixed explicit-PID targeting and scoped window/static-text projection; live fixture acceptance and seven offline regressions pass. [x] Gated corrected runtime installation and installed native acceptance at ae387fe.
+
+- 2026-10-15 | [x] Gated corrected runtime installation and exact installed native acceptance at ae387fe; scoped daemon/fixture cleanup completed. General apps, broad role-quality and native host capture beyond protocol fixtures remain separate acceptance work.
+
+- 2026-10-15 | [x] PR20 opened for audited fixes. [x] Repair missing worktree user-context delivery and Python3.9 native lock startup. [x] Explicit app targets and read-only native policy. [ ] Finish paired real-project acceptance, browser-profile install, approved app trials, exact-head CI/merge and final rollout.
+
+- 2026-10-16 | [x] Paired real model attempts and retained failure/assisted phases. [x] Complete primary delivery, source-linked worktree context, reviewed local publication, stop/resume, scoped Arabic correction and foreign-project refusals. [x] Actual Chrome profile install/index/click/capture; Calculator and read-only TextEdit acceptance; bounded sessions stopped. [x]0.6.0 wheel/sdist distribution13. [ ] Final release commit, required exact-head CI, normal PR20 merge, release assets and installed runtime smoke. Separate future scope: representative business-domain quality and additional app-specific actions.
+
+- 2026-10-16 | [x] Three browser review findings fixed with known-bad rejection and clean42-test acceptance; actual Chrome profile2.3.1 upgrade smoke passed and disabled. [ ] Final mandatory gate, exact-head CI, normal merge, release and installed runtime smoke.

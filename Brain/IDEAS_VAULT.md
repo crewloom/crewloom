@@ -119,3 +119,19 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-12 | Native plugin availability, manual browser tools and agent automation are distinct capabilities. Keep activation at action boundaries, trust extension-owned references rather than DOM attributes, and measure readiness instead of translating a successful request into permission or registration.
 
 - 2026-10-13 | Test the lifecycle boundary, not only an already-open panel: worker restart, first initialization, wrong window, changed tab and expired requests are separate capture refusal conditions.
+
+### 2026-10-14 — Preserve identity across automation layers
+- Carry tab/frame/document/request identity from discovery through execution and return transport. Keep manual activation separate from agent automation consent; test delayed replies, navigation and disabled state in the real transport. Project/task identity must survive the same boundary in a future MCP bridge.
+
+### 2026-10-14 — Host capability separation
+- Keep the task/context/artifact MCP boundary reusable across hosts; attach an independently authorized browser or native desktop provider rather than expanding candidate import into arbitrary host execution. A host-capability matrix should record verified calls, permissions, application targets and unresolved scope.
+
+- 2026-10-14 | Keep native acceptance scoped to an account-free synthetic target before expanding actions. Independent mock refusal, human-approved driver capability, actual Accessibility state and a re-observed application postcondition are separate evidence.
+
+- 2026-10-15 | Keep live native acceptance opt-in and preserve a unique receipt for every attempt. Separate source and installed-runtime receipts; test foreign PID refusal and stale handles alongside visible state transitions.
+
+- 2026-10-15 | Use real generation failures to refine explicit runtime contracts without altering the frozen verifier. Freeze task-source context at the worktree boundary as well as inside model prompts. Report quality per attempted role and task, with failed and blocked runs retained.
+
+- 2026-10-16 | Close an operational acceptance with a published code candidate, a post-delivery correction completed from executor evidence, a per-role coverage inventory and retained failed phases. Unknown backend identity/cost and untested domains remain explicit fields, rather than blocking delivery of verified toolkit capabilities.
+
+- 2026-10-16 | Keep the manually installed browser companion in a stable reviewed directory so reloads retain its Chrome ID; immutable toolkit releases remain separate. Upgrade2.3.1 keeps the existing permissions and explicit enable boundary.

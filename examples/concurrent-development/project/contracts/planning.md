@@ -1,5 +1,9 @@
 # Contract: `src/planning.py`
 
+Runtime import contract: the CLI puts `src/` on `sys.path` and imports this module as
+`planning`, without a package parent. Import the reused helper with
+`from scheduling_support import ...`; package-relative imports cannot run here.
+
 Write exactly one module at `src/planning.py`. Standard library only. It is imported by
 `src/report.py`, so its public names are the contract, not its internals.
 

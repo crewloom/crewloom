@@ -17,7 +17,8 @@
         "src/billing.py",
         "src/planning.py",
         "src/money.py",
-        "src/scheduling_support.py"
+        "src/scheduling_support.py",
+        "criteria.md"
       ],
       "outputs": [
         "src/report.py",

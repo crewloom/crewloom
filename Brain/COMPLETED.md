@@ -312,3 +312,35 @@
 - 2026-10-12 | Initial integrated commit c009813 passed the complete mandatory hook. Final native Chrome test now additionally confirms generation-less click requests are refused; all29 browser checks pass again with one optional screenshot skip. Final fix commit gate pending.
 
 - 2026-10-13 | PR19 review fixes implemented. Dashboard47 tests pass; headed Chrome30 tests pass with one optional screenshot skip, including non-export of entered form values. Added rendered first-open/changed-tab regression; final gate/publication pending.
+
+### 2026-10-14 — Browser/dashboard defect closure
+- Artifact: existing browser/dashboard modules, source packager and documentation/BROWSER_DASHBOARD_ACCEPTANCE.md.
+- Evidence: original tab/DOM/metrics regressions reject old behavior; Python1123 (1016pass/107skip), dashboard55, TypeScript/build, Docker workflow34/policy43, actual Chromium38pass/1optional skip, distribution12 pass. ZIP rejects stale/unreviewed content and accepts deterministic rebuilds. Local rollout follows the gated commit; autonomous MCP/desktop integration is a separate phase.
+
+### 2026-10-14 — MCP and reply import acceptance
+- Artifact: scripts/mcp_bridge.py, workflow import-reply, documentation/MCP_BRIDGE.md and scoped client templates.
+- Evidence:10 bridge/import tests pass with real stdio and Docker; all five Crewloom tools called, plus actual Playwright navigate/snapshot/click/close against an isolated synthetic fixture. Both configs validate; distribution13 and packaging20 pass, Docker publication43 pass. Native Codex registration/runtime rollout follows the gated commit; no paid generation, desktop or broad model-quality claim.
+
+### 2026-10-14 — Verified local runtime rollout
+- Artifact: immutable Git snapshot bb6c68fb5c0bac5ed69500316edd6cb990015064 installed through pipx with the MCP extra; dashboard serves the same snapshot and preserves its monitored project. Prior snapshot retained.
+- Evidence: actual CLI source and SDK2.3.0 confirmed; HTTP overview/page/extension ZIP200, foreign-origin ZIP403, exact ZIP2.3.0 checksum matches source. Rendered English1440px/Arabic390px pass without horizontal overflow or page errors. Codex read-only config registered; its exact installed launch command lists/calls crewloom_status and crewloom_context successfully. Current chats require a new host connection to load tools.
+
+### 2026-10-14 — Typed run-history follow-up
+- Artifact: dashboard/lib/repo.ts and dashboard/test/repo.test.ts.
+- Evidence: regression rejects the prior parser (10 rows accepted instead of2);56 dashboard tests and TypeScript now pass. Required timestamp/role/duration/source fields and optional output/root are validated before history can reach metrics or React. All547 existing local rows have the required fields. Operational installation evidence remains project-private.
+
+### 2026-10-14 — Capture and bounded capability continuation
+- Artifact: existing user-context/native lifecycle/MCP modules; scripts/native_desktop.py, synthetic Swift target and documentation/NATIVE_DESKTOP.md.
+- Evidence: capture8 incl real SDK answer protocol; lifecycle75 (2optional skips), OpenCode36, packaging20, native mock4 pass; Swift fixture compiles. Two requested CLI models each yield selected-context4/4 versus raw-history2/4 on two bilingual scenarios; actual backend model identity unreported. Configured model rejection preserved. Full commit gate/local installation pending; human manifest approval/live Accessibility proof pending.
+
+- 2026-10-14 | Continuation commit ef7782a passed the mandatory99-suite/1207-test repository gate (optional live suites retain their skips). Immutable source installed with pinned MCP extra; exact installed stdio command lists/calls all three read tools. No native driver launch or automatic host capture activation; approval remains pending.
+
+- 2026-10-15 | Artifact: native_desktop.py, opt-in live regression and native guide. Real approved CuaDriver/SDK acceptance passed: counter0→1→0, stale/unobserved handles and foreign PID refused. Seven offline tests pass; live suite skips unless explicitly enabled. Expired session and denied global-discovery attempts retained privately; installed rollout follows the mandatory gate.
+
+- 2026-10-15 | Corrected immutable release ae387fe passed the mandatory99-suite/1211-test gate (optional skips). Exact installed Crewloom native CLI passed real counter0→1→0 and stale/unobserved/foreign-process refusal. Approved daemon stopped and owned fixture closed; receipts remain project-private.
+
+- 2026-10-15 | Artifact: coordinator/user_context delivery guard, native exact target/read-only preparation, import-contract clarification. User-context18 and native10 tests pass (native live case remains opt-in); real Docker coordinator49 passed. Public PR20 opened for the prior gated fixes. Paired model delivery and broader live application acceptance continue with preserved failures.
+
+- 2026-10-16 | Operational acceptance delivered: four real generated modules,70 application cases +16 helper tests, exact credential-reviewed local publication, unchanged verified generation counts on resume, and executor-verified Arabic correction. Actual Chrome profile2.3.0 index/click/capture, Calculator exact12 and TextEdit read-only pass; test sessions stopped.42 guides validate; live role coverage is explicit. Distribution13 passes for0.6.0; final release gate/merge/install follows.
+
+- 2026-10-16 | Browser PR20 review closure: tracked cleanup includes all contacted frames and partial failures; remaining index quota is reused; unverifiable cross-origin targets are omitted with a warning. Four new checks reject37f8387; final real-browser42 passes (one optional skip). Chrome profile upgrade2.3.1 verified index/click/capture/clear, then disabled and owned server/tab closed.

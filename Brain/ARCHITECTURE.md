@@ -1,5 +1,10 @@
 # Repository architecture
 
+### 2026-10-14 — Browser and dashboard correctness
+- Index replies bind tab/navigation request; targets bind frame, document token, generation and action fingerprint. Clicks recheck ancestor interactivity and hit-test visibility. Open Shadow DOM/readable frames share a bounded viewport-prioritized inventory; the directory is paginated.
+- Dashboard role status uses run evidence rather than template headings. Memory counters accept dated compact records; malformed run values are isolated. Tool arguments are data, with bounded quote/JSON parsing and no shell evaluation; external-root tools remain CLI-only.
+- A deterministic source-only browser packager and stale/unreviewed-file regressions prevent ZIP drift. Runtime source and monitored project are displayed separately. These changes do not add autonomous model/browser dispatch or a native desktop controller.
+
 [Public architecture](../documentation/ARCHITECTURE.md) describes the toolkit boundaries. [AGENTS.md](../AGENTS.md) is the single authority for agent behavior. Public role procedures and core tools improve in their existing paths; do not maintain duplicate versioned implementations.
 
 Model generation passes explicit project text to a trusted CLI in a temporary directory; the artifact layer validates writes and the Docker executor verifies code. Host CLI flags are not an OS sandbox. Trial treatment labels remain outside the deterministic scorer.
@@ -78,3 +83,17 @@ The existing bilingual evaluator owns pinned synthetic understanding contracts, 
 - 2026-10-12 | Manual browser companion is now an explicit extensions/ scope entry; native Codex plugin uses one CLI-backed skill under adapters/codex/plugin and a local marketplace. Browser activation is extension-wide persistent storage, default off, enforced at content/capture boundaries. Element clicks use owned references and generation checks. New API routes reuse guard/privateHeaders; native accessibility remains unknown, explicit screen probe is shell-free and bounded.
 
 - 2026-10-13 | Capture requests persist in session storage per explicit window with a30-second expiry and original tab identity; panel readiness consumes once. Form index metadata excludes entered input/textarea/select values.
+
+### 2026-10-14 — Bound MCP and external candidate imports
+- Optional official MCP SDK2.3.0 stdio bridge fixes project/root, checkout, policy, task and plan at launch. Read-only tools are the default inventory; import and container verification require explicit launch flags. No tool selects arbitrary roots, commands or providers.
+- External reply import reuses agent_packet, schema validation, project locks and grouped publication. Packet input/prompt/context/binding/output revisions must remain current, including output fingerprints captured before and after staging. Raw replies remain private; imports do not accept task reviews or create execution evidence.
+- A pinned isolated Playwright MCP config provides a separately authorized host browser integration. It does not turn the Chrome manual panel into an autonomous channel or establish native desktop trust.
+
+### 2026-10-14 — Scoped capture and native acceptance
+- Optional per-task native prompt capture reuses user_context, validated native callbacks, private source storage and frozen context. Literal placeholders/language conflicts retain source-linked questions; native guards refuse actions until a later captured answer resolves them. Interpretation is not permission or speaker authentication. Task MCP adds read questions and opt-in answer writes.
+- Separate native AX MCP connects only to an existing explicit private driver socket. Prepared fixture-only bounded manifests require human approval; exact app/window discovery, one-use button handles, serialization and private action audit precede re-observation. Mock acceptance and compilation do not establish live desktop control.
+- The existing understanding collector supports explicit preselected cases and reports subset coverage; failures and all paired trials remain preserved.
+
+- 2026-10-15 | Fixed observed PID replaces global app discovery under the fixture-only manifest. AX rows are projected by exact window ancestry; static counter text comes from its bounded tree block. Ambiguous identity/rows and potentially truncated blocks fail closed; menu history and raw tokens never leave the adapter.
+
+- 2026-10-15 | Coordinator task context is now projected into same-project Git worktrees with private source copies and parent/child selection receipts. Recheck before commit and on resume refuses changed corrections. Native preparation accepts an explicit exact app/window/button set or observation-only scope; no implicit new application authority.

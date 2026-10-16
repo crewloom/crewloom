@@ -328,3 +328,36 @@
 - 2026-10-12 | Direct helper convenience defaults must not become runtime message defaults: CLICK_INDEX now requires an integer generation before dispatch. A real Chrome transport request without it is rejected, while current-generation requests pass.
 
 - 2026-10-13 | PR19 review found password values exposed by index fallback and first-open capture lost before listeners existed. Replace value fallback with form labels and queue window/tab-bound requests; reject missing/sentinel capture windows.
+
+### 2026-10-14 — Defect root causes and fixes
+- Cause: mutable tab identity in callbacks; generation collisions across documents; first400 DOM order; own-element-only interactivity; template/heading-based readiness; whitespace argument splitting.
+- Fix: request/tab/frame/document-bound replies, action fingerprints and hit tests; viewport/frame/shadow inventory with pagination; run-based status and compact-record parsing; bounded quote/JSON argument data and CLI-only external-root tools.
+- Evidence: bad cases reject old behavior, current regressions pass. Browser tests need arrow-function predicates under extension CSP; a bare expression triggered unsafe-eval and was corrected without weakening CSP. ZIP freshness now has bad/clean acceptance and rejects undeclared source files.
+
+### 2026-10-14 — External candidate freshness and MCP schemas
+- Cause: exporting a packet alone left candidate publication to host-specific code; output edits could be overwritten while generation was in progress.
+- Solution: compare project/task/context/input/prompt/output revisions, recheck staged original bytes, reuse transactional publication, retain private replies and require existing review/verification. Tests reject foreign/stale packets, undeclared outputs, links and owner edits before/after staging.
+- SDK lesson: current official SDK uses MCPServer and Python3.11+; dict[str, Any] exposes direct structured results, while typing.Dict wrapped output. Current Playwright click schema requires target, not the older ref argument. Use actual list-tools schemas and live calls.
+
+### 2026-10-14 — Local package manager backend
+- Cause: pipx's default uv backend rejected an older installed uv before changing the Crewloom environment.
+- Solution: use the supported pip backend for the same editable immutable snapshot and pinned MCP extra, then verify the installed module source, actual stdio tools, dashboard source and downloadable ZIP. Preserve the previous snapshot for rollback.
+
+### 2026-10-14 — Parsed JSON is not a typed run
+- Cause: the first malformed-row fix excluded null/scalars but cast objects after checking only tool/exit/root. An object-valued source/duration could still reach React, and invalid dates could count toward role health.
+- Solution: validate every Run field at the parsing boundary and skip only the bad row. Reject wrong types, nonfinite/negative durations and invalid dates; use realistic timestamped log fixtures. Known violation rejected before the change;56-test clean suite and TypeScript pass.
+
+### 2026-10-14 — Clarification and native scope boundaries
+- Cause: source-linked context needed explicit recording; preserving questions without blocking native tools could still allow an edit. Fix: task opt-in, literal-source capture, unanswered-question guard and later-message exact answers; disabling capture preserves history. Ordinals survive canonical JSON key sorting.
+- Native lesson: short project-private sockets are required by macOS; refuse long paths, autostart and broad-daemon fallback. CuaDriver bounded startup requires actual human manifest approval; prepare and test before requesting it. Driver schemas and TCC readiness need live acceptance.
+- Evaluation: a cached/configured model ID was rejected by the actual authenticated CLI. Retain the two transport failures and blocked trials, then record an explicitly different available model in a separate run. Requested IDs are not verified backend identity.
+
+- 2026-10-15 | Cause: bounded app scope denies global list_apps, while get_window_state indexes only actionable rows and appends unrelated menu history. Solution: bind observed PID, rely on bounded driver bundle validation, filter exact window ancestry and retain only window text for static state. Real counter acceptance passed without widening the reviewed manifest.
+
+- 2026-10-15 | Real paired Ledgerline execution exposed package-relative imports under a top-level CLI, and root user context absent from task worktrees. Clarify runtime imports without changing verifiers; freeze selected source-linked context into each task checkout. GitHub Python3.9 found eager asyncio.Lock construction outside an event loop; initialize it lazily in async actions.
+
+- 2026-10-16 | Independent QA found raw tax rates just outside0..100 admitted after quantization; added two refusal cases reject old fixture/candidate, clarified pre-rounding validation and regenerated only affected delivery work. Repair templates now declare criteria for immutable feedback. An atomic CLI writer cannot replace a preallocated Docker output mount: stage inside container tmp and stream to the declared artifact; preserve the failed attempt.
+
+- 2026-10-16 | PR20 review found child-frame overlays surviving clear/failure, equal quota wasting dense-page capacity, and advertised cross-origin targets rejected on click. Track contacted frames before replies, allocate the remaining budget, and omit embedding paths whose visibility cannot be verified. Four regressions reject the prior source and pass the correction.
+
+- 2026-10-16 | Release gate correctly rejected the stale test requiring development-only metadata. Updated the release metadata check to require0.6.0 and its matching changelog entry; the normal full gate must pass before commit.

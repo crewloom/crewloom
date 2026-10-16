@@ -1,9 +1,16 @@
 # Reusable code registry
 
+
+
 Core Python tools use the standard library. Commands run from the checkout root. Host tools for specialist tasks are not bundled.
 
 | Path | Purpose | Command |
 | --- | --- | --- |
+| [scripts/mcp_bridge.py](../scripts/mcp_bridge.py) | Optional official-SDK stdio tools bound to one project/task; default read-only; mcp-integration-builder | `crewloom mcp --project /absolute/project --project-id project-id --task-id task-id` |
+| [scripts/test_mcp_bridge.py](../scripts/test_mcp_bridge.py) | External reply boundary regressions and opt-in live stdio/Docker acceptance; QA | `python3 -m unittest discover -s scripts -p test_mcp_bridge.py` |
+| [scripts/package_browser.py](../scripts/package_browser.py) | Build/check deterministic browser ZIP from the source tree; toolbox-integration-steward | `python3 scripts/package_browser.py` or `python3 scripts/package_browser.py --check` |
+| [dashboard/lib/tool-arguments.ts](../dashboard/lib/tool-arguments.ts) | Bounded quoted-text/JSON argument parsing without shell evaluation; frontend-ux-auditor | Used by the dashboard Run form |
+| [dashboard/test/tool-arguments.test.ts](../dashboard/test/tool-arguments.test.ts) | Quote, invalid-input and dashboard catalog compatibility regressions; QA | `npm test` from `dashboard` |
 | [scripts/crewloom.py](../scripts/crewloom.py) | Role discovery, validation, and context CLI | `python3 scripts/crewloom.py list` |
 | [scripts/check_repository.py](../scripts/check_repository.py) | Public checkout structure, syntax, links, and regressions | `python3 scripts/check_repository.py` |
 | [.agents/skills/skill-forge-recruiter/scripts/validate_skill.py](../.agents/skills/skill-forge-recruiter/scripts/validate_skill.py) | Bilingual procedure structure | `python3 .agents/skills/skill-forge-recruiter/scripts/validate_skill.py --skill context-guardian` |
@@ -175,3 +182,7 @@ The public context acceptance checker consumes `crewloom-hook-pilot/{context.jso
 | [scripts/test_privacy.py](../scripts/test_privacy.py) | Real private-commit rejection, clean acceptance and publication boundaries; QA | `python3 -m unittest discover -s scripts -p test_privacy.py` |
 
 | [extensions/chrome/background.js](../extensions/chrome/background.js) | Manual browser companion worker; persistent enable state, explicit panel-window routing, gated capture and measured dashboard handshake; owning role: machine-control-operator. Input: validated extension messages; output: bounded browser response. Unsupported/foreign senders and disabled captures refused. | Load `extensions/chrome` unpacked; enable the panel checkbox; verify with `python3 -m unittest scripts.test_sidepanel` |
+
+| [scripts/native_desktop.py](../scripts/native_desktop.py) | Prepare a private exact-app/window bounded manifest (default fixture or explicit target/read-only) or serve owner-scoped observe/AX-press/reobserve MCP; input: bound project/task, private policy/socket, observed PID, fresh handle; output: scoped AX state and private audit; optional MCP SDK/CuaDriver/macOS; human manifest/TCC approval required; machine-control-operator | `crewloom native --help` |
+| [scripts/test_native_desktop.py](../scripts/test_native_desktop.py) | Bad/clean native scope, custom/read-only targets, manifest, permissions, window projection and one-use AX sequencing; QA; optional approved live fixture acceptance records private evidence | `python3 -m unittest discover -s scripts -p test_native_desktop.py` |
+| [scripts/test_chat_capture.py](../scripts/test_chat_capture.py) | Private opt-in prompt capture, clarification guard and optional actual SDK answer protocol; QA | `python3 -m unittest discover -s scripts -p test_chat_capture.py` |

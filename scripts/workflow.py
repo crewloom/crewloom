@@ -768,11 +768,83 @@ def agent_packet(root, plan, fingerprint):
                 'plan_sha256': fingerprint, 'input_sha256': before,
                 'prompt': prompt, 'prompt_sha256': digest(prompt.encode()),
                 'response_schema': mh.SCHEMA, 'outputs': step['outputs'],
+                'output_sha256': output_fingerprints(root, step['outputs']),
                 'handoff': transfer, 'execution_verified': False,
                 'instruction': 'Deliver this prompt and response schema to your chosen agent. '
                                'Packet delivery grants no tool permission. Validate returned artifacts '
                                'and current inputs before authorized writes; use existing task review '
                                'and command verification. Never treat generation as acceptance.'}
+
+
+def output_fingerprints(root, outputs):
+    """Bind an external reply to the output bytes present when its packet was issued."""
+    from execution_policy import destinations
+    destinations(root, outputs)
+    result = {}
+    for relative in outputs:
+        path = safe_path(root, relative)
+        if path.exists():
+            if not path.is_file() or path.stat().st_nlink != 1:
+                raise ValueError('Output must be a regular single-link file: ' + relative)
+            if path.stat().st_size > 16 * 1024 * 1024:
+                raise ValueError('Output fingerprint budget exceeded: ' + relative)
+            result[relative] = digest(path.read_bytes())
+        else:
+            result[relative] = None
+    return result
+
+
+def import_reply(root, plan, fingerprint, packet, response):
+    """Import a scoped external candidate; preserve review and isolated acceptance gates.
+
+    The caller explicitly authorizes publication. A packet is context, never authority.
+    Existing project locks, destination checks and transactional publication are reused.
+    """
+    import model_host as mh
+    import execution_policy as ep
+    import project_context as pc
+    if not isinstance(packet, dict) or not isinstance(response, dict):
+        raise ValueError('Import requires packet and structured artifacts objects')
+    if len(json.dumps(packet, ensure_ascii=False).encode()) > 1024 * 1024:
+        raise ValueError('Agent packet byte budget exceeded')
+    if len(json.dumps(response, ensure_ascii=False).encode()) > 2 * 1024 * 1024:
+        raise ValueError('Agent reply byte budget exceeded')
+    with project_lock(safe_path(root, '.crewloom', internal=True), reentrant=True):
+        current = agent_packet(root, plan, fingerprint)
+        fields = ('schema_version', 'kind', 'project_id', 'checkout_id', 'project_root',
+                  'workflow', 'step', 'plan_sha256', 'input_sha256', 'prompt_sha256',
+                  'outputs', 'output_sha256', 'response_schema')
+        if any(packet.get(key) != current.get(key) for key in fields):
+            raise ValueError('External packet is stale or belongs to another project, task or output revision')
+        if packet.get('prompt') != current['prompt']:
+            raise ValueError('External packet prompt differs from current bound context')
+        artifacts = mh.validate_artifacts(response, current['outputs'])
+        # Fresh preparation also checks reservation, role guidance and managed context.
+        if agent_packet(root, plan, fingerprint) != current:
+            raise ValueError('External packet changed during import preparation')
+        folder = safe_path(root, '.crewloom/private/agent-replies/' + plan['id'] + '/' + uuid.uuid4().hex,
+                           internal=True)
+        record = {'schema_version': 1, 'project_id': current['project_id'],
+                  'checkout_id': current['checkout_id'], 'workflow': plan['id'],
+                  'step': current['step'], 'packet_sha256': digest(json.dumps(packet, sort_keys=True).encode()),
+                  'status': 'received', 'execution_verified': False, 'response': response}
+        target = folder / 'reply.json'
+        pc.private_context_write(target, record)
+        try:
+            # Publication checks these again immediately before the first destination write.
+            receipt = ep.publish(root, {name: body.encode('utf-8') for name, body in artifacts.items()},
+                                 current['input_sha256'], expected_outputs=current['output_sha256'])
+        except (ValueError, OSError) as exc:
+            record.update(status='rejected', error=str(exc))
+            pc.private_context_write(target, record)
+            raise
+        record.update(status='imported', publication=receipt)
+        pc.private_context_write(target, record)
+        return {'status': 'imported', 'project_id': current['project_id'],
+                'checkout_id': current['checkout_id'], 'workflow': plan['id'], 'step': current['step'],
+                'outputs': {key: digest(value.encode()) for key, value in artifacts.items()},
+                'reply_record': str(target), 'execution_verified': False,
+                'instruction': 'Candidate imported. Task review and isolated command acceptance remain required.'}
 
 
 def binding_id(root):
@@ -1383,12 +1455,13 @@ def doctor(image, root=None, host=None, model_host=None):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('run', 'status', 'handoff', 'agent-packet', 'accept', 'cancel', 'doctor', 'prepare-repair', 'repair'))
+    parser.add_argument('action', choices=('run', 'status', 'handoff', 'agent-packet', 'import-reply', 'accept', 'cancel', 'doctor', 'prepare-repair', 'repair'))
     parser.add_argument('--project', help='Explicit canonical project root; required for task actions')
     parser.add_argument('--plan', default='workflow.json')
     parser.add_argument('--image', default=DEFAULT_IMAGE)
     parser.add_argument('--host', choices=('agents', 'claude'))
     parser.add_argument('--step'); parser.add_argument('--reviewer'); parser.add_argument('--reason')
+    parser.add_argument('--packet-file'); parser.add_argument('--response-file')
     parser.add_argument('--repair-id'); parser.add_argument('--model-step')
     parser.add_argument('--reviewer-token-stdin', action='store_true',
                         help='Read the reviewer credential from standard input; it is never a command argument')
@@ -1421,6 +1494,16 @@ def main(argv=None):
                 _, state = state_for(root, plan, fingerprint); result = handoff(root, plan, state)
             elif args.action == 'agent-packet':
                 result = agent_packet(root, plan, fingerprint)
+            elif args.action == 'import-reply':
+                if not args.packet_file or not args.response_file:
+                    raise ValueError('Import requires --packet-file and --response-file under the selected project')
+                values = []
+                for relative in (args.packet_file, args.response_file):
+                    path = safe_path(root, relative, internal=str(relative).startswith('.crewloom/'))
+                    if not path.is_file() or path.stat().st_nlink != 1 or path.stat().st_size > 2 * 1024 * 1024:
+                        raise ValueError('Reply input must be a bounded regular single-link project file')
+                    values.append(json.loads(path.read_text(encoding='utf-8')))
+                result = import_reply(root, plan, fingerprint, *values)
             elif args.action == 'cancel':
                 result = cancel(root, plan, fingerprint, args.reason or 'operator request')
             else:
@@ -1430,7 +1513,7 @@ def main(argv=None):
                 result = run(root, plan, fingerprint, args.image, args.step if args.action == 'accept' else None,
                              args.reviewer, args.allow_host_cli, token)
         print(json.dumps(result, ensure_ascii=False, indent=2))
-        return 0 if args.action in ('status', 'handoff', 'agent-packet', 'accept', 'cancel') or result.get('status') == 'complete' or result.get('isolated_execution_ready') else 2
+        return 0 if args.action in ('status', 'handoff', 'agent-packet', 'import-reply', 'accept', 'cancel') or result.get('status') == 'complete' or result.get('isolated_execution_ready') else 2
     except (ValueError, OSError, subprocess.SubprocessError) as exc:
         print(json.dumps({'status': 'blocked', 'error': str(exc)}, ensure_ascii=False))
         return 2

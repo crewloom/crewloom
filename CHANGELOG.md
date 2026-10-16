@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 — 2026-10-16
+
+- Fix audited browser targeting, dashboard run validation and extension packaging/download behavior.
+- Add project/task-bound MCP, freshness-checked candidate import, source-linked capture/clarification and selected user-context delivery into isolated worktrees.
+- Add exact application/window AX button scopes and observation-only native sessions; verify real Chrome profile, Calculator and TextEdit acceptance.
+- Record a complete real model-generated Ledgerline delivery with independent Docker checks, reviewed publication, preserved failed attempts, resumption and an Arabic correction. See [the acceptance record](examples/evaluation/agency-acceptance-20261015.json).
+- Keep role/domain coverage and unreported model identity/cost explicit; no universal model-quality claim.
+
 - 2026-10-10: Add explicit-project priority scheduling, shared managed-generation admission, bounded role activity charts, and a frozen bilingual developer pilot with preserved provider failures.
 
 ## 0.4.0 — 2026-10-01
