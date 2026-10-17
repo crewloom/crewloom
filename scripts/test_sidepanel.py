@@ -8,6 +8,7 @@ suite skips instead of failing the repository gate.
 """
 import json
 import os
+import re
 import tempfile
 import time
 import unittest
@@ -127,6 +128,20 @@ class ManifestContractTest(unittest.TestCase):
 
     def setUp(self):
         self.manifest = json.loads((EXTENSION / 'manifest.json').read_text(encoding='utf-8'))
+
+    def test_internal_errors_have_translation_resources_in_both_languages(self):
+        source=(EXTENSION/'sidepanel.js').read_text(encoding='utf-8')
+        match=re.search(r'const errorKeys = (\{.*?\});',source,re.S)
+        self.assertIsNotNone(match)
+        keys=json.loads(match.group(1))
+        internal=set()
+        for name in ('background.js','content.js','sidepanel.js'):
+            text=(EXTENSION/name).read_text(encoding='utf-8')
+            internal.update(re.findall(r"error:\s*'([^']+)'",text))
+            internal.update(re.findall(r"throw new Error\('([^']+)'\)",text))
+        self.assertEqual(sorted(internal-set(keys)),[], 'Untranslated companion-generated error')
+        for message in internal:
+            self.assertEqual(len(re.findall(r'^\s+'+re.escape(keys[message])+r':',source,re.M)),2,message)
 
     def test_side_panel_and_command_surface(self):
         self.assertEqual(self.manifest['manifest_version'], 3)
@@ -390,6 +405,32 @@ class SidePanelTest(SidePanelHarness):
         finally:
             context.close()
 
+    def test_capture_disable_race_is_translated_without_rendering_a_frame(self):
+        message = 'Browser companion was disabled during capture'
+        for lang in ('en','ar'):
+            with self.subTest(lang=lang):
+                context, page = self.new_page()
+                try:
+                    self.open_panel(page)
+                    if lang == 'ar':
+                        page.click('#langToggle')
+                    page.evaluate("""() => {
+                      const original=chrome.runtime.sendMessage;
+                      chrome.runtime.sendMessage=(message,callback)=>{
+                        if(message.type==='CAPTURE_TAB') window.__captureReply=callback;
+                        else original(message,callback);
+                      };
+                    }""")
+                    page.click('#captureBtn')
+                    page.click('#companionEnabled')
+                    page.evaluate("message => window.__captureReply({ok:false,error:message})",message)
+                    log=page.inner_text('#terminalLogs')
+                    self.assertIn('تم تعطيل إضافة المتصفح أثناء الالتقاط' if lang=='ar' else message,log)
+                    self.assertTrue(page.locator('#visionImg').evaluate("el=>el.classList.contains('hidden')"))
+                    self.assertFalse(page.get_attribute('#visionImg','src'))
+                finally:
+                    context.close()
+
     def test_empty_capture_labels_and_accessible_controls_follow_language(self):
         context, page = self.new_page()
         try:
@@ -416,6 +457,8 @@ class SidePanelTest(SidePanelHarness):
                 ('A frame could not be indexed; reload and retry', 'تعذر ترقيم أحد الإطارات'),
                 ('Stale or invalid element index; re-index the page', 'رقم العنصر قديم أو غير صالح'),
                 ('Browser companion is disabled', 'إضافة المتصفح غير مفعلة'),
+                ('Explicit panel window required','يجب تحديد نافذة لوحة الإضافة'),
+                ('Unsupported dashboard handshake','اتصال الداشبورد غير متوافق'),
             ]
             for lang in ('en', 'ar'):
                 if lang == 'ar':

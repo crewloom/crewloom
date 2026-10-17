@@ -47,6 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const i18n = {
     en: {
+      errorCaptureDisabled: "Browser companion was disabled during capture",
+      errorWindow: "Explicit panel window required",
+      errorNoTab: "No active tab",
+      errorHandshake: "Unsupported dashboard handshake",
+      errorSender: "Untrusted control sender",
+      errorEnabled: "Invalid enabled state",
+      errorPanelOnly: "Only the companion panel may request this action",
       companion: "Browser companion",
       computerUse: "Computer Use",
       switchLanguage: "Switch Language",
@@ -125,6 +132,13 @@ document.addEventListener('DOMContentLoaded', () => {
       logLang: 'Language switched to {language}.'
     },
     ar: {
+      errorCaptureDisabled: "تم تعطيل إضافة المتصفح أثناء الالتقاط",
+      errorWindow: "يجب تحديد نافذة لوحة الإضافة",
+      errorNoTab: "لا يوجد تبويب نشط",
+      errorHandshake: "اتصال الداشبورد غير متوافق",
+      errorSender: "مرسل طلب التحكم غير موثوق",
+      errorEnabled: "حالة تفعيل غير صالحة",
+      errorPanelOnly: "لوحة الإضافة وحدها يمكنها طلب هذا الإجراء",
       companion: "إضافة المتصفح",
       computerUse: "التحكم بالحاسوب",
       switchLanguage: "تبديل اللغة",
@@ -205,6 +219,13 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const errorKeys = {
+    "Browser companion was disabled during capture": "errorCaptureDisabled",
+    "Explicit panel window required": "errorWindow",
+    "No active tab": "errorNoTab",
+    "Unsupported dashboard handshake": "errorHandshake",
+    "Untrusted control sender": "errorSender",
+    "Invalid enabled state": "errorEnabled",
+    "Only the companion panel may request this action": "errorPanelOnly",
     "unknown error": "errorUnknown",
     "element not found": "errorNotFound",
     "connection refused": "errorConnection",

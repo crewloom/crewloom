@@ -363,3 +363,5 @@
 - 2026-10-16 | Release gate correctly rejected the stale test requiring development-only metadata. Updated the release metadata check to require0.6.0 and its matching changelog entry; the normal full gate must pass before commit.
 
 - 2026-10-17 | Arabic panel logs wrapped English known errors and the page HUD ignored the saved language; empty capture/accessibility labels also stayed English. Reuse the panel dictionary and structured HUD messages, preserve unknown diagnostics, and update only the owned HUD. New rendered tests also exposed display:flex!important overriding the hide action; explicit important inline display preserves hiding across language changes.
+
+- 2026-10-17 | PR22 review reproduced an untranslated internal capture-disable race. Paired delayed-capture regression rejects the prior candidate in Arabic and accepts the fix without rendering captured data. Audit/map the remaining literal internal guards; a persistent contract check now requires both language resources for every literal companion error, while preserving external diagnostics.
