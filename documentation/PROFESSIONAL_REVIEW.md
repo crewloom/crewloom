@@ -2,7 +2,7 @@
 
 The review starts from public main `5d9102f`, retains the existing defect-closure work
 through `35d1055`, and adds release-verification improvements. Existing checkouts and
-the installed runtime are preserved. The package remains `0.6.0.dev0`.
+the installed runtime are preserved. The package version is `0.6.1`.
 
 ## Findings and changes
 
