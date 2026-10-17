@@ -68,8 +68,12 @@ Both example checks print `PASS`. See [six runnable examples](examples/README.md
 
 ## Use it in your project
 
+From the clone, create an isolated Python environment (macOS/Linux):
+
 ```bash
-pip install -e .            # from the clone; adds the `crewloom` command
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .  # adds the `crewloom` command
 crewloom install --host claude --target /path/to/your/project --skill frontend-ux-auditor
 ```
 
@@ -80,7 +84,7 @@ Use the optional [native Codex plugin](documentation/CODEX_PLUGIN.md) for role/c
 ## Live dashboard
 
 ```bash
-crewloom dashboard          # needs Node 20+; opens on http://localhost:4317
+crewloom dashboard          # needs Node 24+; opens on http://localhost:4317
 ```
 
 ![Dashboard demo: role status, tool runs, and live updates](assets/dashboard-demo.gif)
@@ -88,6 +92,9 @@ crewloom dashboard          # needs Node 20+; opens on http://localhost:4317
 Monitor roles, memory, and tool runs live with the optional [web dashboard](dashboard/README.md) ([MP4 version](assets/dashboard-demo.mp4)). `crewloom dashboard` opens on `127.0.0.1` without a password. Local request and Origin checks remain active; non-loopback hosting requires an explicitly configured `CREWLOOM_DASHBOARD_TOKEN`.
 
 See [evidence from real projects](documentation/EVIDENCE.md), including a false positive.
+
+For contributing or preparing a release, use the [verification checklist](documentation/RELEASE.md).
+The current package metadata is `0.6.1`; check the repository's release tags for what has been published.
 
 Follow the [workflow recipes](documentation/WORKFLOWS.md) for role order, inputs, and acceptance evidence. Roles guide your agent; specialist platforms and project assets remain project inputs.
 

@@ -26,6 +26,13 @@
 
 ## Unreleased
 
+- Allocate native operation locks inside the running event loop for Python 3.9 compatibility; retain serialized actions and refuse foreign-loop reuse.
+
+- Run official MCP round trips and real headed Chrome extension acceptance in CI; fail explicit browser/distribution acceptance when prerequisites are unavailable.
+- Use the dashboard lockfile on first launch, require Node 24+, and declare ES modules for its TypeScript test runner.
+- Schedule reviewed dependency updates, bound CI job duration, and cancel superseded pull-request runs.
+- Align English/Arabic setup, dashboard status rules and release documentation with the implemented authentication and integration boundaries.
+
 - Package the Python runtime, all 42 roles, native adapters and runnable examples in a wheel and source archive; add an optional pinned JavaScript/TypeScript syntax backend.
 - Add isolated concurrent model-task worktrees, dependency integration, combined Docker acceptance, credential-scoped review and recoverable artifact publication.
 - Add version-scoped native lifecycle setup, explicit context delivery and tool guards, terminal-session refresh and bounded private event logs.

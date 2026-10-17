@@ -12,6 +12,7 @@ import re
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -815,7 +816,8 @@ class RealBrowserExtensionTest(unittest.TestCase):
         cls.server_thread = threading.Thread(target=cls.server.serve_forever, daemon=True); cls.server_thread.start()
         cls.playwright = _playwright()
         if cls.playwright is None:
-            raise unittest.SkipTest('Playwright is not installed')
+            cls.server.shutdown(); cls.server.server_close()
+            raise AssertionError('CREWLOOM_REAL_BROWSER=1 requires Playwright; it is not installed')
         cls.manager = cls.playwright().start()
         cls.profile = tempfile.mkdtemp(prefix='crewloom-extension-')
         try:
@@ -826,9 +828,11 @@ class RealBrowserExtensionTest(unittest.TestCase):
                 args=[f'--disable-extensions-except={EXTENSION}',
                       f'--load-extension={EXTENSION}'],
             )
-        except Exception as exc:  # pragma: no cover - depends on local browser build
+        except Exception as exc:
+            # Explicit real-browser mode must not turn a runner problem into a green skip.
             cls.manager.stop()
-            raise unittest.SkipTest(f'could not launch a browser for extension loading: {exc}')
+            cls.server.shutdown(); cls.server.server_close()
+            raise AssertionError(f'could not launch a browser for extension loading: {exc}') from exc
 
     @classmethod
     def tearDownClass(cls):
@@ -1025,6 +1029,35 @@ class RealBrowserExtensionTest(unittest.TestCase):
         self.send_to_tab({'type': 'CLEAR_INDEX'})
         self.page.wait_for_timeout(200)
         self.assertEqual(self.page.locator('.crewloom-indexed-tag').count(), 0)
+
+
+class RealBrowserPrerequisiteTests(unittest.TestCase):
+    def test_explicit_real_browser_mode_fails_when_chromium_cannot_launch(self):
+        class Chromium:
+            def launch_persistent_context(self, *args, **kwargs):
+                raise RuntimeError('chromium unavailable')
+        class Manager:
+            chromium = Chromium()
+            stopped = False
+            def stop(self): Manager.stopped = True
+        class Playwright:
+            def start(self): return Manager()
+        with patch(__name__ + '._playwright', return_value=Playwright):
+            try:
+                RealBrowserExtensionTest.setUpClass()
+            except unittest.SkipTest:
+                self.fail('Explicit real-browser acceptance skipped a launch failure')
+            except AssertionError as exc:
+                self.assertIn('could not launch a browser', str(exc))
+            else:
+                RealBrowserExtensionTest.tearDownClass()
+                self.fail('Launch failure was accepted')
+        self.assertTrue(Manager.stopped)
+
+    def test_explicit_real_browser_mode_fails_without_playwright(self):
+        with patch(__name__ + '._playwright', return_value=None):
+            with self.assertRaisesRegex(AssertionError, 'requires Playwright'):
+                RealBrowserExtensionTest.setUpClass()
 
 
 @unittest.skipUnless(os.environ.get('CREWLOOM_SCREENSHOTS') == '1', 'set CREWLOOM_SCREENSHOTS=1 to refresh preview images')

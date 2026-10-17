@@ -1,5 +1,8 @@
 # Repository architecture
 
+### 2026-10-15 — Release verification boundaries
+The default core remains standard-library compatible on Python 3.9+. Explicit integration CI installs the pinned MCP SDK and Playwright, runs actual SDK/container protocols and loads the unpacked extension in headed Chromium. Missing explicit prerequisites fail; optional native desktop approval remains outside CI. Dashboard development requires Node 24+, ES modules and lockfile installation.
+
 ### 2026-10-14 — Browser and dashboard correctness
 - Index replies bind tab/navigation request; targets bind frame, document token, generation and action fingerprint. Clicks recheck ancestor interactivity and hit-test visibility. Open Shadow DOM/readable frames share a bounded viewport-prioritized inventory; the directory is paginated.
 - Dashboard role status uses run evidence rather than template headings. Memory counters accept dated compact records; malformed run values are isolated. Tool arguments are data, with bounded quote/JSON parsing and no shell evaluation; external-root tools remain CLI-only.
