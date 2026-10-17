@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.1 — 2026-10-17
+
+- Browser companion2.3.2 translates known errors and in-page HUD status in Arabic/English, preserves site language and reacts to saved-language changes.
+- Fix HUD hiding against its own important CSS declaration; switching language keeps a hidden HUD hidden.
+- Make paired language, direction and failure-state acceptance explicit without claiming every external/CLI diagnostic is translated.
+
 ## 0.6.0 — 2026-10-16
 
 - Fix audited browser targeting, dashboard run validation and extension packaging/download behavior.

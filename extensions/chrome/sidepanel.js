@@ -47,6 +47,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const i18n = {
     en: {
+      companion: "Browser companion",
+      computerUse: "Computer Use",
+      switchLanguage: "Switch Language",
+      refreshTab: "Refresh Tab State",
+      previewAlt: "Visual Frame Preview",
+      errorUnknown: "unknown error",
+      errorNotFound: "element not found",
+      errorConnection: "connection refused",
+      errorManyFrames: "Too many frames; open the target frame separately",
+      errorIndexFrame: "A frame could not be indexed; reload and retry",
+      errorClearFrames: "One or more frames could not be cleared; reload and retry",
+      errorStale: "Stale or invalid element index; re-index the page",
+      errorDocument: "Document changed; re-index the page",
+      errorRemoved: "Indexed element was removed; re-index the page",
+      errorChanged: "Indexed element changed or is not interactive; re-index the page",
+      errorCovered: "Indexed element is covered or changed; re-index the page",
+      errorFocus: "Target changed on focus; re-index the page",
+      errorToken: "Index generation and document token required; re-index the page",
+      errorDisabled: "Browser companion is disabled",
+      untitled: 'Untitled',
+      languageName: 'English',
       indexName: 'Auto-Index Page',
       indexSub: 'Number buttons [1], [2]...',
       captureName: 'Vision Capture',
@@ -104,6 +125,27 @@ document.addEventListener('DOMContentLoaded', () => {
       logLang: 'Language switched to {language}.'
     },
     ar: {
+      companion: "إضافة المتصفح",
+      computerUse: "التحكم بالحاسوب",
+      switchLanguage: "تبديل اللغة",
+      refreshTab: "تحديث حالة التبويب",
+      previewAlt: "معاينة لقطة التبويب",
+      errorUnknown: "خطأ غير معروف",
+      errorNotFound: "لم يتم العثور على العنصر",
+      errorConnection: "تعذر الاتصال",
+      errorManyFrames: "عدد الإطارات كبير؛ افتح الإطار المطلوب في تبويب منفصل",
+      errorIndexFrame: "تعذر ترقيم أحد الإطارات؛ أعد تحميل الصفحة وحاول مجددًا",
+      errorClearFrames: "تعذر مسح إطار أو أكثر؛ أعد تحميل الصفحة وحاول مجددًا",
+      errorStale: "رقم العنصر قديم أو غير صالح؛ أعد ترقيم الصفحة",
+      errorDocument: "تغير المستند؛ أعد ترقيم الصفحة",
+      errorRemoved: "تمت إزالة العنصر؛ أعد ترقيم الصفحة",
+      errorChanged: "تغير العنصر أو لم يعد تفاعليًا؛ أعد ترقيم الصفحة",
+      errorCovered: "العنصر مغطى أو تغير؛ أعد ترقيم الصفحة",
+      errorFocus: "تغير العنصر عند التركيز عليه؛ أعد ترقيم الصفحة",
+      errorToken: "بيانات الترقيم والمستند مطلوبة؛ أعد ترقيم الصفحة",
+      errorDisabled: "إضافة المتصفح غير مفعلة",
+      untitled: 'بدون عنوان',
+      languageName: 'العربية',
       indexName: 'ترقيم الصفحة',
       indexSub: 'ترقيم العناصر التفاعلية [1]، [2]...',
       captureName: 'التقاط الرؤية',
@@ -162,7 +204,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const languageNames = { en: 'English', ar: 'Arabic' };
+  const errorKeys = {
+    "unknown error": "errorUnknown",
+    "element not found": "errorNotFound",
+    "connection refused": "errorConnection",
+    "Too many frames; open the target frame separately": "errorManyFrames",
+    "A frame could not be indexed; reload and retry": "errorIndexFrame",
+    "One or more frames could not be cleared; reload and retry": "errorClearFrames",
+    "Stale or invalid element index; re-index the page": "errorStale",
+    "Document changed; re-index the page": "errorDocument",
+    "Indexed element was removed; re-index the page": "errorRemoved",
+    "Indexed element changed or is not interactive; re-index the page": "errorChanged",
+    "Indexed element is covered or changed; re-index the page": "errorCovered",
+    "Target changed on focus; re-index the page": "errorFocus",
+    "Index generation and document token required; re-index the page": "errorToken",
+    "Browser companion is disabled": "errorDisabled"
+};
 
   function t(key, vars) {
     const template = i18n[language][key] ?? i18n.en[key] ?? key;
@@ -184,12 +241,17 @@ document.addEventListener('DOMContentLoaded', () => {
     terminalLogs.scrollTop = terminalLogs.scrollHeight;
   }
 
+  function errorMessage(error) {
+    const message = error || 'unknown error';
+    return Object.prototype.hasOwnProperty.call(errorKeys,message) ? t(errorKeys[message]) : message;
+  }
+
   function describeError(error, key = 'logIndexFailed') {
     const message = chrome.runtime.lastError?.message || error || 'unknown error';
     if (RESTRICTED_URL.test(currentTab?.url || '')) {
       return log('logRestricted', 'warn');
     }
-    return log(key, 'warn', { error: message });
+    return log(key, 'warn', { error: errorMessage(message) });
   }
 
   function setDirectoryText(textKey) {
@@ -258,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      tabTitle.textContent = currentTab.title || 'Untitled';
+      tabTitle.textContent = currentTab.title || t('untitled');
       tabUrl.textContent = currentTab.url ? new URL(currentTab.url).hostname : '—';
       log('logTab', 'info', { title: tabTitle.textContent });
 
@@ -421,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
           y: Math.round(res.y)
         });
       } else {
-        log('logClickFailed', 'warn', { error: res?.error || 'element not found' });
+        log('logClickFailed', 'warn', { error: errorMessage(res?.error || 'element not found') });
       }
     };
     chrome.tabs.sendMessage(target.tabId,message,{frameId:target.frameId},reply);
@@ -454,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
           frameMeta.textContent = t('captureMeta', { time });
           log('logCaptured', 'success', { time });
         } else {
-          log('logCaptureFailed', 'warn', { error: res?.error || 'unknown error' });
+          log('logCaptureFailed', 'warn', { error: errorMessage(res?.error) });
         }
       }
     );
@@ -523,7 +585,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { type: 'OPEN_MACOS_SETTINGS', pane: 'Privacy_Accessibility' },
       (res) => {
         if (res?.ok) log('logMacOpened', 'success');
-        else log('logMacFailed', 'warn', { error: res?.error || 'unknown error' });
+        else log('logMacFailed', 'warn', { error: errorMessage(res?.error) });
       }
     );
   });
@@ -534,6 +596,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
     document.documentElement.setAttribute('lang', language);
     langToggle.textContent = isRtl ? 'English' : 'العربية';
+    langToggle.title = t('switchLanguage');
+    document.getElementById('companionLabel').textContent = t('companion');
+    document.querySelector('.sp-badge').textContent = t('computerUse');
+    refreshTabBtn.title = t('refreshTab');
+    visionImg.alt = t('previewAlt');
+    elementInput.setAttribute('aria-label',t('inputPlaceholder'));
+    if (currentTab && !currentTab.title) tabTitle.textContent = t('untitled');
 
     document.querySelector('#indexBtn .tool-name').textContent = t('indexName');
     document.querySelector('#indexBtn .tool-sub').textContent = t('indexSub');
@@ -553,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('permAcc').textContent = t('permAcc');
     document.getElementById('permScreen').textContent = t('permScreen');
     openMacSettingsBtn.textContent = t('macSettings');
-    if (lastCaptureTime) frameMeta.textContent = t('captureMeta', { time: lastCaptureTime });
+    frameMeta.textContent = lastCaptureTime ? t('captureMeta', { time: lastCaptureTime }) : t('noCapture');
 
     const empty = directoryList.querySelector('.directory-empty');
     if (empty) empty.textContent = t(directoryEmptyKey);
@@ -567,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function setLanguage(lang, announce) {
     applyLanguage(lang);
     chrome.storage.local.set({ [LANG_KEY]: language });
-    if (announce) log('logLang', 'info', { language: languageNames[language] });
+    if (announce) log('logLang', 'info', { language: t('languageName') });
   }
 
   langToggle.addEventListener('click', () => {
@@ -607,7 +676,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       daemonLabel.textContent = t('daemonStandalone');
       daemonLabel.style.color = 'var(--warn)';
-      if (changed) log('logDaemonOffline', 'warn', { error: res?.error || 'connection refused' });
+      if (changed) log('logDaemonOffline', 'warn', { error: errorMessage(res?.error || 'connection refused') });
     }
   });
   }

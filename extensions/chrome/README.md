@@ -116,3 +116,5 @@ or private project page is required.
 Clear Overlays, tab changes and failed partial scans clear every contacted frame, including its HUD. Indexing carries unused capacity forward under the shared limit. Frames behind an origin boundary whose embedding hit test cannot be verified are omitted with a visible warning; open the target frame separately. The extension does not advertise handles it cannot safely click. No new permissions are required.
 
 For unpacked installations, keep one stable installation directory and reload the existing extension after reviewed updates. A new directory produces a different unpacked Chrome extension ID. Immutable Crewloom release directories remain unchanged.
+
+The language choice also applies to the owned in-page HUD and known companion errors. Language changes preserve the underlying site and hidden HUD state. Unknown external diagnostics retain their exact text. See [the language support contract](../../documentation/LANGUAGES.md).

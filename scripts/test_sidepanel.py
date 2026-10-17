@@ -34,7 +34,7 @@ window.chrome = {
   runtime: {
     lastError: %(lastError)s,
     getURL: (path) => path,
-    getManifest: () => ({ version: '2.3.1' }),
+    getManifest: () => ({ version: '2.3.2' }),
     sendMessage: (message, callback) => {
       window.__sent.push(message);
       if (message.type === 'GET_CONTROL' || message.type === 'SET_CONTROL') { callback({ ok: true, enabled: message.enabled ?? true });
@@ -97,7 +97,7 @@ CAPTURE_OK = {'ok': True, 'dataUrl': 'data:image/svg+xml;utf8,<svg xmlns="http:/
 
 CONTENT_MOCK = """
 window.chrome = {
-  storage: { local: { get: (_, cb) => cb({ 'crewloom.enabled': window.__enabled !== false }) }, onChanged: { addListener: fn => { window.__controlChanged = fn; } } },
+  storage: { local: { get: (_, cb) => cb({ 'crewloom.enabled': window.__enabled !== false, 'crewloom.lang': window.__language || 'en' }) }, onChanged: { addListener: fn => { window.__controlChanged = fn; } } },
   runtime: {
     getURL: (path) => path,
     onMessage: { addListener: (fn) => { window.__contentMessages.push(fn); } }
@@ -212,7 +212,7 @@ class SidePanelTest(SidePanelHarness):
             self.assertEqual(page.inner_text('#daemonLabel'), 'Online :4317')
             logs = page.inner_text('#terminalLogs')
             self.assertIn('Panel ready', logs)
-            self.assertIn('2.3.1', logs)
+            self.assertIn('2.3.2', logs)
             self.assertIn('Local Crewloom daemon handshake verified', logs)
         finally:
             context.close()
@@ -390,6 +390,53 @@ class SidePanelTest(SidePanelHarness):
         finally:
             context.close()
 
+    def test_empty_capture_labels_and_accessible_controls_follow_language(self):
+        context, page = self.new_page()
+        try:
+            self.open_panel(page)
+            for lang, label, empty, refresh in (
+                ('ar','إضافة المتصفح','لا يوجد التقاط بعد','تحديث حالة التبويب'),
+                ('en','Browser companion','No capture yet','Refresh Tab State'),
+            ):
+                page.click('#langToggle')
+                self.assertEqual(page.get_attribute('html','lang'),lang)
+                self.assertEqual(page.inner_text('#companionLabel'),label)
+                self.assertEqual(page.inner_text('#frameMeta'),empty)
+                self.assertEqual(page.get_attribute('#refreshTabBtn','title'),refresh)
+                self.assertEqual(page.get_attribute('#elementInput','aria-label'),page.get_attribute('#elementInput','placeholder'))
+                self.assertLessEqual(page.evaluate('document.documentElement.scrollWidth'),390)
+        finally:
+            context.close()
+
+    def test_known_errors_follow_language_and_unknown_diagnostics_survive(self):
+        context, page = self.new_page()
+        try:
+            self.open_panel(page)
+            cases = [
+                ('A frame could not be indexed; reload and retry', 'تعذر ترقيم أحد الإطارات'),
+                ('Stale or invalid element index; re-index the page', 'رقم العنصر قديم أو غير صالح'),
+                ('Browser companion is disabled', 'إضافة المتصفح غير مفعلة'),
+            ]
+            for lang in ('en', 'ar'):
+                if lang == 'ar':
+                    page.click('#langToggle')
+                for message, arabic in cases:
+                    with self.subTest(lang=lang, message=message):
+                        page.evaluate("message => window.__indexResult = {ok:false,error:message}", message)
+                        page.click('#clearConsoleBtn')
+                        page.click('#indexBtn')
+                        log = page.inner_text('#terminalLogs')
+                        self.assertIn(arabic if lang == 'ar' else message, log)
+                        if lang == 'ar':
+                            self.assertNotIn(message, log)
+            for diagnostic in ('Provider E42: unavailable', 'toString'):
+                page.evaluate("message => window.__indexResult = {ok:false,error:message}", diagnostic)
+                page.click('#clearConsoleBtn')
+                page.click('#indexBtn')
+                self.assertIn(diagnostic, page.inner_text('#terminalLogs'))
+        finally:
+            context.close()
+
     def test_language_switch_flips_rtl_and_persists(self):
         context, page = self.new_page()
         try:
@@ -402,12 +449,18 @@ class SidePanelTest(SidePanelHarness):
             self.assertEqual(page.inner_text('#indexBtn .tool-name'), 'ترقيم الصفحة')
             self.assertIn('تم الالتقاط', page.inner_text('#frameMeta'))
             self.assertEqual(page.evaluate('() => window.__stored["crewloom.lang"]'), 'ar')
-            self.assertIn('تم تبديل اللغة', page.inner_text('#terminalLogs'))
+            self.assertIn('تم تبديل اللغة إلى العربية', page.inner_text('#terminalLogs'))
 
             page.reload()
             page.wait_for_timeout(150)
             self.assertEqual(page.get_attribute('html', 'dir'), 'rtl')
             self.assertEqual(page.inner_text('#captureBtn .tool-name'), 'التقاط الرؤية')
+            page.click('#langToggle')
+            self.assertEqual(page.get_attribute('html','dir'), 'ltr')
+            self.assertEqual(page.get_attribute('html','lang'), 'en')
+            self.assertEqual(page.inner_text('#captureBtn .tool-name'), 'Vision Capture')
+            page.reload()
+            self.assertEqual(page.get_attribute('html','dir'), 'ltr')
         finally:
             context.close()
 
@@ -447,6 +500,33 @@ class ContentScriptTest(unittest.TestCase):
     def new_page(self):
         context = self.browser.new_context(viewport={'width': 800, 'height': 600})
         return context, context.new_page()
+
+    def test_hud_uses_saved_language_without_changing_site_or_hiding_state(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 2)
+            page.evaluate("document.documentElement.lang='en'; document.documentElement.dir='ltr'; window.__language='ar'")
+            scan = page.evaluate("() => new Promise(resolve => window.__contentMessages[0]({type:'INDEX_PAGE'}, {}, resolve))")
+            hud = page.locator('.crewloom-agent-hud')
+            self.assertEqual(hud.get_attribute('lang'), 'ar')
+            self.assertEqual(hud.get_attribute('dir'), 'rtl')
+            self.assertIn('تم ترقيم', hud.inner_text())
+            self.assertEqual(page.locator('.crewloom-hud-close').get_attribute('title'), 'إخفاء الإشارات')
+            self.assertEqual(page.get_attribute('html','dir'), 'ltr')
+            self.assertEqual(page.get_attribute('html','lang'), 'en')
+            result = page.evaluate("scan => clickElementByIndex(2,scan.generation,scan.documentToken)", scan)
+            self.assertTrue(result['ok'])
+            self.assertIn('تم الضغط على [2]', hud.inner_text())
+            page.evaluate("document.documentElement.lang='ar'; document.documentElement.dir='rtl'; window.__controlChanged({'crewloom.lang':{newValue:'en'}},'local')")
+            self.assertEqual(page.get_attribute('html','lang'),'ar')
+            self.assertEqual(page.get_attribute('html','dir'),'rtl')
+            self.assertEqual(hud.get_attribute('dir'), 'ltr')
+            self.assertIn('Clicked [2]', hud.inner_text())
+            page.click('.crewloom-hud-close')
+            page.evaluate("window.__controlChanged({'crewloom.lang':{newValue:'ar'}},'local')")
+            self.assertFalse(hud.is_visible())
+        finally:
+            context.close()
 
     def test_index_never_exports_entered_form_values(self):
         context, page = self.new_page()
@@ -760,6 +840,29 @@ class RealBrowserExtensionTest(unittest.TestCase):
         self.assertEqual(manifest['version'], declared['version'])
         self.assertIn('<all_urls>', manifest['host_permissions'],
                       'captureVisibleTab needs <all_urls> or a transient activeTab grant')
+
+    def test_real_language_choice_updates_all_frame_huds_and_persists(self):
+        self.page.goto(self.DASHBOARD+'frames')
+        self.page.wait_for_timeout(600)
+        self.page.bring_to_front()
+        same = next(frame for frame in self.page.frames if frame.url.endswith('/same-frame'))
+        try:
+            self.panel.evaluate("document.querySelector('#langToggle').click()")
+            self.panel.wait_for_function("() => document.documentElement.lang==='ar'")
+            self.panel.evaluate("document.querySelector('#indexBtn').click()")
+            self.panel.wait_for_function("() => document.querySelector('#directoryList').textContent.includes('Same frame action')")
+            for frame in (self.page,same):
+                hud=frame.locator('.crewloom-agent-hud')
+                self.assertEqual(hud.get_attribute('dir'),'rtl')
+                self.assertIn('تم ترقيم',hud.inner_text())
+            self.assertIn('تم تجاوز 1 إطار',self.panel.inner_text('#terminalLogs'))
+            self.panel.reload()
+            self.panel.wait_for_function("() => document.documentElement.lang==='ar'")
+            self.panel.evaluate("document.querySelector('#langToggle').click()")
+            same.wait_for_function("() => document.querySelector('.crewloom-agent-hud').dir==='ltr'")
+            self.assertIn('elements indexed',same.inner_text('.crewloom-agent-hud'))
+        finally:
+            self.panel.evaluate("async () => await chrome.storage.local.set({'crewloom.lang':'en'})")
 
     def test_real_panel_indexes_frames_and_routes_same_origin_click(self):
         self.page.goto(self.DASHBOARD + 'frames')

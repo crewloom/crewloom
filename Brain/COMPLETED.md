@@ -344,3 +344,7 @@
 - 2026-10-16 | Operational acceptance delivered: four real generated modules,70 application cases +16 helper tests, exact credential-reviewed local publication, unchanged verified generation counts on resume, and executor-verified Arabic correction. Actual Chrome profile2.3.0 index/click/capture, Calculator exact12 and TextEdit read-only pass; test sessions stopped.42 guides validate; live role coverage is explicit. Distribution13 passes for0.6.0; final release gate/merge/install follows.
 
 - 2026-10-16 | Browser PR20 review closure: tracked cleanup includes all contacted frames and partial failures; remaining index quota is reused; unverifiable cross-origin targets are omitted with a warning. Four new checks reject37f8387; final real-browser42 passes (one optional skip). Chrome profile upgrade2.3.1 verified index/click/capture/clear, then disabled and owned server/tab closed.
+
+- 2026-10-17 | Browser companion2.3.2 localizes known error details, HUD statuses, empty capture, toggle labels and accessible control names. Paired direction/reload/frame cases and known-bad release rejection are exercised; full release gate and operational rollout follow.
+
+- 2026-10-17 | Paired rendered browser46 passes (one optional screenshot skip); three new regressions reject the previous released source. Evaluator14 and context19 pass. Actual profile2.3.2 verifies Arabic HUD on English site, English HUD on Arabic site, exact click effects, saved Arabic after reopen and hidden-state preservation; companion disabled and owned tab/server closed.

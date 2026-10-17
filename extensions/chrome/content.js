@@ -80,36 +80,56 @@ function hitTarget(element) {
   return true;
 }
 
-// Ensure HUD banner exists
-function showHud(statusText = 'Active') {
+// The page language belongs to the site; only our HUD adopts the operator's choice.
+let contentLanguage = 'en';
+let hudStatus = {key:'active', vars:{}};
+const HUD_TEXT = {
+  en: {active:'Active', indexed:'{total} elements indexed', limited:'Indexed {count} of {total} (limit {limit})',
+    clicked:'Clicked [{index}]', inspector:'Inspector active', close:'Hide Overlay'},
+  ar: {active:'نشط', indexed:'تم ترقيم {total} عنصر', limited:'تم ترقيم {count} من {total} (الحد {limit})',
+    clicked:'تم الضغط على [{index}]', inspector:'الفاحص نشط', close:'إخفاء الإشارات'}
+};
+function hudText(key, vars = {}) {
+  return HUD_TEXT[contentLanguage][key].replace(/\{(\w+)\}/g, (match,name) =>
+    Object.prototype.hasOwnProperty.call(vars,name) ? String(vars[name]) : match);
+}
+function renderHudLanguage() {
+  if (!hudElement) return;
+  hudElement.lang = contentLanguage;
+  hudElement.dir = contentLanguage === 'ar' ? 'rtl' : 'ltr';
+  hudElement.querySelector('.crewloom-hud-text').textContent = hudText(hudStatus.key,hudStatus.vars);
+  hudElement.querySelector('.crewloom-hud-close').title = hudText('close');
+}
+function setHudLanguage(value) {
+  contentLanguage = value === 'ar' ? 'ar' : 'en';
+  renderHudLanguage();
+}
+
+// Ensure HUD banner exists without translating or changing the underlying page.
+function showHud(key = 'active', vars = {}) {
+  hudStatus = {key,vars};
   if (hudElement) {
-    const statusTextNode = hudElement.querySelector('.crewloom-hud-text');
-    if (statusTextNode) statusTextNode.textContent = statusText;
-    hudElement.style.display = 'flex';
+    renderHudLanguage();
+    hudElement.style.setProperty('display','flex','important');
     return;
   }
-
   hudElement = document.createElement('div');
   hudElement.className = 'crewloom-agent-hud';
   const logoUrl = chrome.runtime.getURL('icons/icon-32.png');
-
   hudElement.innerHTML = `
-    <img src="${logoUrl}" alt="Logo" class="crewloom-hud-logo">
+    <img src="${logoUrl}" alt="Crewloom" class="crewloom-hud-logo">
     <span class="crewloom-hud-title">Crewloom Computer Use</span>
     <div class="crewloom-hud-status">
       <span class="crewloom-hud-dot"></span>
       <span class="crewloom-hud-text"></span>
     </div>
-    <button class="crewloom-hud-close" title="Hide Overlay">✕</button>
+    <button class="crewloom-hud-close">✕</button>
   `;
-
-  hudElement.querySelector('.crewloom-hud-text').textContent = statusText;
-
+  renderHudLanguage();
   hudElement.querySelector('.crewloom-hud-close').addEventListener('click', () => {
     clearAllIndexTags();
-    hudElement.style.display = 'none';
+    hudElement.style.setProperty('display','none','important');
   });
-
   document.body.appendChild(hudElement);
 }
 
@@ -245,11 +265,7 @@ function indexInteractiveElements(options = {}) {
   window.addEventListener('scroll', scheduleReposition, { passive: true });
   window.addEventListener('resize', scheduleReposition, { passive: true });
 
-  const status =
-    items.length < total
-      ? `Indexed ${items.length} of ${total} (limit ${limit})`
-      : `${total} elements indexed`;
-  showHud(status);
+  showHud(items.length < total ? 'limited' : 'indexed', {count:items.length,total,limit});
 
   return { generation: indexGeneration, documentToken, items, total, blockedFrames,
     truncated: items.length < total, limit };
@@ -312,7 +328,7 @@ function clickElementByIndex(index, generation = indexGeneration, expectedDocume
   }
   el.click();
 
-  showHud(`Clicked [${index}]`);
+  showHud('clicked', {index});
   return { ok: true, x: clickX, y: clickY, tag: el.tagName.toLowerCase() };
 }
 
@@ -328,7 +344,7 @@ function toggleInspector(forceState) {
       document.body.appendChild(inspectorBox);
     }
     document.addEventListener('mousemove', onInspectorMouseMove, { passive: true });
-    showHud('Inspector active');
+    showHud('inspector');
   } else {
     if (inspectorBox) inspectorBox.remove();
     inspectorBox = null;
@@ -405,13 +421,15 @@ function handleMessage(message, sender, sendResponse) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'CLEAR_INDEX') { handleMessage(message, sender, sendResponse); return false; }
-  chrome.storage.local.get({ 'crewloom.enabled': false }, (stored) => {
+  chrome.storage.local.get({ 'crewloom.enabled': false, 'crewloom.lang': 'en' }, (stored) => {
+    setHudLanguage(stored['crewloom.lang']);
     if (!stored['crewloom.enabled']) return sendResponse({ ok: false, error: 'Browser companion is disabled' });
     handleMessage(message, sender, sendResponse);
   });
   return true;
 });
 chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes['crewloom.lang']) setHudLanguage(changes['crewloom.lang'].newValue);
   if (area === 'local' && changes['crewloom.enabled']?.newValue === false) {
     clearAllIndexTags();
     isInspectorActive = false;

@@ -116,3 +116,5 @@ User sources and customization data stay project-local; commit hooks reject priv
 - 2026-10-15 | Delivery continuation now exercises two independent model-generated Ledgerline projects. Actual failures exposed context delivery and import-contract gaps; their fixes preserve verifier bytes. PR20 is open; general app acceptance and final publication remain pending until verified.
 
 - 2026-10-16 | 0.6.0 operational acceptance is recorded with complete real generated software delivery, independent container checks and post-delivery correction. Real profile/browser and two system-app scopes passed.42 role guides validate, with live evidence limited to named software/context/QA/MCP/machine workflows. Final normal GitHub merge/release and local refresh remain the delivery steps.
+
+- 2026-10-17 | Arabic and English are paired product acceptance requirements for localized changes, with RTL/LTR and failure-state evidence. Language support scope is explicit; external diagnostics and application labels retain their source text.
