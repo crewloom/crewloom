@@ -45,7 +45,7 @@ Project context is opt-in per project and never changes workflow isolation. See 
 Every core tool above runs on the Python standard library alone. The navigation index reads real JS/TS syntax trees and `tsconfig` aliases only when the one optional extra is installed:
 
 ```
-python3 -m pip install 'crewloom[syntax]'   # tree-sitter 0.23.2, javascript 0.23.1, typescript 0.23.2
+python3 -m pip install '.[syntax]'   # from the source clone in an activated Python environment
 ```
 
 Without it the same commands still work and the generated map records that approximate extraction was used, so a missing extra is reported rather than hidden. `map --help` and the map metadata name the parser that produced each index.

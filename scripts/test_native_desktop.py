@@ -65,6 +65,34 @@ class NativeScopeTests(unittest.TestCase):
         self.assertTrue(all(args.get('prompt') is False for name,args in self.driver.calls if name == 'check_permissions'))
         self.assertFalse(any(name == 'list_apps' for name, args in self.driver.calls))
 
+    def test_construction_never_allocates_an_event_loop_lock(self):
+        with patch.object(nd.asyncio, 'Lock', side_effect=AssertionError('No lock outside a running loop')):
+            nd.Controller(str(self.root), 'sample-project', 'understand-task',
+                          self.prepared['policy'], self.driver, pid=42)
+
+    def test_concurrent_observations_serialize_and_foreign_loops_are_refused(self):
+        original = self.driver.call_tool
+        active = peak = 0
+        async def delayed(name, args):
+            nonlocal active, peak
+            active += 1
+            peak = max(peak, active)
+            try:
+                await asyncio.sleep(0)
+                return await original(name, args)
+            finally:
+                active -= 1
+        async def run():
+            snapshots = await asyncio.gather(self.controller.snapshot(), self.controller.snapshot())
+            self.assertEqual([value['observation'] for value in snapshots], [1, 2])
+        with patch.object(self.driver, 'call_tool', delayed):
+            asyncio.run(run())
+        self.assertEqual(peak, 1)
+        calls = len(self.driver.calls)
+        with self.assertRaisesRegex(ValueError, 'event loop'):
+            asyncio.run(self.controller.snapshot())
+        self.assertEqual(len(self.driver.calls), calls)
+
     def test_foreign_target_and_changed_manifest_are_refused_before_click(self):
         async def run():
             snapshot = await self.controller.snapshot()

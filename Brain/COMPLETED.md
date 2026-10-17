@@ -1,5 +1,15 @@
 # Completed work
 
+### 2026-10-15 — Hosted Python compatibility follow-up
+- Artifact: native_desktop.py and its existing regression suite; PR21 first-head failure retained.
+- Impact: synchronous construction needs no implicit event loop; asynchronous native operations serialize on one loop and reject foreign loops.
+- Evidence: actual Python3.9 Docker and Python3.14 each9pass/1optional-live-skip; original hosted failure and new red/green construction test confirm the cause. Final gate/hosted rerun follows.
+
+### 2026-10-15 — Professional repository review
+- Artifact: documentation/PROFESSIONAL_REVIEW.md, launcher/tests, pinned CI and Dependabot configuration; prior defect-closure commits retained.
+- Impact: explicit acceptance cannot skip missing prerequisites; first dashboard install obeys the lockfile; bilingual setup matches runtime behavior.
+- Evidence: required commit gate99 suites/1216cases (1104pass/112skip); dashboard56, browser41pass/1skip, MCP9pass/1skip, capture8, distribution14 and Docker34/43 pass; TypeScript/build and npm audit clean. Hosted outcomes belong to the reviewed commit.
+
 ### 2026-10-01 — Initial public toolkit
 - Artifact: 42 English public role guides, clean memory, core CLI and checks.
 - Impact: Independently usable repository edition without client history or external account configuration.
