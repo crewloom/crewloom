@@ -54,7 +54,7 @@ def declared_files(directory, skip=()):
 class DistributionMetadata(unittest.TestCase):
     def test_release_version_has_a_matching_changelog_entry(self):
         version = pyproject()['project']['version']
-        self.assertEqual(version, '0.6.0')
+        self.assertRegex(version, r'^\d+\.\d+\.\d+$')
         self.assertIn('## ' + version + ' — ', (ROOT / 'CHANGELOG.md').read_text(encoding='utf-8'))
 
     def test_declared_license_notice_and_english_docs(self):

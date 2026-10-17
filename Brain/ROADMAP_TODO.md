@@ -246,3 +246,7 @@
 - 2026-10-16 | [x] Paired real model attempts and retained failure/assisted phases. [x] Complete primary delivery, source-linked worktree context, reviewed local publication, stop/resume, scoped Arabic correction and foreign-project refusals. [x] Actual Chrome profile install/index/click/capture; Calculator and read-only TextEdit acceptance; bounded sessions stopped. [x]0.6.0 wheel/sdist distribution13. [ ] Final release commit, required exact-head CI, normal PR20 merge, release assets and installed runtime smoke. Separate future scope: representative business-domain quality and additional app-specific actions.
 
 - 2026-10-16 | [x] Three browser review findings fixed with known-bad rejection and clean42-test acceptance; actual Chrome profile2.3.1 upgrade smoke passed and disabled. [ ] Final mandatory gate, exact-head CI, normal merge, release and installed runtime smoke.
+
+- 2026-10-17 | [x] Paired product language contract and in-place companion localization, HUD/site isolation and hide correction. [x]46-case real browser suite (one optional skip), evaluator14 and task-context19. [x] Actual profile both language/site combinations, persistence and hidden-state behavior. [ ] Mandatory gate, review/CI and merged runtime rollout. CLI/help and unknown external diagnostics retain their documented language boundaries.
+
+- 2026-10-17 | [x] PR22 reviewed capture-disable race fixed and paired regression recorded; [x] internal error translation coverage guard. [ ] Final48-case acceptance, required commit gate, final-head CI and rollout.

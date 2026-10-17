@@ -135,3 +135,5 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-16 | Close an operational acceptance with a published code candidate, a post-delivery correction completed from executor evidence, a per-role coverage inventory and retained failed phases. Unknown backend identity/cost and untested domains remain explicit fields, rather than blocking delivery of verified toolkit capabilities.
 
 - 2026-10-16 | Keep the manually installed browser companion in a stable reviewed directory so reloads retain its Chrome ID; immutable toolkit releases remain separate. Upgrade2.3.1 keeps the existing permissions and explicit enable boundary.
+
+- 2026-10-17 | Use equivalent language/direction/error acceptance for every localized change. Keep application labels and third-party diagnostics intact; a translation count or role-guide translation cannot demonstrate bilingual runtime quality.
