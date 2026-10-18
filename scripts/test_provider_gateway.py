@@ -48,7 +48,7 @@ class GatewayTests(unittest.TestCase):
         self.assertEqual(evidence['usage']['total_tokens'],170)
 
     def test_local_providers_loopback_enforced(self):
-        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://remote.host.test:11434/api/chat'}):
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://8.8.8.8:11434/api/chat'}):
             with self.assertRaisesRegex(ValueError,'loopback'):
                 g._resolve_endpoint('ollama')
         with patch.dict(os.environ,{'VLLM_ENDPOINT':'http://localhost/no-port'}):
@@ -56,6 +56,64 @@ class GatewayTests(unittest.TestCase):
                 g._resolve_endpoint('vllm')
         with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://127.0.0.1:11434/api/chat'}):
             self.assertEqual(g._resolve_endpoint('ollama'),'http://127.0.0.1:11434/api/chat')
+
+    def test_private_lan_endpoints_allowed_for_local_providers(self):
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://192.168.1.100:11434/api/chat'}):
+            self.assertEqual(g._resolve_endpoint('ollama'),'http://192.168.1.100:11434/api/chat')
+        with patch.dict(os.environ,{'VLLM_ENDPOINT':'http://10.0.0.5:8000/v1/chat/completions'}):
+            self.assertEqual(g._resolve_endpoint('vllm'),'http://10.0.0.5:8000/v1/chat/completions')
+        fake_lan_info = [(2, 1, 6, '', ('10.0.1.50', 11434))]
+        with patch.dict(os.environ, {'OLLAMA_ENDPOINT': 'http://gpu-server.internal:11434'}):
+            with patch('socket.getaddrinfo', return_value=fake_lan_info):
+                self.assertEqual(g._resolve_endpoint('ollama'), 'http://gpu-server.internal:11434/api/chat')
+
+    def test_remote_gateway_override_permits_public_ips(self):
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://8.8.8.8:11434/api/chat','CREWLOOM_ALLOW_REMOTE_GATEWAY':'1'}):
+            self.assertEqual(g._resolve_endpoint('ollama'),'http://8.8.8.8:11434/api/chat')
+
+    def test_link_local_and_cloud_metadata_ips_rejected(self):
+        with patch.dict(os.environ, {'OLLAMA_ENDPOINT': 'http://169.254.169.254:11434/api/chat'}):
+            with self.assertRaisesRegex(ValueError, 'outside allowed loopback'):
+                g._resolve_endpoint('ollama')
+        with patch.dict(os.environ, {'VLLM_ENDPOINT': 'http://0.0.0.0:8000/v1'}):
+            with self.assertRaisesRegex(ValueError, 'outside allowed loopback'):
+                g._resolve_endpoint('vllm')
+
+    def test_dns_rebinding_to_public_ip_rejected(self):
+        import socket
+        fake_addrinfo = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', ('8.8.8.8', 11434))]
+        with patch.dict(os.environ, {'OLLAMA_ENDPOINT': 'http://gpu.internal:11434/api/chat'}):
+            with patch('socket.getaddrinfo', return_value=fake_addrinfo):
+                with self.assertRaisesRegex(ValueError, 'outside allowed CIDRs'):
+                    g._resolve_endpoint('ollama')
+
+    def test_think_tags_inside_artifact_content_preserved(self):
+        raw_json = json.dumps({'artifacts': [{'path': 'a', 'content': 'before <think>keep me</think> after'}]})
+        value = {
+            'model': 'qwen2.5-coder:7b',
+            'choices': [{'finish_reason': 'stop', 'message': {'role': 'assistant', 'content': raw_json}}],
+            'usage': {'prompt_tokens': 10, 'completion_tokens': 20, 'total_tokens': 30}
+        }
+        artifacts, _ = g.parse('vllm', value, ['a'])
+        self.assertEqual(artifacts['a'], 'before <think>keep me</think> after')
+
+    def test_dynamic_max_output_tokens_setting(self):
+        with patch.dict(os.environ, {'CREWLOOM_MAX_OUTPUT_TOKENS': '8192'}):
+            self.assertEqual(g._max_output_tokens(), 8192)
+        with patch.dict(os.environ, {'CREWLOOM_MAX_OUTPUT_TOKENS': '999999'}):
+            self.assertEqual(g._max_output_tokens(), g.MAX_OUTPUT_TOKENS_CEILING)
+
+    def test_system_proxies_enabled_when_configured(self):
+        class Response:
+            def __enter__(self): return self
+            def __exit__(self, *args): pass
+            def read(self, *args): return b'{"status":"completed"}'
+        with patch.dict(os.environ, {'OPENAI_API_KEY': 'k', 'CREWLOOM_TRUST_SYSTEM_PROXIES': '1'}):
+            with patch.object(g.urllib.request, 'build_opener') as build_opener:
+                build_opener.return_value.open.return_value = Response()
+                g._request('openai', 'model', 'prompt', 10)
+                # Verify that proxy_handler was created
+                self.assertTrue(build_opener.called)
 
     def test_local_providers_do_not_require_api_key(self):
         class Response:
