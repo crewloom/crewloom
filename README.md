@@ -17,7 +17,7 @@ The toolkit brings together **44 English role guides**, **156 detailed reference
 
 Managed workflows add project and checkout identities, frozen context, isolated Docker acceptance, credential-scoped review, and concurrent task worktrees. [Native lifecycle setup](documentation/HOST_LIFECYCLE.md) connects supported host callbacks; [agency readiness](documentation/READINESS.md) reports client evidence without modifying client projects. See [enforcement boundaries](documentation/ENFORCEMENT.md) for what each execution path actually covers.
 
-The optional [project task MCP bridge](documentation/MCP_BRIDGE.md) gives Codex and other MCP hosts read-only project context and workflow packets. Explicitly enabled candidate imports preserve task review and isolated acceptance. Tested templates are available for [Cursor](examples/mcp/cursor.json) and [Windsurf](examples/mcp/windsurf.json) (see [MCP guide](examples/mcp/README.md)).
+The optional [project task MCP bridge](documentation/MCP_BRIDGE.md) gives Cursor, Windsurf, Codex, and other MCP hosts read-only project context, workflow packets, and verified configuration templates (see [examples/mcp/README.md](examples/mcp/README.md)).
 
 ## Quickstart in 20 seconds
 
@@ -103,6 +103,7 @@ flowchart TD
 | **Developer Experience** | **Zero friction**: 1-line quickstart (`quickstart.sh`), instant 20-second offline demo (`crewloom demo`), zero API keys needed. | High setup friction; large dependency tree; mandatory paid API key for hello-world. | Requires virtualenv, `OAI_CONFIG_LIST` configuration, and active LLM credentials. | Requires multi-package installation, model credentials, and complex graph wiring. |
 | **AI IDE & MCP** | **Native stdio MCP bridge** with fine-grained security flags for Cursor, Windsurf, and Codex. | No repository MCP server; relies on standalone Python execution scripts. | Client-side tool consumer only; does not expose repo context or task packets to IDEs. | Client-side tool consumer; lacks repository-native MCP server for AI IDEs. |
 | **Cloud Overhead** | **100% local and offline**; zero telemetry; local dashboard on `localhost:4317`. | Pushes toward CrewAI Enterprise / cloud monitoring. | Standalone library; optional cloud extensions. | Strongly coupled with LangSmith cloud monitoring and LangGraph Cloud. |
+>>>>>>> main
 
 ## Execute a software workflow
 
