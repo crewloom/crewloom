@@ -22,6 +22,51 @@ class GatewayTests(unittest.TestCase):
         value={'stop_reason':'end_turn','content':[{'type':'text','text':self.artifacts()}]}
         self.assertEqual(g.parse('anthropic',value,['a'])[0]['a'],'verified')
 
+    def test_ollama_completed_artifacts(self):
+        value={'done':True,'model':'qwen2.5-coder:7b','message':{'role':'assistant','content':self.artifacts()},
+               'prompt_eval_count':150,'eval_count':45}
+        artifacts,evidence=g.parse('ollama',value,['a'])
+        self.assertEqual(artifacts['a'],'verified')
+        self.assertEqual(evidence['model_reported'],'qwen2.5-coder:7b')
+        self.assertEqual(evidence['usage']['input_tokens'],150)
+        self.assertEqual(evidence['usage']['output_tokens'],45)
+        self.assertEqual(evidence['usage']['total_tokens'],195)
+
+    def test_ollama_markdown_fence_stripped(self):
+        wrapped='```json\n'+self.artifacts()+'\n```'
+        value={'done':True,'model':'qwen2.5-coder:7b','message':{'role':'assistant','content':wrapped}}
+        artifacts,_=g.parse('ollama',value,['a'])
+        self.assertEqual(artifacts['a'],'verified')
+
+    def test_vllm_completed_artifacts(self):
+        value={'model':'deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct',
+               'choices':[{'index':0,'finish_reason':'stop','message':{'role':'assistant','content':self.artifacts()}}],
+               'usage':{'prompt_tokens':120,'completion_tokens':50,'total_tokens':170}}
+        artifacts,evidence=g.parse('vllm',value,['a'])
+        self.assertEqual(artifacts['a'],'verified')
+        self.assertEqual(evidence['model_reported'],'deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct')
+        self.assertEqual(evidence['usage']['total_tokens'],170)
+
+    def test_local_providers_loopback_enforced(self):
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://remote.host.test:11434/api/chat'}):
+            with self.assertRaisesRegex(ValueError,'loopback'):
+                g._resolve_endpoint('ollama')
+        with patch.dict(os.environ,{'VLLM_ENDPOINT':'http://localhost/no-port'}):
+            with self.assertRaisesRegex(ValueError,'explicit port'):
+                g._resolve_endpoint('vllm')
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://127.0.0.1:11434/api/chat'}):
+            self.assertEqual(g._resolve_endpoint('ollama'),'http://127.0.0.1:11434/api/chat')
+
+    def test_local_providers_do_not_require_api_key(self):
+        class Response:
+            def __enter__(self):return self
+            def __exit__(self,*args):pass
+            def read(self,*args):return b'{"done":true,"model":"qwen2.5-coder","message":{"role":"assistant","content":"{\\"artifacts\\":[{\\"path\\":\\"a\\",\\"content\\":\\"ok\\"}]}"}}'
+        with patch.dict(os.environ,{},clear=True),patch.object(g.urllib.request,'build_opener') as opener:
+            opener.return_value.open.return_value=Response()
+            result=g._request('ollama','qwen2.5-coder','prompt',10)
+            self.assertTrue(result['done'])
+
     def test_tool_calls_refusals_and_incomplete_responses_rejected(self):
         cases=[('openai',{'status':'completed','output':[{'type':'function_call'}]}),
                ('openai',{'status':'incomplete'}),
@@ -57,6 +102,27 @@ class GatewayTests(unittest.TestCase):
             (root/'workflow.json').write_text(json.dumps(plan));plan,fingerprint=w.read_plan(root,'workflow.json')
             with patch.object(h,'generate') as generate:report=w.run(root,plan,fingerprint,'image')
             self.assertEqual(report['status'],'failed');self.assertIn('disabled',report['blocker']);generate.assert_not_called()
+
+    def test_endpoint_resolution_appends_routes(self):
+        with patch.dict(os.environ,{'OLLAMA_ENDPOINT':'http://127.0.0.1:11434'}):
+            self.assertEqual(g._resolve_endpoint('ollama'),'http://127.0.0.1:11434/api/chat')
+        with patch.dict(os.environ,{'VLLM_ENDPOINT':'http://127.0.0.1:8000/v1'}):
+            self.assertEqual(g._resolve_endpoint('vllm'),'http://127.0.0.1:8000/v1/chat/completions')
+        with patch.dict(os.environ,{'VLLM_ENDPOINT':'http://127.0.0.1:8000'}):
+            self.assertEqual(g._resolve_endpoint('vllm'),'http://127.0.0.1:8000/v1/chat/completions')
+
+    def test_vllm_token_normalization(self):
+        raw_response={
+            'choices':[{'finish_reason':'stop','message':{'content':'{"artifacts":[{"path":"x.py","content":"1"}]}'}}],
+            'usage':{'prompt_tokens':42,'completion_tokens':10,'total_tokens':52}
+        }
+        _,meta=g.parse('vllm',raw_response,['x.py'])
+        usage=meta['usage']
+        self.assertEqual(usage['input_tokens'],42)
+        self.assertEqual(usage['output_tokens'],10)
+        self.assertEqual(usage['total_tokens'],52)
+        self.assertEqual(usage['prompt_tokens'],42)
+        self.assertEqual(usage['completion_tokens'],10)
 
     def test_untrusted_model_cannot_rewrite_trusted_runtime(self):
         import execution_policy as p
