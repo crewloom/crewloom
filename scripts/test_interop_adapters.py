@@ -11,6 +11,7 @@ Verifies:
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 import sys
@@ -128,6 +129,23 @@ class TestInteropSandboxCommand(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "escapes workspace"):
             build_sandbox_command(self.workspace, ["python3"], writable=["../outside"])
 
+    def test_crewai_docker_user_fallback(self):
+        import adapters.interop.crewai_sandbox as crewai_mod
+        with mock.patch.object(crewai_mod, "_workflow", None):
+            with mock.patch("os.getuid", return_value=0), mock.patch("os.getgid", return_value=0):
+                # Valid override
+                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "10005:10005"}):
+                    self.assertEqual(crewai_mod._docker_user(), "10005:10005")
+
+                # Invalid root override
+                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "0:0"}):
+                    with self.assertRaisesRegex(ValueError, "unprivileged"):
+                        crewai_mod._docker_user()
+
+                # Root allow fallback
+                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "", "CREWLOOM_ALLOW_CONTAINER_ROOT": "1"}):
+                    self.assertEqual(crewai_mod._docker_user(), "10001:10001")
+
 
 class TestCrewAISandboxTool(unittest.TestCase):
     """Test CrewAI tool interface and execution behavior."""
@@ -158,6 +176,27 @@ class TestCrewAISandboxTool(unittest.TestCase):
         self.assertEqual(res["exit_code"], 0)
         self.assertEqual(res["output"], "direct output\n")
         self.assertFalse(res["output_truncated"])
+
+    @mock.patch("adapters.interop.crewai_sandbox.subprocess.run")
+    @mock.patch("adapters.interop.crewai_sandbox.subprocess.Popen")
+    def test_execute_sandbox_command_cancellation_kills_container(self, mock_popen, mock_run):
+        import io
+        proc = mock.MagicMock()
+        proc.stdout = io.BytesIO(b"partial output\n")
+        proc.poll.return_value = None
+        proc.wait.return_value = 0
+        mock_popen.return_value = proc
+
+        token = mock.Mock()
+        token.is_cancelled.return_value = True
+
+        res = execute_sandbox_command(self.workspace, ["python3", "-c", "import time; time.sleep(10)"], cancellation_token=token)
+        self.assertEqual(res["exit_code"], 130)
+        self.assertTrue(res["cancelled"])
+        self.assertIn("Execution cancelled by user", res["output"])
+        proc.kill.assert_called()
+        kill_calls = [call for call in mock_run.call_args_list if call[0][0][:2] == ["docker", "kill"]]
+        self.assertTrue(len(kill_calls) >= 1)
 
     @mock.patch("adapters.interop.crewai_sandbox.execute_sandbox_command")
     def test_tool_execution_success(self, mock_exec):
@@ -277,6 +316,8 @@ echo "done"
         import asyncio
         executor = CrewloomAutoGenExecutor(workspace_root=self.workspace)
         token = mock.Mock()
+        token.is_cancelled.return_value = False
+        token.is_set.return_value = False
         with mock.patch("adapters.interop.autogen_sandbox.execute_sandbox_command") as mock_exec:
             mock_exec.return_value = {"exit_code": 0, "output": "ok"}
             res = executor.execute_code_blocks([CodeBlock(language="python", code="1")], cancellation_token=token)
@@ -290,6 +331,96 @@ echo "done"
         async_res = asyncio.run(run_async())
         self.assertEqual(async_res.exit_code, 0)
         self.assertEqual(async_res.output, "async_ok")
+
+    def test_cancellation_token_triggered(self):
+        token = mock.Mock()
+        token.is_cancelled.return_value = True
+        executor = CrewloomAutoGenExecutor(workspace_root=self.workspace)
+        result = executor.execute_code_blocks([CodeBlock(language="python", code="print(1)")], cancellation_token=token)
+        self.assertEqual(result.exit_code, 130)
+        self.assertIn("Execution cancelled", result.output)
+
+    def test_cancellation_token_cancelled_between_blocks(self):
+        token = mock.Mock()
+        # First check False, second check True
+        token.is_cancelled.side_effect = [False, False, True]
+        executor = CrewloomAutoGenExecutor(workspace_root=self.workspace)
+        with mock.patch("adapters.interop.autogen_sandbox.execute_sandbox_command") as mock_exec:
+            mock_exec.return_value = {"exit_code": 0, "output": "block 1 ok"}
+            blocks = [
+                CodeBlock(language="python", code="print(1)"),
+                CodeBlock(language="python", code="print(2)"),
+            ]
+            result = executor.execute_code_blocks(blocks, cancellation_token=token)
+            self.assertEqual(result.exit_code, 130)
+            self.assertIn("Execution cancelled before block 2", result.output)
+
+    def test_stateful_session_wrapper(self):
+        executor = CrewloomAutoGenExecutor(workspace_root=self.workspace, stateful=True)
+        self.assertTrue(executor.stateful)
+        with mock.patch("adapters.interop.autogen_sandbox.execute_sandbox_command") as mock_exec:
+            mock_exec.return_value = {"exit_code": 0, "output": "stateful_output"}
+            res = executor.execute_code_blocks([CodeBlock(language="python", code="def add(a, b): return a + b\nx = 10")])
+            self.assertEqual(res.exit_code, 0)
+            self.assertEqual(res.output, "stateful_output")
+
+            # Block 1 was recorded in session
+            self.assertEqual(len(executor._session_blocks), 1)
+
+            # Block 2 should replay block 1
+            res2 = executor.execute_code_blocks([CodeBlock(language="python", code="print(add(x, 20))")])
+            self.assertEqual(res2.exit_code, 0)
+
+            called_argv = mock_exec.call_args[1]["argv"]
+            self.assertEqual(called_argv[0], "python3")
+            self.assertEqual(called_argv[1], "-c")
+            self.assertIn("_REPLAY_BLOCKS", called_argv[2])
+            self.assertIn("def add(a, b): return a + b", called_argv[2])
+
+    def test_restart_cleans_session_state(self):
+        executor = CrewloomAutoGenExecutor(workspace_root=self.workspace, stateful=True)
+        session_dir = self.workspace / ".crewloom" / "autogen_session"
+        session_dir.mkdir(parents=True, exist_ok=True)
+        hist_file = session_dir / "session_history.json"
+        hist_file.write_text(json.dumps(["x = 10"]))
+
+        self.assertTrue(hist_file.exists())
+
+        executor.restart()
+
+        self.assertFalse(hist_file.exists())
+        self.assertEqual(executor._session_blocks, [])
+
+    def test_autogen_cli_runner(self):
+        from adapters.interop.autogen_sandbox import main
+        import io
+        from unittest.mock import patch
+
+        with patch("adapters.interop.autogen_sandbox.execute_sandbox_command") as mock_exec:
+            mock_exec.return_value = {"exit_code": 0, "output": "CLI Hello"}
+            stdout = io.StringIO()
+            with patch("sys.stdout", stdout):
+                code = main(["--code", "print('CLI Hello')", "--workspace", str(self.workspace), "--json"])
+            self.assertEqual(code, 0)
+            import json
+            data = json.loads(stdout.getvalue())
+            self.assertEqual(data["status"], "success")
+            self.assertEqual(data["output"], "CLI Hello")
+
+        # Missing code/file argument returns 2
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        with patch("sys.stdout", stdout), patch("sys.stderr", stderr):
+            code = main(["--workspace", str(self.workspace)])
+        self.assertEqual(code, 2)
+
+        # Reset flag returns 0 and clears session
+        stdout = io.StringIO()
+        with patch("sys.stdout", stdout):
+            code = main(["--reset", "--workspace", str(self.workspace), "--json"])
+        self.assertEqual(code, 0)
+        data = json.loads(stdout.getvalue())
+        self.assertTrue(data.get("session_reset"))
 
 
 class TestLangGraphSandboxNode(unittest.TestCase):
