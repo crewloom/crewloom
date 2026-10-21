@@ -1,5 +1,11 @@
 # Repository architecture
 
+### 2026-10-21 — Transport and adapter consumer boundaries
+Restricted local provider requests pin validated numeric IPs at the socket while retaining the URL host for HTTP and verified TLS, with no proxy forwarding. Interop uses self-contained standard-library helpers, validates grant sequence types before conversion, and exposes an explicit awaited AutoGen adapter. Persistent Python sessions capture OS descriptors with a bounded collector and disable Docker logging; background output is not a later-results channel.
+
+### 2026-10-20 — Interop boundary and live Python sessions
+Framework adapters mount the selected project read-only by default, validate explicit output grants and share bounded Docker process collection. They expose the whole readable project, not workflow snapshots or transactional output publication. AutoGen Python state lives in an owned isolated interpreter with bounded socket requests and explicit close/reset; named CLI sessions survive process exit until reset. No command history is replayed. Adapter code is packaged under its existing `adapters.interop` imports. Optional parser changes invalidate warm navigation caches; approximate graphs remain incomplete. Dashboard setup requires Node 24+ consistently.
+
 ### 2026-10-15 — Release verification boundaries
 The default core remains standard-library compatible on Python 3.9+. Explicit integration CI installs the pinned MCP SDK and Playwright, runs actual SDK/container protocols and loads the unpacked extension in headed Chromium. Missing explicit prerequisites fail; optional native desktop approval remains outside CI. Dashboard development requires Node 24+, ES modules and lockfile installation.
 

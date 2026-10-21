@@ -62,11 +62,11 @@ Core Python tools use the standard library. Commands run from the checkout root.
 
 | [scripts/execution_policy.py](../scripts/execution_policy.py) | Declared artifact broker; publishes one output group as a recoverable transaction under the project lock, journalled inside a bounded record and reconciled before managed work starts; releases a transaction folder by its own per-index staging names only and revalidates every destination before a rollback; context-guardian | `crewloom workflow run --project /path/to/project` |
 
-| [scripts/provider_gateway.py](../scripts/provider_gateway.py) | Tool-free provider RPC; fullstack-mvp-engineer | `crewloom workflow run --project /path/to/project` |
+| [scripts/provider_gateway.py](../scripts/provider_gateway.py) | Tool-free provider RPC with pinned local transport; fullstack-mvp-engineer | `crewloom workflow run --project /path/to/project` |
 
 | [scripts/test_execution_policy.py](../scripts/test_execution_policy.py) | Broker rejection, grouped-publication budgets, links, rollback validation, per-index staged-ownership cleanup, destination revalidation before a rollback and lifecycle recovery; QA; `CREWLOOM_DOCKER_TESTS=1` adds real container group publication | `python3 -m unittest discover -s scripts -p test_execution_policy.py` |
 
-| [scripts/test_provider_gateway.py](../scripts/test_provider_gateway.py) | Provider transport and default host denial; QA | `python3 -m unittest discover -s scripts -p test_provider_gateway.py` |
+| [scripts/test_provider_gateway.py](../scripts/test_provider_gateway.py) | Provider transport, actual pinned DNS connections and TLS host checks; QA | `python3 -m unittest discover -s scripts -p test_provider_gateway.py` |
 
 | [scripts/repo_map.py](../scripts/repo_map.py) | Project-local symbol index, versioned generations, SHA-verified reuse and bounded navigation; context-guardian | `crewloom map --project /path/to/git-project --query login` |
 | [scripts/test_repo_map.py](../scripts/test_repo_map.py) | Map freshness, generations, seed visibility, import accuracy and CLI regressions; QA | `python3 -m unittest discover -s scripts -p test_repo_map.py` |
@@ -192,3 +192,8 @@ The public context acceptance checker consumes `crewloom-hook-pilot/{context.jso
 | [scripts/native_desktop.py](../scripts/native_desktop.py) | Prepare a private fixture-only bounded manifest or serve owner-scoped observe/AX-press/reobserve MCP; input: bound project/task, private policy/socket, observed PID, fresh handle; output: scoped AX state and private audit; optional MCP SDK/CuaDriver/macOS; human manifest/TCC approval required; machine-control-operator | `crewloom native --help` |
 | [scripts/test_native_desktop.py](../scripts/test_native_desktop.py) | Bad/clean native scope, manifest, permissions, window projection and one-use AX sequencing; QA; optional approved live fixture acceptance records private evidence | `python3 -m unittest discover -s scripts -p test_native_desktop.py` |
 | [scripts/test_chat_capture.py](../scripts/test_chat_capture.py) | Private opt-in prompt capture, clarification guard and optional actual SDK answer protocol; QA | `python3 -m unittest discover -s scripts -p test_chat_capture.py` |
+
+| [adapters/interop/crewai_sandbox.py](../adapters/interop/crewai_sandbox.py) | Framework adapter module; validated read-only project mounts with explicit output grants, bounded Docker execution and native CrewAI wrapping; owner: fullstack-mvp-engineer | Import `adapters.interop.CrewloomSandboxTool`; [boundaries](../documentation/INTEROP.md) |
+| [adapters/interop/autogen_sandbox.py](../adapters/interop/autogen_sandbox.py) | Framework adapter/CLI; one-shot blocks or owned live Python sessions without replay, named-session reset and bounded teardown; owner: fullstack-mvp-engineer | `python3 -m adapters.interop.autogen_sandbox --help` |
+| [adapters/interop/langgraph_sandbox.py](../adapters/interop/langgraph_sandbox.py) | Framework adapter/CLI; state-delta execution through the same validated container runner; owner: fullstack-mvp-engineer | `python3 -m adapters.interop.langgraph_sandbox --help` |
+| [scripts/test_interop_adapters.py](../scripts/test_interop_adapters.py) | Framework protocol, default-write and alias/control refusals, actual interpreter side effects, timeout/reset/cancellation and ownership acceptance; QA | `CREWLOOM_DOCKER_TESTS=1 python3 -m unittest discover -s scripts -p test_interop_adapters.py` |

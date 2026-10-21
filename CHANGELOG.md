@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+- Pin local-provider sockets to validated IP addresses while preserving HTTP Host and TLS verification; restricted local connections bypass proxies.
+- Provide an explicit async executor for AutoGen 0.4 and verify the real pinned SDK agent without model calls.
+- Capture stateful child-process and raw-fd stdout/stderr, bound output and disable persistent container logs.
+- Avoid importing consumer workflow.py from installed adapters; reject malformed write-grant sequences before conversion.
+
+- Make interop workspaces read-only by default; validate explicit output grants and refuse control trees, links and overlapping paths before creating directories.
+- Include `adapters.interop` in wheel and sdist; test installed imports outside a checkout.
+- Keep stateful AutoGen Python in a live isolated interpreter instead of replaying commands. Add cleanup, named CLI sessions/reset and bounded cancellation/timeout teardown; ignore legacy command histories.
+- Refresh navigation parses when optional JS/TS syntax support changes; approximate extraction never claims a complete graph.
+- Align dashboard setup on Node 24+; check optional readiness honestly and document the minimal core path.
+- Add actual Docker/session, installed-artifact and warm-cache transition acceptance.
+
 ## 0.8.1 — 2026-10-18
 
 - Add native standard-library loopback gateways for local open-weights model runtimes: Ollama (`/api/chat`) and vLLM (`/v1/chat/completions`), with loopback host validation, explicit port enforcement, and transparent markdown code-fence stripping.

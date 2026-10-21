@@ -129,22 +129,62 @@ class TestInteropSandboxCommand(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "escapes workspace"):
             build_sandbox_command(self.workspace, ["python3"], writable=["../outside"])
 
+    def test_omitted_write_set_is_readonly(self):
+        cmd = build_sandbox_command(self.workspace, ['python3', '-c', 'print(1)'])
+        mounts = [cmd[i+1] for i, part in enumerate(cmd) if part == '--mount']
+        self.assertEqual(mounts, [f'type=bind,src={self.workspace},dst=/workspace,readonly'])
+
+    def test_control_paths_aliases_and_parent_grants_are_refused_before_writes(self):
+        (self.workspace / 'output/.git').mkdir()
+        for path in ('.git', '.GiT/config', '.crewloom', '.codex', 'crewloom.project.json',
+                     'output', '../outside', '.', '/tmp'):
+            with self.subTest(path=path), self.assertRaises(ValueError):
+                build_sandbox_command(self.workspace, ['python3'], writable=['new-output', path])
+            self.assertFalse((self.workspace / 'new-output').exists())
+        (self.workspace / 'alias').symlink_to(self.workspace / 'output', target_is_directory=True)
+        with self.assertRaises(ValueError):
+            build_sandbox_command(self.workspace, ['python3'], writable=['alias'])
+        (self.workspace / 'source.txt').write_text('original')
+        os.link(self.workspace / 'source.txt', self.workspace / 'output/linked.txt')
+        (self.workspace / 'output/.git').rmdir()
+        with self.assertRaisesRegex(ValueError, 'hardlinks'):
+            build_sandbox_command(self.workspace, ['python3'], writable=['output'])
+
+
+    def test_all_adapters_reject_non_sequence_write_grants_before_side_effects(self):
+        before = sorted(self.workspace.rglob("*"))
+        for factory in (CrewloomSandboxTool, CrewloomAutoGenExecutor, CrewloomLangGraphNode):
+            for invalid in ('out', b'out', ['out', 4], [''], ['x\0y'], iter(['out']), 4):
+                with self.subTest(adapter=factory.__name__, value=repr(invalid)):
+                    with mock.patch('subprocess.Popen') as launch, mock.patch('subprocess.run') as run:
+                        with self.assertRaises(ValueError):
+                            factory(self.workspace, writable=invalid)
+                        launch.assert_not_called()
+                        run.assert_not_called()
+                    self.assertEqual(sorted(self.workspace.rglob("*")), before)
+
+    def test_invalid_timeout_does_not_create_outputs_or_start_a_container(self):
+        with mock.patch('adapters.interop.crewai_sandbox.subprocess.Popen') as launch:
+            with self.assertRaisesRegex(ValueError, 'timeout'):
+                execute_sandbox_command(self.workspace, ['python3'], timeout=0, writable=['new-output'])
+        launch.assert_not_called()
+        self.assertFalse((self.workspace / 'new-output').exists())
+
     def test_crewai_docker_user_fallback(self):
         import adapters.interop.crewai_sandbox as crewai_mod
-        with mock.patch.object(crewai_mod, "_workflow", None):
-            with mock.patch("os.getuid", return_value=0), mock.patch("os.getgid", return_value=0):
-                # Valid override
-                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "10005:10005"}):
-                    self.assertEqual(crewai_mod._docker_user(), "10005:10005")
+        with mock.patch("os.getuid", return_value=0), mock.patch("os.getgid", return_value=0):
+            # Valid override
+            with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "10005:10005"}):
+                self.assertEqual(crewai_mod._docker_user(), "10005:10005")
 
-                # Invalid root override
-                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "0:0"}):
-                    with self.assertRaisesRegex(ValueError, "unprivileged"):
-                        crewai_mod._docker_user()
+            # Invalid root override
+            with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "00:0"}):
+                with self.assertRaisesRegex(ValueError, "unprivileged"):
+                    crewai_mod._docker_user()
 
-                # Root allow fallback
-                with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "", "CREWLOOM_ALLOW_CONTAINER_ROOT": "1"}):
-                    self.assertEqual(crewai_mod._docker_user(), "10001:10001")
+            # Root allow fallback
+            with mock.patch.dict(os.environ, {"CREWLOOM_CONTAINER_USER": "", "CREWLOOM_ALLOW_CONTAINER_ROOT": "1"}):
+                self.assertEqual(crewai_mod._docker_user(), "10001:10001")
 
 
 class TestCrewAISandboxTool(unittest.TestCase):
@@ -355,41 +395,50 @@ echo "done"
             self.assertEqual(result.exit_code, 130)
             self.assertIn("Execution cancelled before block 2", result.output)
 
-    def test_stateful_session_wrapper(self):
+    def test_stateful_execution_delegates_without_host_history_replay(self):
         executor = CrewloomAutoGenExecutor(workspace_root=self.workspace, stateful=True)
-        self.assertTrue(executor.stateful)
-        with mock.patch("adapters.interop.autogen_sandbox.execute_sandbox_command") as mock_exec:
-            mock_exec.return_value = {"exit_code": 0, "output": "stateful_output"}
-            res = executor.execute_code_blocks([CodeBlock(language="python", code="def add(a, b): return a + b\nx = 10")])
-            self.assertEqual(res.exit_code, 0)
-            self.assertEqual(res.output, "stateful_output")
+        with mock.patch.object(executor._session, 'execute', return_value={'exit_code': 0, 'output': '42'}) as execute:
+            result = executor.execute_code_blocks([CodeBlock('python', 'print(x)')])
+        self.assertEqual(result.output, '42')
+        execute.assert_called_once_with('print(x)', None)
+        self.assertFalse((self.workspace / '.crewloom/autogen_session').exists())
 
-            # Block 1 was recorded in session
-            self.assertEqual(len(executor._session_blocks), 1)
-
-            # Block 2 should replay block 1
-            res2 = executor.execute_code_blocks([CodeBlock(language="python", code="print(add(x, 20))")])
-            self.assertEqual(res2.exit_code, 0)
-
-            called_argv = mock_exec.call_args[1]["argv"]
-            self.assertEqual(called_argv[0], "python3")
-            self.assertEqual(called_argv[1], "-c")
-            self.assertIn("_REPLAY_BLOCKS", called_argv[2])
-            self.assertIn("def add(a, b): return a + b", called_argv[2])
-
-    def test_restart_cleans_session_state(self):
+    def test_restart_releases_the_owned_interpreter(self):
         executor = CrewloomAutoGenExecutor(workspace_root=self.workspace, stateful=True)
-        session_dir = self.workspace / ".crewloom" / "autogen_session"
-        session_dir.mkdir(parents=True, exist_ok=True)
-        hist_file = session_dir / "session_history.json"
-        hist_file.write_text(json.dumps(["x = 10"]))
+        with mock.patch.object(executor._session, 'close') as close:
+            executor.restart()
+        close.assert_called_once_with()
 
-        self.assertTrue(hist_file.exists())
+    def test_session_cannot_reuse_or_remove_a_foreign_container(self):
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='owned')
+        response = mock.Mock(returncode=0, stdout=json.dumps({'labels': {}, 'running': True}))
+        with mock.patch('adapters.interop.autogen_sandbox.subprocess.run', return_value=response) as run:
+            with self.assertRaisesRegex(ValueError, 'not owned'):
+                executor.close()
+            self.assertEqual(run.call_count, 1)
+            self.assertEqual(run.call_args.args[0][:2], ['docker', 'inspect'])
 
-        executor.restart()
+    def test_missing_session_recognizes_docker_error_case_variants(self):
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='missing')
+        for error in ('error: no such object: fixture', 'Error: No such container: fixture'):
+            with self.subTest(error=error), mock.patch('adapters.interop.autogen_sandbox.subprocess.run',
+                    return_value=mock.Mock(returncode=1, stderr=error)):
+                self.assertIsNone(executor._session._inspect())
 
-        self.assertFalse(hist_file.exists())
-        self.assertEqual(executor._session_blocks, [])
+    def test_session_cleanup_reports_daemon_failures(self):
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='unavailable')
+        response = mock.Mock(returncode=1, stderr='Cannot connect to Docker daemon')
+        with mock.patch('adapters.interop.autogen_sandbox.subprocess.run', return_value=response):
+            with self.assertRaisesRegex(ValueError, 'Cannot inspect'):
+                executor.close()
+
+    def test_named_session_policy_changes_require_reset(self):
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='policy')
+        info = {'running': True, 'labels': {'crewloom.interop-policy': 'old-policy'}}
+        with mock.patch.object(executor._session, '_inspect', return_value=info):
+            result = executor.execute_code_blocks([CodeBlock('python', 'print(42)')])
+        self.assertEqual(result.exit_code, 1)
+        self.assertIn('reset', result.output)
 
     def test_autogen_cli_runner(self):
         from adapters.interop.autogen_sandbox import main
@@ -416,7 +465,7 @@ echo "done"
 
         # Reset flag returns 0 and clears session
         stdout = io.StringIO()
-        with patch("sys.stdout", stdout):
+        with patch("sys.stdout", stdout), patch("adapters.interop.autogen_sandbox._PythonSession.close"):
             code = main(["--reset", "--workspace", str(self.workspace), "--json"])
         self.assertEqual(code, 0)
         data = json.loads(stdout.getvalue())
@@ -594,6 +643,174 @@ class TestLangGraphSandboxNode(unittest.TestCase):
         delta = node({"custom_code": "print('positional test')"})
         self.assertIn("custom_output", delta)
         self.assertEqual(delta["custom_output"]["exit_code"], 0)
+
+
+@unittest.skipUnless(os.environ.get('CREWLOOM_DOCKER_TESTS') == '1',
+                     'Enable actual interop Docker acceptance explicitly')
+class TestActualInteropDocker(unittest.TestCase):
+    """Observe real mounts and interpreter side effects instead of mocked argv alone."""
+
+    def setUp(self):
+        import subprocess
+        available = subprocess.run(['docker', 'image', 'inspect', 'python:3.14-slim'],
+                                   capture_output=True, timeout=10)
+        self.assertEqual(available.returncode, 0, 'Pull python:3.14-slim for explicit acceptance')
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.root = Path(temporary.name).resolve()
+        (self.root / 'out').mkdir()
+        (self.root / '.git').mkdir()
+        (self.root / '.git' / 'control').write_text('original')
+        (self.root / 'source.txt').write_text('original')
+
+    def test_default_mount_refuses_source_and_git_writes_for_all_adapters(self):
+        code = '''from pathlib import Path
+for name in ('source.txt', '.git/control'):
+    try:
+        Path(name).write_text('changed')
+    except OSError:
+        pass
+    else:
+        raise AssertionError('write was allowed: ' + name)
+print('refused')'''
+        tool = CrewloomSandboxTool(self.root, image_id='python:3.14-slim')
+        self.assertEqual(tool.execute(code)['exit_code'], 0)
+        executor = CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim')
+        self.assertEqual(executor.execute_code_blocks([CodeBlock('python', code)]).exit_code, 0)
+        node = CrewloomLangGraphNode(self.root, image_id='python:3.14-slim')
+        self.assertEqual(node({'code': code})['sandbox_result']['exit_code'], 0)
+        self.assertEqual((self.root / 'source.txt').read_text(), 'original')
+        self.assertEqual((self.root / '.git/control').read_text(), 'original')
+
+    def test_explicit_output_is_writable_and_runtime_is_hidden(self):
+        (self.root / '.crewloom').mkdir()
+        (self.root / '.crewloom/private.txt').write_text('private fixture')
+        result = execute_sandbox_command(self.root, ['python3', '-c',
+            "from pathlib import Path; assert not Path('.crewloom/private.txt').exists(); "
+            "Path('out/result.txt').write_text('accepted')"],
+            image_id='python:3.14-slim', writable=['out'])
+        self.assertEqual(result['exit_code'], 0, result['output'])
+        self.assertEqual((self.root / 'out/result.txt').read_text(), 'accepted')
+
+    def test_stateful_functions_imports_and_files_are_not_replayed(self):
+        with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim',
+                                     writable=['out'], stateful=True) as executor:
+            first = executor.execute_code_blocks([CodeBlock('python',
+                "from pathlib import Path\nimport math\nx=42\n"
+                "def twice(value): return value*2\n"
+                "with Path('out/counter.txt').open('a') as f: f.write('x')")])
+            self.assertEqual(first.exit_code, 0, first.output)
+            second = executor.execute_code_blocks([CodeBlock('python', 'print(twice(x), math.sqrt(9))')])
+            self.assertEqual(second.exit_code, 0, second.output)
+            self.assertEqual(second.output, '84 3.0')
+            self.assertEqual((self.root / 'out/counter.txt').read_text(), 'x')
+            # Failures are visible and never trigger history replay either.
+            failed = executor.execute_code_blocks([CodeBlock('python', "raise ValueError('visible failure')")])
+            self.assertEqual(failed.exit_code, 1)
+            self.assertIn('visible failure', failed.output)
+            self.assertEqual(executor.execute_code_blocks([CodeBlock('python', 'print(x)')]).output, '42')
+            name = executor._session.name
+        import subprocess
+        self.assertNotEqual(subprocess.run(['docker', 'inspect', name], capture_output=True).returncode, 0)
+
+    def test_timeout_and_reset_do_not_replay_or_silently_recover_state(self):
+        with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim',
+                                     timeout=1, stateful=True) as executor:
+            self.assertEqual(executor.execute_code_blocks([CodeBlock('python', 'x=42')]).exit_code, 0)
+            timed_out = executor.execute_code_blocks([CodeBlock('python', 'import time; time.sleep(30)')])
+            self.assertEqual(timed_out.exit_code, 124, timed_out.output)
+            lost = executor.execute_code_blocks([CodeBlock('python', 'print(x)')])
+            self.assertEqual(lost.exit_code, 1)
+            self.assertIn('reset', lost.output)
+            executor.restart()
+            fresh = executor.execute_code_blocks([CodeBlock('python', 'print("x" in globals())')])
+            self.assertEqual(fresh.output, 'False')
+
+    def test_cancellation_destroys_only_the_owned_session(self):
+        import threading
+        with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim', stateful=True) as executor:
+            self.assertEqual(executor.execute_code_blocks([CodeBlock('python', 'x=42')]).exit_code, 0)
+            event = threading.Event()
+            timer = threading.Timer(0.2, event.set)
+            timer.start()
+            try:
+                cancelled = executor.execute_code_blocks(
+                    [CodeBlock('python', 'import time; time.sleep(30)')], cancellation_token=event)
+            finally:
+                timer.cancel()
+            self.assertEqual(cancelled.exit_code, 130, cancelled.output)
+            self.assertIn('reset', executor.execute_code_blocks([CodeBlock('python', 'print(x)')]).output)
+
+    def test_replaced_workspace_cannot_reuse_old_mounts_or_python_state(self):
+        project = self.root / 'project'
+        project.mkdir()
+        with CrewloomAutoGenExecutor(project, image_id='python:3.14-slim', stateful=True) as executor:
+            first = executor.execute_code_blocks([CodeBlock('python', 'x=42')])
+            self.assertEqual(first.exit_code, 0, first.output)
+            project.rename(self.root / 'previous-project')
+            project.mkdir()
+            result = executor.execute_code_blocks([CodeBlock('python', 'print(x)')])
+            self.assertEqual(result.exit_code, 1)
+            self.assertIn('reset', result.output)
+
+    def test_stateful_captures_child_and_raw_output_with_a_bounded_result(self):
+        import subprocess
+        with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim', stateful=True) as executor:
+            result = executor.execute_code_blocks([CodeBlock('python',
+                "import os, subprocess; subprocess.run(['python3', '-c', \"import sys; print('CHILD'); print('ERR',file=sys.stderr)\"],check=True); os.write(1,b'RAW'); os.write(2,b'RAWERR')")])
+            self.assertEqual(result.exit_code, 0, result.output)
+            for marker in ('CHILD', 'ERR', 'RAW', 'RAWERR'):
+                self.assertIn(marker, result.output)
+            flooded = executor.execute_code_blocks([CodeBlock('python', "os.write(1,b'Z'*131072)")])
+            self.assertNotEqual(flooded.exit_code, 0)
+            self.assertLessEqual(len(flooded.output.encode()), 32768)
+            self.assertIn('output limit exceeded', flooded.output)
+            invalid = executor.execute_code_blocks([CodeBlock('python', "os.write(2,b'\\xff'*32768)")])
+            self.assertNotEqual(invalid.exit_code, 0)
+            self.assertLessEqual(len(invalid.output.encode()), 32768)
+            self.assertEqual(executor.execute_code_blocks([CodeBlock('python', "print('alive')")]).output, 'alive')
+            info = subprocess.run(['docker', 'inspect', '--format', '{{.HostConfig.LogConfig.Type}}',
+                                   executor._session.name], capture_output=True, text=True, timeout=10)
+            self.assertEqual(info.stdout.strip(), 'none')
+            logs = subprocess.run(['docker', 'logs', executor._session.name], capture_output=True, timeout=10)
+            self.assertNotIn(b'Z' * 1024, logs.stdout + logs.stderr)
+
+    def test_real_autogen_agent_uses_async_executor_without_a_model(self):
+        if os.environ.get('CREWLOOM_AUTOGEN_TESTS') != '1':
+            self.skipTest('Enable official AutoGen SDK acceptance explicitly')
+        import asyncio
+        # Missing dependencies fail this explicitly requested test rather than skipping silently.
+        from autogen_agentchat.agents import CodeExecutorAgent
+        from autogen_agentchat.messages import TextMessage
+        from autogen_core import CancellationToken
+
+        async def run():
+            with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim', stateful=True) as sync:
+                async with sync.as_async_executor() as executor:
+                    agent = CodeExecutorAgent('runner', code_executor=executor)
+                    response = await agent.on_messages(
+                        [TextMessage(content="```python\nx=42; print(x)\n```", source='user')], CancellationToken())
+                    self.assertEqual(response.chat_message.content, '42')
+                    await executor.restart()
+                    response = await agent.on_messages(
+                        [TextMessage(content="```python\nprint(x)\n```", source='user')], CancellationToken())
+                    self.assertIn('NameError', response.chat_message.content)
+        asyncio.run(run())
+
+    def test_named_cli_session_persists_and_reset_removes_it(self):
+        import subprocess
+        command = [sys.executable, '-m', 'adapters.interop.autogen_sandbox', '--workspace', str(self.root),
+                   '--image', 'python:3.14-slim', '--session', 'acceptance', '--json']
+        def invoke(*args):
+            result = subprocess.run(command + list(args), cwd=_REPO_ROOT, capture_output=True, text=True, timeout=20)
+            self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
+            self.assertNotIn('RuntimeWarning', result.stderr)
+            return json.loads(result.stdout)
+        try:
+            invoke('--stateful', '--code', 'x=42')
+            self.assertEqual(invoke('--stateful', '--code', 'print(x)')['output'], '42')
+        finally:
+            invoke('--reset')
 
 
 if __name__ == "__main__":

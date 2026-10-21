@@ -17,7 +17,7 @@ recursive-include scripts *.py
 recursive-include workflows *.json
 recursive-include examples *
 recursive-include assets *.svg *.gif *.mp4 *.png *.zip
-recursive-include adapters *.json *.js *.md *.png
+recursive-include adapters *.py *.json *.js *.md *.png
 recursive-include .agents/plugins *.json
 recursive-include adapters/codex/plugin/.codex-plugin *.json
 recursive-include extensions/chrome *.json *.js *.css *.html *.md *.png

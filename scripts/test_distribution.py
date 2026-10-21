@@ -126,6 +126,29 @@ class InstalledDistributionTests(unittest.TestCase):
 
     # ------------------------------------------------------------------ archives
 
+    def check_adapter_imports(self, python):
+        with tempfile.TemporaryDirectory(dir=self.work) as directory:
+            consumer = Path(directory)
+            (consumer / 'workflow.py').write_text(
+                "from pathlib import Path; Path('HOST_IMPORT_EXECUTED').write_text('bad')\ndef build_app(): pass\n")
+            result = run([python, '-c',
+                'import json; from adapters.interop import CrewloomSandboxTool, CrewloomAutoGenExecutor, CrewloomLangGraphNode; '
+                'import adapters.interop.crewai_sandbox as c; '
+                'from pathlib import Path; command=c.build_sandbox_command(Path.cwd(),["python3","-c","print(42)"]); '
+                'print(json.dumps({"module":c.__file__,"names":[CrewloomSandboxTool.name,CrewloomAutoGenExecutor.__name__,CrewloomLangGraphNode.__name__],"command":command}))'],
+                cwd=consumer, env={**self.env, 'CREWLOOM_CONTAINER_USER': '10001:10001'})
+            self.assertFalse((consumer / 'HOST_IMPORT_EXECUTED').exists(), 'Consumer workflow.py ran during adapter import')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        value = json.loads(result.stdout)
+        self.assertNotIn(str(ROOT), value['module'])
+        self.assertIn('--read-only', value['command'])
+
+    def test_installed_wheel_contains_all_three_adapter_imports(self):
+        self.check_adapter_imports(self.target / 'bin/python')
+        with zipfile.ZipFile(self.wheel) as archive:
+            for name in ('crewai_sandbox', 'autogen_sandbox', 'langgraph_sandbox'):
+                self.assertIn('adapters/interop/' + name + '.py', archive.namelist())
+
     def test_optional_mcp_cli_and_resources_work_without_the_extra(self):
         result = self.crewloom('mcp', '--help')
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -182,6 +205,11 @@ class InstalledDistributionTests(unittest.TestCase):
                  and name.endswith('/SKILL.md')]
         self.assertEqual(len(roles), 44)
         self.assertIn('crewloom_data/documentation/TOOLS.json', names)
+        clean = self.work / 'sdist-installed'
+        venv.EnvBuilder(with_pip=True).create(str(clean))
+        installed = run([clean / 'bin/python', '-m', 'pip', 'install', '--no-deps', next(rebuilt.glob('*.whl'))])
+        self.assertEqual(installed.returncode, 0, installed.stderr)
+        self.check_adapter_imports(clean / 'bin/python')
 
     # ------------------------------------------------------------------ installed CLI
 
