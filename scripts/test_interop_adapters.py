@@ -163,6 +163,21 @@ class TestInteropSandboxCommand(unittest.TestCase):
                         run.assert_not_called()
                     self.assertEqual(sorted(self.workspace.rglob("*")), before)
 
+    def test_alternate_bound_policy_cannot_be_a_write_grant(self):
+        (self.workspace / 'config').mkdir()
+        policy = self.workspace / 'config/custom.json'
+        policy.write_text('{}')
+        (self.workspace / '.crewloom').mkdir()
+        binding = self.workspace / '.crewloom/binding.json'
+        binding.write_text(json.dumps({'project_root': str(self.workspace), 'config_path': 'config/custom.json'}))
+        for grant in ('config', 'config/custom.json', 'CONFIG/CUSTOM.JSON'):
+            with self.subTest(grant=grant), self.assertRaisesRegex(ValueError, 'project control'):
+                build_sandbox_command(self.workspace, ['python3'], writable=[grant])
+        build_sandbox_command(self.workspace, ['python3'], writable=['config/result'])
+        binding.write_text('invalid')
+        with self.assertRaisesRegex(ValueError, 'Invalid project binding'):
+            build_sandbox_command(self.workspace, ['python3'], writable=['output'])
+
     def test_invalid_timeout_does_not_create_outputs_or_start_a_container(self):
         with mock.patch('adapters.interop.crewai_sandbox.subprocess.Popen') as launch:
             with self.assertRaisesRegex(ValueError, 'timeout'):
@@ -432,6 +447,79 @@ echo "done"
             with self.assertRaisesRegex(ValueError, 'Cannot inspect'):
                 executor.close()
 
+    def test_close_waits_for_owned_autoremove_but_keeps_other_errors_visible(self):
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='race')
+        session = executor._session
+        session.started = True
+        deleting = mock.Mock(returncode=1, stderr='removal of container fixture is already in progress')
+        with mock.patch.object(session, '_inspect', side_effect=[{'running': True}, None]), \
+                mock.patch('adapters.interop.autogen_sandbox.subprocess.run', return_value=deleting):
+            executor.close()
+        self.assertFalse(session.started)
+        session.started = True
+        with mock.patch.object(session, '_inspect', side_effect=[{'running': True}, ValueError('not owned')]), \
+                mock.patch('adapters.interop.autogen_sandbox.subprocess.run', return_value=deleting):
+            with self.assertRaisesRegex(ValueError, 'not owned'):
+                executor.close()
+        self.assertTrue(session.started)
+
+    def test_unsupported_batch_is_refused_before_any_supported_prefix_executes(self):
+        executor = CrewloomAutoGenExecutor(self.workspace)
+        for language in ('ruby', None, 42):
+            with self.subTest(language=language), \
+                    mock.patch('adapters.interop.autogen_sandbox.execute_sandbox_command') as execute:
+                result = executor.execute_code_blocks([CodeBlock('python', 'print(42)'), CodeBlock(language, 'x')])
+                self.assertEqual(result.exit_code, 2)
+                self.assertIn('Unsupported language', result.output)
+                execute.assert_not_called()
+
+    def test_native_async_cancellation_waits_for_worker_cleanup(self):
+        import asyncio
+        import threading
+        import time
+        started, finished = threading.Event(), threading.Event()
+        executor = CrewloomAutoGenExecutor(self.workspace)
+
+        def execute(*args, cancellation_token=None, **kwargs):
+            started.set()
+            deadline = time.monotonic() + 2
+            from adapters.interop.crewai_sandbox import _is_cancelled
+            while time.monotonic() < deadline and not _is_cancelled(cancellation_token):
+                time.sleep(0.01)
+            finished.set()
+            return {'exit_code': 130, 'output': 'cancelled', 'cancelled': True}
+
+        async def run():
+            task = asyncio.create_task(executor.as_async_executor().execute_code_blocks([CodeBlock('python', 'x')]))
+            self.assertTrue(await asyncio.to_thread(started.wait, 2))
+            task.cancel()
+            with self.assertRaises(asyncio.CancelledError):
+                await asyncio.wait_for(task, 2)
+            self.assertTrue(finished.is_set())
+
+        with mock.patch('adapters.interop.autogen_sandbox.execute_sandbox_command', side_effect=execute):
+            asyncio.run(run())
+
+    def test_cancelled_session_admission_does_not_wait_for_another_block(self):
+        import asyncio
+        executor = CrewloomAutoGenExecutor(self.workspace, stateful=True)
+        session = executor._session
+        session._lock.acquire()
+
+        async def run():
+            task = asyncio.create_task(executor.a_execute_code_blocks([CodeBlock('python', 'x')]))
+            await asyncio.sleep(0.05)
+            task.cancel()
+            with self.assertRaises(asyncio.CancelledError):
+                await asyncio.wait_for(task, 1)
+
+        try:
+            with mock.patch.object(session, '_ensure') as ensure:
+                asyncio.run(run())
+                ensure.assert_not_called()
+        finally:
+            session._lock.release()
+
     def test_named_session_policy_changes_require_reset(self):
         executor = CrewloomAutoGenExecutor(self.workspace, stateful=True, session_id='policy')
         info = {'running': True, 'labels': {'crewloom.interop-policy': 'old-policy'}}
@@ -544,6 +632,16 @@ class TestLangGraphSandboxNode(unittest.TestCase):
         self.assertEqual(res["exit_code"], 130)
         self.assertTrue(res["cancelled"])
         self.assertIn("cancelled by user", res["output"])
+
+    def test_unsupported_language_never_runs_as_python(self):
+        node = CrewloomLangGraphNode(self.workspace)
+        for language in ('ruby', 42, None, []):
+            with self.subTest(language=language), \
+                    mock.patch('adapters.interop.langgraph_sandbox.execute_sandbox_command') as execute:
+                result = node({'code': 'print(42)', 'language': language})['sandbox_result']
+                self.assertEqual(result['exit_code'], 2)
+                self.assertIn('Unsupported language', result['output'])
+                execute.assert_not_called()
 
     @mock.patch("adapters.interop.langgraph_sandbox.execute_sandbox_command")
     def test_messages_fallback(self, mock_exec):
@@ -795,6 +893,48 @@ print('refused')'''
                     response = await agent.on_messages(
                         [TextMessage(content="```python\nprint(x)\n```", source='user')], CancellationToken())
                     self.assertIn('NameError', response.chat_message.content)
+        asyncio.run(run())
+
+    def test_stateless_utf8_return_budget_includes_replacement_expansion(self):
+        for count in (32768, 65536):
+            result = execute_sandbox_command(self.root, ['python3', '-c',
+                "import os; os.write(1,b'\\xff'*%d)" % count], image_id='python:3.14-slim')
+            self.assertNotEqual(result['exit_code'], 0)
+            self.assertTrue(result['output_truncated'])
+            self.assertLessEqual(len(result['output'].encode('utf-8')), 65536)
+        valid = execute_sandbox_command(self.root, ['python3', '-c',
+            "import os; os.write(1,('é'*32768).encode())"], image_id='python:3.14-slim')
+        self.assertEqual(valid['exit_code'], 0)
+        self.assertFalse(valid['output_truncated'])
+        self.assertEqual(len(valid['output'].encode()), 65536)
+
+    def test_native_async_cancellation_destroys_the_running_container(self):
+        import asyncio
+        import subprocess
+
+        async def run():
+            with CrewloomAutoGenExecutor(self.root, image_id='python:3.14-slim',
+                                         writable=['out'], stateful=True) as executor:
+                code = "from pathlib import Path; import time; Path('out/started').touch(); time.sleep(20)"
+                task = asyncio.create_task(executor.a_execute_code_blocks([CodeBlock('python', code)]))
+                try:
+                    for _ in range(100):
+                        if (self.root / 'out/started').exists():
+                            break
+                        await asyncio.sleep(0.05)
+                    self.assertTrue((self.root / 'out/started').exists())
+                    task.cancel()
+                    with self.assertRaises(asyncio.CancelledError):
+                        await asyncio.wait_for(task, 5)
+                    info = subprocess.run(['docker', 'inspect', executor._session.name], capture_output=True, timeout=5)
+                    self.assertNotEqual(info.returncode, 0)
+                finally:
+                    if not task.done():
+                        task.cancel()
+                        try:
+                            await task
+                        except asyncio.CancelledError:
+                            pass
         asyncio.run(run())
 
     def test_named_cli_session_persists_and_reset_removes_it(self):

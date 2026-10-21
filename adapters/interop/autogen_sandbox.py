@@ -242,12 +242,21 @@ class _PythonSession:
         import base64
         if len(code.encode('utf-8')) > 65536:
             raise ValueError('Stateful Python blocks are limited to 65536 UTF-8 bytes')
-        with self._lock:
+        while not self._lock.acquire(timeout=0.1):
+            if _is_cancelled(cancellation_token):
+                return {'exit_code': 130, 'output': 'Execution cancelled before session admission',
+                        'cancelled': True}
+        try:
+            if _is_cancelled(cancellation_token):
+                return {'exit_code': 130, 'output': 'Execution cancelled before session admission',
+                        'cancelled': True}
             self._ensure()
             encoded = base64.b64encode(code.encode()).decode('ascii')
             cmd = ['docker', 'exec', self.name, 'python3', '-c', _SESSION_CLIENT, encoded]
             return _execute_container_command(cmd, self.name, self.image, self.timeout,
                                               cancellation_token, remove=False)
+        finally:
+            self._lock.release()
 
     def close(self):
         """Remove only this executor's verified container; never deserialize host history."""
@@ -258,7 +267,21 @@ class _PythonSession:
                     result = subprocess.run(['docker', 'rm', '--force', self.name],
                                             capture_output=True, text=True, timeout=10)
                     if result.returncode:
-                        raise ValueError('Cannot close Python session: ' + result.stderr[-1000:])
+                        error = result.stderr.casefold()
+                        removal_race = ('removal' in error and 'already in progress' in error)
+                        missing = 'no such container' in error or 'no such object' in error
+                        if not (removal_race or missing):
+                            raise ValueError('Cannot close Python session: ' + result.stderr[-1000:])
+                        # --rm and explicit teardown can overlap after interruption.
+                        # Re-inspection still verifies ownership; never hide daemon errors
+                        # or report a successful close while the container remains.
+                        import time
+                        for _ in range(20):
+                            if self._inspect() is None:
+                                break
+                            time.sleep(0.1)
+                        else:
+                            raise ValueError('Python session removal is still in progress; retry close')
             self.started = False
 
     def _cleanup(self):
@@ -336,6 +359,11 @@ class CrewloomAutoGenExecutor:
         if not blocks:
             return CommandLineCodeResult(exit_code=0, output="No executable code blocks found.")
 
+        # Refuse the whole request before executing any supported prefix.
+        for block in blocks:
+            if not isinstance(block.language, str) or block.language.lower() not in (
+                    "python", "python3", "py", "bash", "sh", "shell"):
+                return CommandLineCodeResult(2, f"Unsupported language: {block.language}")
         combined_outputs: List[str] = []
 
         for idx, block in enumerate(blocks):
@@ -351,9 +379,6 @@ class CrewloomAutoGenExecutor:
                 argv = ["python3", "-c", block.code]
             elif lang in ("bash", "sh", "shell"):
                 argv = ["/bin/sh", "-c", block.code]
-            else:
-                combined_outputs.append(f"[Skipped unsupported language: {block.language}]")
-                continue
 
             try:
                 if self._session is not None and lang in ("python", "python3", "py"):
@@ -415,7 +440,32 @@ class CrewloomAutoGenExecutor:
         import asyncio
         if _is_cancelled(cancellation_token):
             return CommandLineCodeResult(exit_code=130, output="Execution cancelled by user")
-        return await asyncio.to_thread(self.execute_code_blocks, code_blocks, cancellation_token)
+        # Shield the worker so cancelling the await does not detach a running container.
+        interrupted = threading.Event()
+
+        class Token:
+            def is_cancelled(self):
+                return interrupted.is_set() or _is_cancelled(cancellation_token)
+
+        worker = asyncio.create_task(asyncio.to_thread(self.execute_code_blocks, code_blocks, Token()))
+        try:
+            return await asyncio.shield(worker)
+        except asyncio.CancelledError:
+            interrupted.set()
+            # Keep cleanup owned even if the caller cancels repeatedly while Docker exits.
+            while not worker.done():
+                try:
+                    await asyncio.shield(worker)
+                except asyncio.CancelledError:
+                    continue
+                except Exception:
+                    break
+            # Retrieve a worker exception without replacing the caller's cancellation.
+            try:
+                worker.result()
+            except Exception:
+                pass
+            raise
 
 
 

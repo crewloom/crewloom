@@ -1,5 +1,10 @@
 # Challenges
 
+### 2026-10-21 — Independent roles found lifecycle and evidence gaps
+- Concurrent Docker --rm can race explicit close. Only tolerate known missing/removing diagnostics after verified ownership and observing disappearance; preserve other daemon/ownership failures.
+- Byte capture alone does not bound decoded UTF-8. Budget normalized output and diagnostics, report truncation, and refuse success on overflow. Native asyncio cancellation must signal and join its worker; queued admission must observe cancellation too.
+- Adapter demos without SDKs must not claim framework protocol acceptance. Unknown-language dispatch must fail before execution. Alternate project configuration has to follow its binding in every consumer, including relocation.
+
 ### 2026-10-21 — Resolve the five consumer-boundary failures
 - Python stream replacement missed subprocess/raw descriptor writes. Redirect both descriptors into a draining, bounded collector; cap UTF-8 replacement expansion too, fail excess output, and disable persistent Docker logs. A bounded drain prevents inherited descriptors from holding responses open indefinitely.
 - DNS checks must govern the socket, so transport pins numeric addresses and retains the original host for HTTP/TLS; restricted requests bypass proxies. An async helper name alone is not the framework protocol: expose an explicit wrapper and test the actual pinned agent. Remove the generic workflow import and normalize grant types before tuple conversion.

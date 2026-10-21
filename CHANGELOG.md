@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Keep async cancellation attached to its worker and owned teardown, tolerate observed automatic removal races, and enforce output budgets after UTF-8 decoding.
+- Reject unsupported languages before execution; AutoGen refuses the full batch before running a supported prefix.
+- Label adapter demos as previews and require explicit Docker execution with honest prerequisite failures.
+- Preserve explicitly bound alternate project configuration across context/status/relocation, managed lifecycle and lesson fingerprints; protect it from workflow and adapter writes.
+
 - Pin local-provider sockets to validated IP addresses while preserving HTTP Host and TLS verification; restricted local connections bypass proxies.
 - Provide an explicit async executor for AutoGen 0.4 and verify the real pinned SDK agent without model calls.
 - Capture stateful child-process and raw-fd stdout/stderr, bound output and disable persistent container logs.

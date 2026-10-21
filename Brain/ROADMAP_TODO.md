@@ -1,5 +1,11 @@
 # Current backlog — 2026-10-10
 
+### 2026-10-21 — Specialist follow-up
+- [x] QA: reproduce and repair removal races, decoded UTF-8 overflow and native async cancellation ownership.
+- [x] Integration: refuse unknown languages before execution and distinguish previews from actual container/SDK evidence.
+- [x] Project context: preserve explicit configuration selection in downstream consumers and relocation.
+- [ ] Native CrewAI/StateGraph SDK acceptance remains separate from standard-library adapter examples; no new SDK coverage is claimed.
+
 ### 2026-10-20 — Deeper review findings (repaired 2026-10-21)
 - [x] P1: Bind local-provider connections to validated DNS addresses; reject a changed forbidden destination before sending the prompt.
 - [x] P1: Provide an actual AutoGen 0.4 async executor contract and verify with the pinned real CodeExecutorAgent.

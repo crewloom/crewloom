@@ -1,5 +1,8 @@
 # Ideas
 
+### 2026-10-21 — Separate specialist evidence from runtime bookkeeping
+Use independent project-role reviews to seek failures that a passing suite misses, then reproduce them with targeted tests and actual execution. Record runtime provenance and exact evidence scope; role labels and preview exit codes do not establish SDK or model execution.
+
 ### 2026-10-21 — Make integration mode explicit
 Expose synchronous and awaited framework entry points separately instead of returning ambiguous dual-mode values. Test real consumer calls and populated installed environments; keep framework versions pinned in acceptance without making them core runtime dependencies.
 

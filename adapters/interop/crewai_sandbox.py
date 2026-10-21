@@ -15,6 +15,7 @@ Zero external pip dependencies required; operates entirely using Python 3.9+ sta
 from __future__ import annotations
 
 import os
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -71,9 +72,37 @@ def _normalize_writable(writable: Optional[Sequence[str]]) -> Optional[Tuple[str
     return tuple(writable)
 
 
+def _bound_policy(root: Path) -> Optional[Path]:
+    """Find an explicitly selected policy without importing the host's runtime modules."""
+    state = root / '.crewloom'
+    binding = state / 'binding.json'
+    if state.is_symlink() or binding.is_symlink():
+        raise ValueError("Project binding must not use symlinks")
+    if not binding.exists():
+        return None
+    if not binding.is_file() or binding.stat().st_nlink != 1 or binding.stat().st_size > 65536:
+        raise ValueError("Invalid project binding")
+    try:
+        data = json.loads(binding.read_text(encoding='utf-8'))
+    except (ValueError, UnicodeError) as exc:
+        raise ValueError("Invalid project binding") from exc
+    if not isinstance(data, dict) or data.get('project_root') != str(root):
+        raise ValueError("Project binding belongs to another workspace")
+    relative = data.get('config_path') or 'crewloom.project.json'
+    if not isinstance(relative, str) or '\0' in relative or Path(relative).is_absolute() or '..' in Path(relative).parts:
+        raise ValueError("Invalid bound project policy path")
+    policy = (root / relative).resolve()
+    if policy == root or not policy.is_relative_to(root):
+        raise ValueError("Bound project policy escapes workspace")
+    return policy
+
+
 def _writable_paths(root: Path, writable: Optional[Sequence[str]]) -> List[Path]:
     """Validate the complete write set before creating any mount directories."""
     writable = _normalize_writable(writable)
+    policy = _bound_policy(root) if writable else None
+    policy_key = ('/'.join(unicodedata.normalize('NFC', part).casefold() for part in policy.relative_to(root).parts)
+                  if policy else None)
     protected = {".git", ".crewloom", ".crewloom-repairs", ".codex", ".claude", ".opencode",
                  "crewloom.project.json", "repository_scope.json", "opencode.json", "opencode.jsonc"}
     paths = []
@@ -112,6 +141,8 @@ def _writable_paths(root: Path, writable: Optional[Sequence[str]]) -> List[Path]
                 else:
                     raise ValueError("Writable paths must be regular files or directories")
         key = '/'.join(unicodedata.normalize('NFC', part).casefold() for part in rel.parts)
+        if policy_key is not None and (key == policy_key or policy_key.startswith(key + '/') or key.startswith(policy_key + '/')):
+            raise ValueError("Writable path includes the bound project control file: " + relative)
         if any(key == other or key.startswith(other + '/') or other.startswith(key + '/') for other in keys):
             raise ValueError("Writable paths cannot overlap")
         paths.append(target)
@@ -288,10 +319,17 @@ def _execute_container_command(
         exit_code = 1
     duration_ms = round((time.monotonic() - started) * 1000)
     output = captured.decode("utf-8", errors="replace")
-    if timed_out:
-        output = (output + f"\n[Command timed out after {timeout} seconds]").strip()
-    elif cancelled:
-        output = (output + "\n[Execution cancelled by user]").strip()
+    suffix = (f"\n[Command timed out after {timeout} seconds]" if timed_out else
+              "\n[Execution cancelled by user]" if cancelled else "")
+    budget = 65536 - len(suffix.encode("utf-8"))
+    encoded = output.encode("utf-8")
+    if len(encoded) > budget:
+        discarded[0] = True
+        if exit_code == 0:
+            exit_code = 1
+    output = encoded[:budget].decode("utf-8", errors="ignore") + suffix
+    if suffix:
+        output = output.strip()
 
     return {
         "exit_code": exit_code,

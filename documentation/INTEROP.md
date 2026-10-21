@@ -28,7 +28,9 @@ Containers have networking disabled, read-only roots, non-root users, all
 capabilities dropped and `no-new-privileges`. Limits are 1 GiB RAM, two CPUs,
 128 PIDs, 128 MiB temporary storage and 4 MiB per file. Per-file limits do not cap
 aggregate disk usage in writable directories. Normal output capture is bounded
-at 64 KiB; one-shot containers are removed after execution. Docker and the OS
+at 64 KiB of returned UTF-8, including replacement characters and timeout/cancellation
+diagnostics. Decoding cannot expand the returned text beyond that budget; truncation
+is reported and cannot return a successful exit. One-shot containers are removed after execution. Docker and the OS
 remain trusted; these restrictions do not establish protection from every escape.
 
 ## Interfaces
@@ -102,4 +104,23 @@ and run the same suite with both `CREWLOOM_DOCKER_TESTS=1` and
 is unavailable. No model or API key is needed.
 
 Write grants must be a list or tuple of relative path strings, never a bare
-string. Adapter imports do not resolve consumer `workflow.py` modules.
+string. An alternate policy selected by a valid local project binding is protected
+as a file and as part of a directory grant; malformed/foreign bindings are refused
+when granting writes. Adapter imports do not resolve consumer `workflow.py` modules.
+
+
+Unsupported languages return a nonzero refusal. AutoGen validates the complete block
+batch before executing a supported prefix; LangGraph never silently interprets an
+unknown language as Python.
+
+Cancelling an asyncio task running the async executor signals its worker and waits
+for owned cleanup before propagating `CancelledError`. A call cancelled while waiting
+for an occupied Python session does not interrupt that session's current block.
+Explicit framework cancellation tokens still return exit 130. Docker control calls
+have bounded timeouts; cleanup can take several seconds if the daemon is slow.
+Concurrent automatic removal is tolerated only after ownership verification and
+observing that the session disappeared; daemon failures and foreign labels remain errors.
+
+The [adapter examples](../examples/interop/README.md) are previews by default.
+`--require-execution` requires real container execution and fails on missing Docker,
+daemon or image prerequisites. They do not establish framework SDK integration.
