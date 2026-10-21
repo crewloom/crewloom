@@ -1,7 +1,7 @@
 # Repository architecture
 
 ### 2026-10-21 — Cancellation and configuration identity
-Async adapter cancellation owns its worker until cleanup finishes; waiting for a busy session is cancellation-aware. Returned UTF-8 and diagnostics share the output budget. Explicit alternate project configurations are resolved from the binding by default consumers, lifecycle selection and lesson fingerprints; both managed artifacts and adapter grants protect the bound authority. Preview examples require a separate execution flag and never imply SDK acceptance.
+Async adapter cancellation owns its worker until cleanup finishes; waiting for a busy session is cancellation-aware. Returned UTF-8 and diagnostics share the output budget. Explicit alternate project configurations are resolved from the binding by default consumers, lifecycle selection and lesson fingerprints; both managed artifacts and adapter grants protect the bound authority. Preview examples require a separate execution flag and never imply SDK acceptance. Project-local teamwork memory is excluded from source archives independently of Git ignore rules.
 
 ### 2026-10-21 — Transport and adapter consumer boundaries
 Restricted local provider requests pin validated numeric IPs at the socket while retaining the URL host for HTTP and verified TLS, with no proxy forwarding. Interop uses self-contained standard-library helpers, validates grant sequence types before conversion, and exposes an explicit awaited AutoGen adapter. Persistent Python sessions capture OS descriptors with a bounded collector and disable Docker logging; background output is not a later-results channel.

@@ -1,6 +1,7 @@
 # Current backlog — 2026-10-10
 
 ### 2026-10-21 — Specialist follow-up
+- [x] Packaging: exclude private teamwork memory from sdist and reject synthetic private paths in both artifact types.
 - [x] QA: reproduce and repair removal races, decoded UTF-8 overflow and native async cancellation ownership.
 - [x] Integration: refuse unknown languages before execution and distinguish previews from actual container/SDK evidence.
 - [x] Project context: preserve explicit configuration selection in downstream consumers and relocation.

@@ -1,7 +1,7 @@
 # Crewloom shared memory
 
 ### 2026-10-21 — Specialist consumer review
-Independent security, QA and integration roles identified and reproduced remaining lifecycle, output-budget, dispatch and example-evidence defects. Repairs retain explicit ownership and add targeted actual execution; alternate configuration binding is now consistent across consumers. SDK, isolated unit, host and hosted evidence retain distinct scopes.
+Private teamwork memory is explicitly excluded from source archives and tested with a synthetic populated fixture. Independent security, QA and integration roles identified and reproduced remaining lifecycle, output-budget, dispatch and example-evidence defects. Repairs retain explicit ownership and add targeted actual execution; alternate configuration binding is now consistent across consumers. SDK, isolated unit, host and hosted evidence retain distinct scopes.
 
 ### 2026-10-21 — Consumer-boundary repair
 The deeper review's five reproduced defects are repaired with real HTTP/DNS, Docker, pinned AutoGen 0.4.9 and populated-consumer artifact checks. Sync callers retain their API; 0.4 agents select as_async_executor(). No release, merge or universal sandbox assurance is implied. See Brain/COMPLETED.md and documentation/INTEROP.md for evidence and scope.

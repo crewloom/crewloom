@@ -1,6 +1,7 @@
 # Challenges
 
 ### 2026-10-21 — Independent roles found lifecycle and evidence gaps
+- Setuptools recursive source-archive patterns can include Git-ignored local team memory. Keep real private data out of build fixtures, inject synthetic data, and explicitly prune the private subtree from source distributions.
 - Concurrent Docker --rm can race explicit close. Only tolerate known missing/removing diagnostics after verified ownership and observing disappearance; preserve other daemon/ownership failures.
 - Byte capture alone does not bound decoded UTF-8. Budget normalized output and diagnostics, report truncation, and refuse success on overflow. Native asyncio cancellation must signal and join its worker; queued admission must observe cancellation too.
 - Adapter demos without SDKs must not claim framework protocol acceptance. Unknown-language dispatch must fail before execution. Alternate project configuration has to follow its binding in every consumer, including relocation.

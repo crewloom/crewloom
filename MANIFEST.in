@@ -27,6 +27,7 @@ recursive-include dashboard *.ts *.tsx *.json *.mjs *.css *.md *.svg
 
 # Private runtime state, generated output, and dependencies never belong in a distribution.
 prune .crewloom
+prune .agents/teamwork
 prune build
 prune dist
 prune node_modules

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Exclude ignored project-local teamwork memory from source archives; test wheel/sdist boundaries with synthetic private content.
+
 - Keep async cancellation attached to its worker and owned teardown, tolerate observed automatic removal races, and enforce output budgets after UTF-8 decoding.
 - Reject unsupported languages before execution; AutoGen refuses the full batch before running a supported prefix.
 - Label adapter demos as previews and require explicit Docker execution with honest prerequisite failures.

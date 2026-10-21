@@ -3,6 +3,7 @@
 ### 2026-10-21 — Specialist follow-up at the consumer boundary
 - Applied project security, QA, toolbox integration and delivery roles. Independent reviewers reproduced a Docker teardown race, decoded-output expansion, unsupported-language success and offline example overclaims; runtime provenance was checked separately from source version.
 - Repaired owned-removal idempotency, cancellation worker ownership/admission, returned UTF-8 budgets, prelaunch language refusal and explicit preview/execution examples. Actual use of the bound project also exposed alternate-config consumers falling back to the default path; resolution now follows the binding and relocation tests cover it.
+- Packaging follow-up: a synthetic `.agents/teamwork` note reproduced private source-archive inclusion despite Git ignore rules. Explicit archive pruning and populated-fixture checks now cover this separate publication boundary.
 - Focused evidence: 58 interop tests with actual Docker and pinned SDK enabled, six example checks with actual execution, 92 project regressions and a real local TLS certificate/hostname acceptance/refusal probe. Required gate and hosted checks remain distinct evidence.
 
 ### 2026-10-21 — Deeper review repairs and consumer acceptance
