@@ -47,7 +47,7 @@ class ReleaseFailureTests(unittest.TestCase):
                                     capture_output=True, text=True, timeout=20)
             self.assertNotEqual(result.returncode, 0)
             self.assertEqual(subprocess.run(['git', '-C', str(root), 'tag', '--list'], capture_output=True,
-                                            text=True, env=git_environment(root)).stdout, '')
+                                            text=True, env=git_environment()).stdout, '')
             self.assertIn('version = "0.9.0"', (root / 'pyproject.toml').read_text(encoding='utf-8'))
             self.assertEqual(json.loads((root / 'documentation/MANIFEST.json').read_text(encoding='utf-8'))['package_version'], '0.9.0')
 

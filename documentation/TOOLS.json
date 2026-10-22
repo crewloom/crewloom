@@ -226,6 +226,18 @@
       ],
       "effect": "reads-project-and-agency-registry",
       "dashboard": "cli"
+    },
+    {
+      "id": "computer-use",
+      "skill": "reverse-engineering-analyst",
+      "path": "scripts/computer_use.py",
+      "description": "Claude-compatible Computer Use Tool engine supporting mouse, keyboard, scrolling, screenshots, and Chrome Tab Groups background browsing",
+      "example_args": "--action screenshot",
+      "dependencies": [
+        "Python standard library"
+      ],
+      "effect": "dispatches-browser-and-os-computer-actions",
+      "dashboard": "cli"
     }
   ]
 }

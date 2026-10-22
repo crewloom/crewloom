@@ -448,8 +448,158 @@ function onInspectorMouseMove(e) {
   label.textContent = `<${tagDesc}> (${Math.round(rect.width)}×${Math.round(rect.height)})`;
 }
 
+let currentCursor = { x: 0, y: 0 };
+let agentCursorElement = null;
+
+function renderAgentCursor(x, y) {
+  currentCursor = { x, y };
+  if (!agentCursorElement) {
+    agentCursorElement = document.createElement('div');
+    agentCursorElement.className = 'crewloom-agent-cursor';
+    document.body.appendChild(agentCursorElement);
+  }
+  agentCursorElement.style.left = `${x}px`;
+  agentCursorElement.style.top = `${y}px`;
+}
+
+function resolvePointElement(x, y) {
+  let hit = document.elementFromPoint(x, y);
+  while (hit?.shadowRoot) {
+    const inner = hit.shadowRoot.elementFromPoint(x, y);
+    if (!inner || inner === hit) break;
+    hit = inner;
+  }
+  return hit || document.body || document.documentElement;
+}
+
+function executeComputerAction(message) {
+  const action = message.action;
+  const coord = Array.isArray(message.coordinate) ? message.coordinate : null;
+  const x = coord ? coord[0] : currentCursor.x;
+  const y = coord ? coord[1] : currentCursor.y;
+
+  if (action === 'mouse_move') {
+    renderAgentCursor(x, y);
+    const target = resolvePointElement(x, y);
+    const mouseOpts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y };
+    try {
+      target.dispatchEvent(new PointerEvent('pointermove', mouseOpts));
+      target.dispatchEvent(new MouseEvent('mousemove', mouseOpts));
+    } catch {}
+    return { ok: true, action: 'mouse_move', coordinate: [x, y] };
+  }
+
+  if (action === 'cursor_position') {
+    return { ok: true, action: 'cursor_position', coordinate: [currentCursor.x, currentCursor.y] };
+  }
+
+  if (['left_click', 'right_click', 'middle_click', 'double_click', 'triple_click'].includes(action)) {
+    renderAgentCursor(x, y);
+    const target = resolvePointElement(x, y);
+    const wave = document.createElement('div');
+    wave.className = 'crewloom-click-wave';
+    wave.style.left = `${x}px`;
+    wave.style.top = `${y}px`;
+    document.body.appendChild(wave);
+    setTimeout(() => wave.remove(), 450);
+
+    try { target.focus?.({ preventScroll: true }); } catch {}
+
+    const button = action === 'right_click' ? 2 : (action === 'middle_click' ? 1 : 0);
+    const mouseOpts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, button, buttons: button === 2 ? 2 : (button === 1 ? 4 : 1) };
+
+    try {
+      target.dispatchEvent(new PointerEvent('pointerdown', mouseOpts));
+      target.dispatchEvent(new MouseEvent('mousedown', mouseOpts));
+      target.dispatchEvent(new PointerEvent('pointerup', mouseOpts));
+      target.dispatchEvent(new MouseEvent('mouseup', mouseOpts));
+      if (action === 'right_click') {
+        target.dispatchEvent(new MouseEvent('contextmenu', mouseOpts));
+      } else {
+        target.dispatchEvent(new MouseEvent('click', mouseOpts));
+      }
+      if (action === 'double_click' || action === 'triple_click') {
+        target.dispatchEvent(new MouseEvent('dblclick', mouseOpts));
+      }
+    } catch {}
+
+    if (action === 'left_click' && typeof target.click === 'function' && target.tagName !== 'BODY' && target.tagName !== 'HTML') {
+      target.click();
+    }
+
+    return { ok: true, action, coordinate: [x, y], tag: target.tagName.toLowerCase() };
+  }
+
+  if (action === 'left_click_drag') {
+    const startX = currentCursor.x, startY = currentCursor.y;
+    renderAgentCursor(x, y);
+    const startTarget = resolvePointElement(startX, startY);
+    const endTarget = resolvePointElement(x, y);
+    const downOpts = { bubbles: true, cancelable: true, view: window, clientX: startX, clientY: startY, button: 0, buttons: 1 };
+    const moveOpts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, button: 0, buttons: 1 };
+    const upOpts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, button: 0, buttons: 0 };
+    try {
+      startTarget.dispatchEvent(new MouseEvent('mousedown', downOpts));
+      endTarget.dispatchEvent(new MouseEvent('mousemove', moveOpts));
+      endTarget.dispatchEvent(new MouseEvent('mouseup', upOpts));
+    } catch {}
+    return { ok: true, action: 'left_click_drag', start: [startX, startY], end: [x, y] };
+  }
+
+  if (action === 'type') {
+    const text = String(message.text || '');
+    const active = document.activeElement || resolvePointElement(currentCursor.x, currentCursor.y);
+    if (active && ['INPUT', 'TEXTAREA'].includes(active.tagName)) {
+      const proto = active.tagName === 'INPUT' ? window.HTMLInputElement.prototype : window.HTMLTextAreaElement.prototype;
+      const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+      const finalVal = (active.value || '') + text;
+      if (setter) setter.call(active, finalVal); else active.value = finalVal;
+      active.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+      active.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+    } else if (active && active.isContentEditable) {
+      active.textContent = (active.textContent || '') + text;
+      active.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+    }
+    return { ok: true, action: 'type', length: text.length };
+  }
+
+  if (action === 'key') {
+    const key = String(message.key || 'Enter');
+    const active = document.activeElement || document.body;
+    const standardKey = key === 'Return' ? 'Enter' : (key === 'BackSpace' ? 'Backspace' : key);
+    const keyOpts = { key: standardKey, code: standardKey, bubbles: true, cancelable: true, view: window };
+    try {
+      active.dispatchEvent(new KeyboardEvent('keydown', keyOpts));
+      active.dispatchEvent(new KeyboardEvent('keypress', keyOpts));
+      active.dispatchEvent(new KeyboardEvent('keyup', keyOpts));
+      if (standardKey === 'Enter' && active.form) {
+        try { active.form.requestSubmit ? active.form.requestSubmit() : active.form.submit(); } catch {}
+      }
+    } catch {}
+    return { ok: true, action: 'key', key: standardKey };
+  }
+
+  if (action === 'scroll') {
+    const dir = message.scroll_direction || 'down';
+    const amount = Number(message.scroll_amount) || 400;
+    let dx = 0, dy = 0;
+    if (dir === 'up') dy = -amount;
+    else if (dir === 'down') dy = amount;
+    else if (dir === 'left') dx = -amount;
+    else if (dir === 'right') dx = amount;
+    window.scrollBy({ left: dx, top: dy, behavior: 'instant' });
+    return { ok: true, action: 'scroll', scrollX: window.scrollX, scrollY: window.scrollY };
+  }
+
+  return { ok: false, error: 'unknown error' };
+}
+
 // Message Listener from Sidepanel & Background
 function handleMessage(message, sender, sendResponse) {
+  if (message.type === 'COMPUTER_ACTION') {
+    sendResponse(executeComputerAction(message));
+    return false;
+  }
   if (message.type === 'INDEX_PAGE') {
     const result = indexInteractiveElements(message);
     sendResponse({

@@ -281,6 +281,107 @@ function handleMessage(message, sender, sendResponse) {
     return true;
   }
 
+  // Central Claude-compatible Computer Use Action Gateway
+  if (message.type === 'COMPUTER_ACTION') {
+    const action = message.action;
+    // 1. Tab lifecycle actions
+    if (action === 'create_tab') {
+      const url = message.url || 'about:blank';
+      const active = Boolean(message.active);
+      const chatId = String(message.chatId || 'default');
+      const chatTitle = String(message.chatTitle || chatId || 'Chat');
+      chrome.tabs.create({ url, active }, (tab) => {
+        if (chrome.runtime.lastError || !tab?.id) {
+          sendResponse({ ok: false, error: 'Tab not found' });
+          return;
+        }
+        getOrCreateChatGroup(chatId, chatTitle, tab.id, 'purple', (groupRes) => {
+          sendResponse({ ok: true, action: 'create_tab', tab, groupId: groupRes?.groupId ?? null });
+        });
+      });
+      return true;
+    }
+    if (action === 'list_tabs') {
+      const chatId = String(message.chatId || 'default');
+      getChatGroupInfo(chatId, (info) => {
+        if (!info?.groupId) {
+          chrome.tabs.query({}, (tabs) => sendResponse({ ok: true, action: 'list_tabs', tabs: tabs || [] }));
+          return;
+        }
+        chrome.tabs.query({ groupId: info.groupId }, (tabs) => {
+          sendResponse({ ok: true, action: 'list_tabs', tabs: tabs || [], groupId: info.groupId, title: info.title });
+        });
+      });
+      return true;
+    }
+    if (action === 'navigate') {
+      const tabId = message.tabId;
+      const url = message.url;
+      if (!Number.isInteger(tabId) || tabId <= 0) { sendResponse({ ok: false, error: 'Tab not found' }); return false; }
+      if (!url || typeof url !== 'string') { sendResponse({ ok: false, error: 'Invalid tab URL' }); return false; }
+      chrome.tabs.update(tabId, { url, active: Boolean(message.active) }, (tab) => {
+        if (chrome.runtime.lastError || !tab) { sendResponse({ ok: false, error: 'Tab not found' }); return; }
+        sendResponse({ ok: true, action: 'navigate', tab });
+      });
+      return true;
+    }
+    if (action === 'close_tab') {
+      const tabId = message.tabId;
+      if (!Number.isInteger(tabId) || tabId <= 0) { sendResponse({ ok: false, error: 'Tab not found' }); return false; }
+      chrome.tabs.remove(tabId, () => {
+        if (chrome.runtime.lastError) { sendResponse({ ok: false, error: 'Tab not found' }); return; }
+        sendResponse({ ok: true, action: 'close_tab' });
+      });
+      return true;
+    }
+    if (action === 'screenshot') {
+      const windowId = message.windowId;
+      if (!Number.isInteger(windowId) || windowId < 0) {
+        chrome.windows?.getCurrent((w) => {
+          if (!w?.id) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return; }
+          chrome.tabs.captureVisibleTab(w.id, { format: 'png' }, (dataUrl) => {
+            if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+            else sendResponse({ ok: true, action: 'screenshot', dataUrl });
+          });
+        });
+        return true;
+      }
+      chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {
+        if (chrome.runtime.lastError) sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+        else sendResponse({ ok: true, action: 'screenshot', dataUrl });
+      });
+      return true;
+    }
+
+    // 2. In-page DOM / input / coordinate actions -> forward to target tab
+    const forwardToTab = (targetTabId) => {
+      chrome.tabs.sendMessage(targetTabId, message, (res) => {
+        if (chrome.runtime.lastError) {
+          sendResponse({ ok: false, error: 'connection refused' });
+        } else {
+          sendResponse(res || { ok: false, error: 'unknown error' });
+        }
+      });
+    };
+
+    if (Number.isInteger(message.tabId) && message.tabId > 0) {
+      forwardToTab(message.tabId);
+      return true;
+    }
+    if (Number.isInteger(message.windowId) && message.windowId >= 0) {
+      chrome.tabs.query({ active: true, windowId: message.windowId }, (tabs) => {
+        if (tabs && tabs[0]?.id) forwardToTab(tabs[0].id);
+        else sendResponse({ ok: false, error: 'No active tab' });
+      });
+      return true;
+    }
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs && tabs[0]?.id) forwardToTab(tabs[0].id);
+      else sendResponse({ ok: false, error: 'No active tab' });
+    });
+    return true;
+  }
+
   // Helper for resilient localhost / 127.0.0.1 fetch
   const fetchWithFallback = async (path, options = {}) => {
     try {

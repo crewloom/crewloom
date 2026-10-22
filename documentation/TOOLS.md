@@ -37,6 +37,7 @@ Workflow execution requires Docker and a locally available image. See [execution
 | [reviewer-credentials](../scripts/reviewer_credentials.py) | Credential-verified reviewer identities with signed, scoped, revocable approvals | `python3 scripts/crewloom.py reviewer status --project /path/to/project` |
 | [resource-resolver](../scripts/crewloom_resources.py) | Resolves roles, documentation and dashboard sources in a checkout or an installed distribution | `python3 scripts/crewloom.py list` |
 | [agency-readiness](../scripts/agency_readiness.py) | Read-only evidence and rollout readiness for one explicitly registered project | `python3 scripts/agency_readiness.py --project-id sample-client --project-root /path/to/project --agency-root /path/to/agency --registry .agents/project-control/registry.json` |
+| [computer-use](../scripts/computer_use.py) | Claude-compatible Computer Use Tool engine supporting mouse, keyboard, scrolling, screenshots, and Chrome Tab Groups background browsing | `python3 scripts/crewloom.py run computer-use -- --schema` |
 
 The [readiness guide](READINESS.md) explains required evidence, exit statuses and the optional private report directory. Readiness does not reconcile project records or deploy changes.
 

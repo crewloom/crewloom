@@ -157,3 +157,18 @@
     opacity: 0;
   }
 }
+
+/* Simulated Agent Cursor Pointer */
+.crewloom-agent-cursor {
+  position: fixed !important;
+  width: 14px !important;
+  height: 14px !important;
+  border-radius: 50% !important;
+  background: rgba(64, 221, 188, 0.9) !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 0 10px rgba(64, 221, 188, 0.8) !important;
+  pointer-events: none !important;
+  z-index: 2147483645 !important;
+  transition: transform 0.1s ease, left 0.15s ease-out, top 0.15s ease-out !important;
+  transform: translate(-50%, -50%) !important;
+}

@@ -20,3 +20,14 @@ CREWLOOM_REAL_BROWSER=1 python3 -m unittest scripts.test_sidepanel
 Default rendered checks use mocked Chrome APIs; real browser checks are opt-in and skip when dependencies or the fixture dashboard are unavailable. Screenshots from mocked APIs are layout previews only. New tests reproduce spoofed attributes, stale generations, removed/hidden elements and disabled controls. Dashboard tests exercise actual request authorization and persistent worker state with a controlled Chrome transport.
 
 Version 2.3.1 clears all contacted frame overlays and HUDs after Clear, tab changes or partial scan failures. Unused frame quota remains available under the shared cap. Unverifiable cross-origin embeddings are omitted with a warning instead of exposing unusable click handles; open those frames separately. Permissions are unchanged. Use a stable unpacked-installation directory for future updates.
+
+## Claude-Compatible Computer Use & Tab Groups
+
+Version 2.3.2 introduces full reverse-engineered Claude Computer Use tool compliance (`computer_20241022` and `computer_20250124`):
+
+- **Chat Tab Group Isolation**: Each chat session manages its own dedicated Chrome Tab Group, automatically grouped and color-coded.
+- **Background Execution**: Background browsing operations (`create_tab`, `navigate`) run with `active: false` and DOM interaction uses non-scroll focusing (`preventScroll: true`), ensuring the user's workflow is never interrupted by tab switching or window focus stealing.
+- **Action Parity**: Complete implementation of mouse coordinates (`mouse_move`, `left_click`, `right_click`, `double_click`, `triple_click`, `middle_click`, `left_click_drag`), realistic typing with native property setters and event dispatches, key presses, scrolling, and viewport screenshots.
+- **Visual Feedback**: Real-time agent cursor overlay displays coordinate motion and click triggers on live web pages.
+- **CLI and Runtime Tool**: Registered under `scripts/computer_use.py` and invokable directly via `python3 scripts/crewloom.py run computer-use -- <args>`.
+
