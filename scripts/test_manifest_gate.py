@@ -8,10 +8,48 @@ import io
 import json
 import os
 import subprocess
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+
+class ReleaseFailureTests(unittest.TestCase):
+    """Exercise the release script with real local commits and no remote operations."""
+
+    def test_a_rejected_commit_never_creates_or_pushes_a_release_tag(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'scripts').mkdir()
+            (root / 'documentation').mkdir()
+            (root / 'bin').mkdir()
+            shutil.copyfile(Path(__file__).with_name('release.sh'), root / 'scripts/release.sh')
+            (root / 'scripts/check_repository.py').write_text('pass\n', encoding='utf-8')
+            (root / 'pyproject.toml').write_text('[project]\nversion = "0.8.1"\n', encoding='utf-8')
+            (root / 'CHANGELOG.md').write_text('## 0.9.0 — 2026-10-22\n\n- Fixture release.\n', encoding='utf-8')
+            (root / 'documentation/MANIFEST.json').write_text('{"package_version": "0.8.1"}\n', encoding='utf-8')
+            python = root / 'bin/python3'
+            python.write_text('#!/bin/sh\nif [ "$1" = -m ] || [ "$1" = -c ]; then exit 0; fi\nexec ' +
+                              __import__('shlex').quote(__import__('sys').executable) + ' "$@"\n', encoding='utf-8')
+            python.chmod(0o700)
+            gh = root / 'bin/gh'
+            gh.write_text('#!/bin/sh\nexit 99\n', encoding='utf-8')
+            gh.chmod(0o700)
+            git(root, 'init', '-q')
+            git(root, 'add', '-A')
+            git(root, 'commit', '-qm', 'fixture')
+            hook = root / '.git/hooks/pre-commit'
+            hook.write_text('#!/bin/sh\nexit 1\n', encoding='utf-8')
+            hook.chmod(0o700)
+            env = {**os.environ, 'PATH': str(root / 'bin') + os.pathsep + os.environ['PATH']}
+            result = subprocess.run(['bash', str(root / 'scripts/release.sh'), '0.9.0'], env=env,
+                                    capture_output=True, text=True, timeout=20)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertEqual(subprocess.run(['git', '-C', str(root), 'tag', '--list'], capture_output=True,
+                                            text=True, env=git_environment(root)).stdout, '')
+            self.assertIn('version = "0.9.0"', (root / 'pyproject.toml').read_text(encoding='utf-8'))
+            self.assertEqual(json.loads((root / 'documentation/MANIFEST.json').read_text(encoding='utf-8'))['package_version'], '0.9.0')
 
 import check_repository as gate
 from repo_map import git_environment

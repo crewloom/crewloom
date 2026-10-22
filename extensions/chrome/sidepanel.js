@@ -26,12 +26,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const openMacSettingsBtn = document.getElementById('openMacSettingsBtn');
   const langToggle = document.getElementById('langToggle');
   const daemonLabel = document.getElementById('daemonLabel');
+  const chatSessionInput = document.getElementById('chatSessionInput');
+  const chatSessionLabel = document.getElementById('chatSessionLabel');
+  const groupChatBtn = document.getElementById('groupChatBtn');
+  const groupChatBtnText = document.getElementById('groupChatBtnText');
+  const newBgTabBtn = document.getElementById('newBgTabBtn');
+  const newBgTabBtnText = document.getElementById('newBgTabBtnText');
+  const bgBrowsingToggle = document.getElementById('bgBrowsingToggle');
+  const bgBrowsingLabel = document.getElementById('bgBrowsingLabel');
+  const targetTabSelect = document.getElementById('targetTabSelect');
+  const activeTabOption = document.getElementById('activeTabOption');
 
   const LANG_KEY = 'crewloom.lang';
   const MAX_DIRECTORY_ROWS = 50;
   const RESTRICTED_URL = /^(chrome|edge|brave|about|chrome-extension|devtools|view-source):/i;
 
   let currentTab = null;
+  let selectedTargetTabId = 'active';
+  let cachedChatTabs = [];
   let navigationEpoch = 0;
   let refreshRequest = 0;
   let indexRequest = 0;
@@ -129,7 +141,20 @@ document.addEventListener('DOMContentLoaded', () => {
       logMacFailed: 'Could not reach the dashboard API: {error}',
       logDaemon: 'Local Crewloom daemon handshake verified.',
       logDaemonOffline: 'Dashboard API offline on :4317 ({error}).',
-      logLang: 'Language switched to {language}.'
+      logLang: 'Language switched to {language}.',
+      errorTabGroup: "Tab group operation failed",
+      errorTabNotFound: "Tab not found",
+      errorInvalidUrl: "Invalid tab URL",
+      chatSessionLabel: "Chat Session:",
+      chatSessionPlaceholder: "Chat name / session",
+      groupChatBtn: "Group in Chat",
+      newBgTabBtn: "+ Background Tab",
+      bgBrowsingMode: "Background browsing (no focus)",
+      activeForegroundTab: "Active Foreground Tab",
+      chatTabOption: "Chat Tab #{id}: {title}",
+      logTabGroupCreated: "Tab added to Chrome tab group for chat: {name}",
+      logBgTabCreated: "Created background tab #{id} without stealing focus.",
+      logBgNavigated: "Navigated background tab #{id} without stealing focus."
     },
     ar: {
       errorCaptureDisabled: "تم تعطيل إضافة المتصفح أثناء الالتقاط",
@@ -214,7 +239,20 @@ document.addEventListener('DOMContentLoaded', () => {
       logMacFailed: 'تعذر الوصول إلى واجهة الداشبورد: {error}',
       logDaemon: 'تم التحقق من الاتصال بالداشبورد المحلي.',
       logDaemonOffline: 'واجهة الداشبورد غير متاحة على :4317 ({error}).',
-      logLang: 'تم تبديل اللغة إلى {language}.'
+      logLang: 'تم تبديل اللغة إلى {language}.',
+      errorTabGroup: "فشلت عملية تجميع التبويبات",
+      errorTabNotFound: "لم يتم العثور على التبويب",
+      errorInvalidUrl: "رابط التبويب غير صالح",
+      chatSessionLabel: "جلسة الشات:",
+      chatSessionPlaceholder: "اسم الشات / الجلسة",
+      groupChatBtn: "تجميع في الشات",
+      newBgTabBtn: "+ تبويب خلفي",
+      bgBrowsingMode: "تصفح خلفي (بدون فوكس)",
+      activeForegroundTab: "التبويب النشط الحالي",
+      chatTabOption: "تبويب شات #{id}: {title}",
+      logTabGroupCreated: "تمت إضافة التبويب إلى مجموعة كروم للشات: {name}",
+      logBgTabCreated: "تم إنشاء تبويب خلفي #{id} دون سحب الفوكس.",
+      logBgNavigated: "تم توجيه التبويب الخلفي #{id} دون سحب الفوكس."
     }
   };
 
@@ -239,7 +277,10 @@ document.addEventListener('DOMContentLoaded', () => {
     "Indexed element is covered or changed; re-index the page": "errorCovered",
     "Target changed on focus; re-index the page": "errorFocus",
     "Index generation and document token required; re-index the page": "errorToken",
-    "Browser companion is disabled": "errorDisabled"
+    "Browser companion is disabled": "errorDisabled",
+    "Tab group operation failed": "errorTabGroup",
+    "Tab not found": "errorTabNotFound",
+    "Invalid tab URL": "errorInvalidUrl"
 };
 
   function t(key, vars) {
@@ -324,6 +365,73 @@ document.addEventListener('DOMContentLoaded', () => {
     setDirectoryText('dirIdle');
   }
 
+  function getTargetTabId() {
+    if (selectedTargetTabId !== 'active') {
+      const id = parseInt(selectedTargetTabId, 10);
+      if (Number.isFinite(id) && id > 0) return id;
+    }
+    return currentTab?.id ?? null;
+  }
+
+  function getTargetTab(callback) {
+    const targetId = getTargetTabId();
+    if (!targetId || targetId === currentTab?.id) {
+      return callback(currentTab);
+    }
+    chrome.runtime.sendMessage({ type: 'GET_TARGET_TAB', tabId: targetId }, (res) => {
+      if (res?.ok && res.tab) {
+        callback(res.tab);
+      } else {
+        callback(currentTab);
+      }
+    });
+  }
+
+  function updateBannerForTab(tab) {
+    if (!tab) return;
+    tabTitle.textContent = tab.title || t('untitled');
+    try {
+      tabUrl.textContent = tab.url ? new URL(tab.url).hostname : '—';
+    } catch {
+      tabUrl.textContent = tab.url || '—';
+    }
+    log('logTab', 'info', { title: tabTitle.textContent });
+  }
+
+  function refreshChatTabsList() {
+    const chatId = chatSessionInput?.value?.trim() || 'Chat 1';
+    chrome.runtime.sendMessage({ type: 'GET_CHAT_TABS', chatId }, (res) => {
+      if (!res?.ok) return;
+      cachedChatTabs = res.tabs || [];
+      if (!targetTabSelect) return;
+
+      const currentVal = targetTabSelect.value;
+      targetTabSelect.innerHTML = '';
+
+      const optActive = document.createElement('option');
+      optActive.value = 'active';
+      optActive.id = 'activeTabOption';
+      optActive.textContent = t('activeForegroundTab');
+      targetTabSelect.appendChild(optActive);
+
+      cachedChatTabs.forEach((tab) => {
+        const opt = document.createElement('option');
+        opt.value = String(tab.id);
+        const title = tab.title ? (tab.title.length > 25 ? tab.title.slice(0, 25) + '...' : tab.title) : (tab.url || t('untitled'));
+        opt.textContent = t('chatTabOption', { id: tab.id, title });
+        targetTabSelect.appendChild(opt);
+      });
+
+      if (currentVal && [...targetTabSelect.options].some(o => o.value === currentVal)) {
+        targetTabSelect.value = currentVal;
+        selectedTargetTabId = currentVal;
+      } else {
+        targetTabSelect.value = 'active';
+        selectedTargetTabId = 'active';
+      }
+    });
+  }
+
   // Refresh active tab info
   function refreshActiveTab(onReady) {
     if (!Number.isInteger(panelWindowId)) return;
@@ -356,79 +464,82 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Auto-Index Page
   indexBtn.addEventListener('click', () => {
-    if (!currentTab?.id) return refreshActiveTab();
-    const tabId = currentTab.id;
-    const url = currentTab.url;
-    const epoch = navigationEpoch;
-    const request = ++indexRequest;
-    indexedTargets.clear();
-    currentGeneration = null;
-    const fresh = () => request === indexRequest && epoch === navigationEpoch &&
-      currentTab?.id === tabId && currentTab?.url === url;
-    log('logIndexing', 'action');
-    const accept = (res) => {
-      if (!fresh()) return;
-      if (chrome.runtime.lastError || !res?.ok) {
-        clearFrameOverlays(tabId);
-        currentGeneration = null;
-    elemCountBadge.textContent = '0';
-        setDirectoryText('dirIdle');
-        return describeError(res?.error);
-      }
-      currentGeneration = res.generation;
-      indexedTargets = new Map((res.items || []).map(item => [item.index, {
-        tabId, frameId: item.frameId ?? 0, documentToken: item.documentToken ?? res.documentToken,
-        generation: item.generation ?? res.generation
-      }]));
-      elemCountBadge.textContent = res.count;
-      if (res.truncated) {
-        log('logIndexLimited', 'warn', {
-          shown: res.count,
-          total: res.total,
-          limit: res.limit
-        });
-      } else {
-        log('logIndexed', 'success', { count: res.count });
-      }
-      renderDirectory(res);
-      if (res.blockedFrames) log('logSkippedFrames', 'warn', {count:res.blockedFrames});
-    };
-    if (!chrome.scripting?.executeScript) {
-      rememberFrame(tabId, 0);
-      chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE' }, accept);
-      return;
-    }
-    const discover = () => chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: () => true }, (frames) => {
-      if (!fresh()) return;
-      if (chrome.runtime.lastError || !frames?.length) return accept(null);
-      const ids = [...new Set(frames.map(frame => frame.frameId))].sort((a,b) => a-b);
-      if (ids.length > 128) return accept({ok:false,error:'Too many frames; open the target frame separately'});
-      const combined = { ok: true, items: [], total: 0, limit: 400, generation: null, truncated: false, blockedFrames: 0 };
-      function scan(position) {
+    const activeTargetId = getTargetTabId();
+    if (!activeTargetId) return refreshActiveTab();
+    getTargetTab((targetTab) => {
+      const tabId = targetTab?.id || activeTargetId;
+      const url = targetTab?.url || currentTab?.url;
+      const epoch = navigationEpoch;
+      const request = ++indexRequest;
+      indexedTargets.clear();
+      currentGeneration = null;
+      const fresh = () => request === indexRequest && epoch === navigationEpoch &&
+        (selectedTargetTabId === 'active' ? (currentTab?.id === tabId && currentTab?.url === url) : (getTargetTabId() === tabId));
+      log('logIndexing', 'action');
+      const accept = (res) => {
         if (!fresh()) return;
-        if (position === ids.length) {
-          combined.count = combined.items.length;
-          combined.truncated = combined.count < combined.total;
-          accept(combined); return;
+        if (chrome.runtime.lastError || !res?.ok) {
+          clearFrameOverlays(tabId);
+          currentGeneration = null;
+          elemCountBadge.textContent = '0';
+          setDirectoryText('dirIdle');
+          return describeError(res?.error);
         }
-        const frameId = ids[position];
-        rememberFrame(tabId, frameId); // Also retain frames whose indexing reply fails.
-        chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE', includeFrames: false,
-          offset: combined.items.length, limit: Math.max(0,400-combined.items.length) }, {frameId}, (res) => {
-          if (!fresh()) return;
-          if (chrome.runtime.lastError || !res?.ok) {
-            return accept({ok:false,error:'A frame could not be indexed; reload and retry'});
-          }
-          combined.total += res.total;
-          combined.blockedFrames += res.blockedFrames || 0;
-          combined.items.push(...res.items.map(item => ({...item,frameId,
-            generation:res.generation,documentToken:res.documentToken})));
-          scan(position+1);
-        });
+        currentGeneration = res.generation;
+        indexedTargets = new Map((res.items || []).map(item => [item.index, {
+          tabId, frameId: item.frameId ?? 0, documentToken: item.documentToken ?? res.documentToken,
+          generation: item.generation ?? res.generation
+        }]));
+        elemCountBadge.textContent = res.count;
+        if (res.truncated) {
+          log('logIndexLimited', 'warn', {
+            shown: res.count,
+            total: res.total,
+            limit: res.limit
+          });
+        } else {
+          log('logIndexed', 'success', { count: res.count });
+        }
+        renderDirectory(res);
+        if (res.blockedFrames) log('logSkippedFrames', 'warn', {count:res.blockedFrames});
+      };
+      if (!chrome.scripting?.executeScript) {
+        rememberFrame(tabId, 0);
+        chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE' }, accept);
+        return;
       }
-      scan(0);
+      const discover = () => chrome.scripting.executeScript({ target: { tabId, allFrames: true }, func: () => true }, (frames) => {
+        if (!fresh()) return;
+        if (chrome.runtime.lastError || !frames?.length) return accept(null);
+        const ids = [...new Set(frames.map(frame => frame.frameId))].sort((a,b) => a-b);
+        if (ids.length > 128) return accept({ok:false,error:'Too many frames; open the target frame separately'});
+        const combined = { ok: true, items: [], total: 0, limit: 400, generation: null, truncated: false, blockedFrames: 0 };
+        function scan(position) {
+          if (!fresh()) return;
+          if (position === ids.length) {
+            combined.count = combined.items.length;
+            combined.truncated = combined.count < combined.total;
+            accept(combined); return;
+          }
+          const frameId = ids[position];
+          rememberFrame(tabId, frameId); // Also retain frames whose indexing reply fails.
+          chrome.tabs.sendMessage(tabId, { type: 'INDEX_PAGE', includeFrames: false,
+            offset: combined.items.length, limit: Math.max(0,400-combined.items.length) }, {frameId}, (res) => {
+            if (!fresh()) return;
+            if (chrome.runtime.lastError || !res?.ok) {
+              return accept({ok:false,error:'A frame could not be indexed; reload and retry'});
+            }
+            combined.total += res.total;
+            combined.blockedFrames += res.blockedFrames || 0;
+            combined.items.push(...res.items.map(item => ({...item,frameId,
+              generation:res.generation,documentToken:res.documentToken})));
+            scan(position+1);
+          });
+        }
+        scan(0);
+      });
+      clearFrameOverlays(tabId, () => { if (fresh()) discover(); });
     });
-    clearFrameOverlays(tabId, () => { if (fresh()) discover(); });
   });
 
   // Render directory list
@@ -493,7 +604,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Execute Click on Element Index
   function executeClick(index) {
     const target = indexedTargets.get(index);
-    if (!currentTab?.id || !target || target.tabId !== currentTab.id) return;
+    const activeTargetId = getTargetTabId();
+    if (!activeTargetId || !target || target.tabId !== activeTargetId) return;
     log('logClick', 'action', { index });
     const message = { type: 'CLICK_INDEX', index, generation: target.generation, documentToken:target.documentToken };
     const reply = (res) => {
@@ -656,6 +768,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (note && lastDirectoryNote) note.textContent = t(lastDirectoryNote.key, lastDirectoryNote.vars);
     if (directoryResult) renderDirectory(directoryResult,directoryPage);
     if (daemonConnected !== null) daemonLabel.textContent = t(daemonConnected ? 'daemonOnline' : 'daemonStandalone');
+
+    if (chatSessionLabel) chatSessionLabel.textContent = t('chatSessionLabel');
+    if (chatSessionInput) chatSessionInput.placeholder = t('chatSessionPlaceholder');
+    if (groupChatBtnText) groupChatBtnText.textContent = t('groupChatBtn');
+    if (newBgTabBtnText) newBgTabBtnText.textContent = t('newBgTabBtn');
+    if (bgBrowsingLabel) bgBrowsingLabel.textContent = t('bgBrowsingMode');
+    if (activeTabOption) activeTabOption.textContent = t('activeForegroundTab');
   }
 
   // Language Toggle (English <-> Arabic) persisted across panel sessions
@@ -673,16 +792,88 @@ document.addEventListener('DOMContentLoaded', () => {
     applyLanguage(stored?.[LANG_KEY]);
     log('logInit', 'info', { version: chrome.runtime.getManifest().version });
     refreshActiveTab();
+    refreshChatTabsList();
   });
 
   const control = document.getElementById('companionEnabled');
   function showControl(enabled) {
     control.checked = enabled;
-    for (const id of ['indexBtn','captureBtn','inspectBtn','clickElementBtn']) document.getElementById(id).disabled = !enabled;
+    for (const id of ['indexBtn','captureBtn','inspectBtn','clickElementBtn','groupChatBtn','newBgTabBtn']) {
+      const el = document.getElementById(id);
+      if (el) el.disabled = !enabled;
+    }
   }
   chrome.runtime.sendMessage({ type: 'GET_CONTROL' }, (res) => showControl(res?.ok && res.enabled));
   control.addEventListener('change', () => chrome.runtime.sendMessage({ type: 'SET_CONTROL', enabled: control.checked }, (res) => showControl(res?.ok && res.enabled)));
   chrome.storage.onChanged.addListener((changes, area) => { if (area === 'local' && changes['crewloom.enabled']) showControl(changes['crewloom.enabled'].newValue); });
+
+  // Chat tab grouping & background browsing event handlers
+  if (groupChatBtn) {
+    groupChatBtn.addEventListener('click', () => {
+      if (!currentTab?.id) return refreshActiveTab();
+      const chatId = chatSessionInput?.value?.trim() || 'Chat 1';
+      chrome.runtime.sendMessage({
+        type: 'GROUP_CHAT_TAB',
+        tabId: currentTab.id,
+        chatId,
+        chatTitle: chatId
+      }, (res) => {
+        if (res?.ok) {
+          log('logTabGroupCreated', 'success', { name: chatId, tabId: currentTab.id });
+          refreshChatTabsList();
+        } else {
+          describeError(res?.error, 'logIndexFailed');
+        }
+      });
+    });
+  }
+
+  if (newBgTabBtn) {
+    newBgTabBtn.addEventListener('click', () => {
+      const chatId = chatSessionInput?.value?.trim() || 'Chat 1';
+      chrome.runtime.sendMessage({
+        type: 'CREATE_CHAT_TAB',
+        url: 'about:blank',
+        chatId,
+        chatTitle: chatId,
+        active: false // Real browser background: never steal focus!
+      }, (res) => {
+        if (res?.ok && res.tab?.id) {
+          log('logBgTabCreated', 'success', { id: res.tab.id });
+          refreshChatTabsList();
+          selectedTargetTabId = String(res.tab.id);
+          if (targetTabSelect) targetTabSelect.value = String(res.tab.id);
+          updateBannerForTab(res.tab);
+        } else {
+          describeError(res?.error, 'logIndexFailed');
+        }
+      });
+    });
+  }
+
+  if (targetTabSelect) {
+    targetTabSelect.addEventListener('change', () => {
+      selectedTargetTabId = targetTabSelect.value;
+      resetIndexState();
+      if (selectedTargetTabId === 'active') {
+        refreshActiveTab();
+      } else {
+        const targetId = parseInt(selectedTargetTabId, 10);
+        const found = cachedChatTabs.find(t => t.id === targetId);
+        if (found) {
+          updateBannerForTab(found);
+        } else {
+          chrome.runtime.sendMessage({ type: 'GET_TARGET_TAB', tabId: targetId }, (res) => {
+            if (res?.ok && res.tab) updateBannerForTab(res.tab);
+          });
+        }
+      }
+    });
+  }
+
+  if (chatSessionInput) {
+    chatSessionInput.addEventListener('change', refreshChatTabsList);
+  }
 
   // Refresh measured status without overlapping requests or repeating unchanged logs.
   let daemonCheckPending = false;
@@ -727,6 +918,11 @@ document.addEventListener('DOMContentLoaded', () => {
         resetIndexState();
         refreshActiveTab();
       }
+    });
+  }
+  if (chrome.tabs?.onRemoved) {
+    chrome.tabs.onRemoved.addListener(() => {
+      refreshChatTabsList();
     });
   }
 });

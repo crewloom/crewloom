@@ -48,6 +48,98 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
+const CHAT_GROUPS_KEY = 'crewloom.chatGroups';
+
+function getChatGroupInfo(chatId, callback) {
+  chrome.storage.local.get(CHAT_GROUPS_KEY, (res) => {
+    const map = res[CHAT_GROUPS_KEY] || {};
+    const entry = map[chatId];
+    if (!entry || !entry.groupId) return callback(null);
+    if (!chrome.tabGroups?.get) return callback(entry);
+    chrome.tabGroups.get(entry.groupId, (group) => {
+      if (chrome.runtime.lastError || !group) {
+        delete map[chatId];
+        chrome.storage.local.set({ [CHAT_GROUPS_KEY]: map }, () => callback(null));
+      } else {
+        callback(entry);
+      }
+    });
+  });
+}
+
+function saveChatGroup(chatId, groupId, title, color, callback) {
+  chrome.storage.local.get(CHAT_GROUPS_KEY, (res) => {
+    const map = res[CHAT_GROUPS_KEY] || {};
+    map[chatId] = { groupId, title, color, updatedAt: Date.now() };
+    chrome.storage.local.set({ [CHAT_GROUPS_KEY]: map }, () => {
+      callback({ ok: true, groupId, title });
+    });
+  });
+}
+
+function finalizeChatGroup(chatId, chatTitle, groupId, color, callback) {
+  const title = `Crewloom: ${chatTitle || chatId || 'Chat'}`;
+  if (chrome.tabGroups?.update) {
+    chrome.tabGroups.update(groupId, { title, color }, () => {
+      void chrome.runtime.lastError;
+      saveChatGroup(chatId, groupId, title, color, callback);
+    });
+  } else {
+    saveChatGroup(chatId, groupId, title, color, callback);
+  }
+}
+
+function getOrCreateChatGroup(chatId, chatTitle, tabId, color, callback) {
+  if (typeof color === 'function') {
+    callback = color;
+    color = 'purple';
+  }
+  if (!chrome.tabs?.group) {
+    return callback({ ok: false, error: 'Tab group operation failed' });
+  }
+  const groupTitle = `Crewloom: ${chatTitle || chatId || 'Chat'}`;
+  getChatGroupInfo(chatId, (entry) => {
+    if (entry?.groupId) {
+      chrome.tabs.group({ tabIds: [tabId], groupId: entry.groupId }, (groupId) => {
+        if (chrome.runtime.lastError) {
+          createNewOrFindGroup(chatId, chatTitle, tabId, color, groupTitle, callback);
+        } else {
+          callback({ ok: true, groupId });
+        }
+      });
+    } else {
+      createNewOrFindGroup(chatId, chatTitle, tabId, color, groupTitle, callback);
+    }
+  });
+}
+
+function createNewOrFindGroup(chatId, chatTitle, tabId, color, groupTitle, callback) {
+  if (chrome.tabGroups?.query) {
+    chrome.tabGroups.query({ title: groupTitle }, (groups) => {
+      if (!chrome.runtime.lastError && groups && groups.length > 0) {
+        chrome.tabs.group({ tabIds: [tabId], groupId: groups[0].id }, (gid) => {
+          if (!chrome.runtime.lastError && gid) {
+            saveChatGroup(chatId, gid, groupTitle, color, callback);
+            return;
+          }
+          createBrandNewGroup(chatId, chatTitle, tabId, color, callback);
+        });
+      } else {
+        createBrandNewGroup(chatId, chatTitle, tabId, color, callback);
+      }
+    });
+  } else {
+    createBrandNewGroup(chatId, chatTitle, tabId, color, callback);
+  }
+}
+
+function createBrandNewGroup(chatId, chatTitle, tabId, color, callback) {
+  chrome.tabs.group({ tabIds: [tabId] }, (newGroupId) => {
+    if (chrome.runtime.lastError || !newGroupId) return callback({ ok: false, error: 'Tab group operation failed' });
+    finalizeChatGroup(chatId, chatTitle, newGroupId, color, callback);
+  });
+}
+
 // Central Message Routing
 function handleMessage(message, sender, sendResponse) {
   // Capture the visible tab. windowId comes from the caller so the right window is captured.
@@ -83,6 +175,108 @@ function handleMessage(message, sender, sendResponse) {
       } else {
         sendResponse({ ok: false, error: 'No active tab' });
       }
+    });
+    return true;
+  }
+
+  // Get target tab info (active tab or specific tab in group)
+  if (message.type === 'GET_TARGET_TAB') {
+    if (Number.isInteger(message.tabId) && message.tabId > 0) {
+      chrome.tabs.get(message.tabId, (tab) => {
+        if (chrome.runtime.lastError || !tab) {
+          sendResponse({ ok: false, error: 'Tab not found' });
+        } else {
+          sendResponse({ ok: true, tab });
+        }
+      });
+      return true;
+    }
+    if (!Number.isInteger(message.windowId) || message.windowId < 0) { sendResponse({ ok: false, error: 'Explicit panel window required' }); return false; }
+    chrome.tabs.query({ active: true, windowId: message.windowId }, (tabs) => {
+      if (tabs && tabs[0]) {
+        sendResponse({ ok: true, tab: tabs[0] });
+      } else {
+        sendResponse({ ok: false, error: 'No active tab' });
+      }
+    });
+    return true;
+  }
+
+  // Create background tab belonging to a chat's tab group without stealing focus
+  if (message.type === 'CREATE_CHAT_TAB') {
+    const url = message.url || 'about:blank';
+    const active = Boolean(message.active);
+    const chatId = String(message.chatId || 'default');
+    const chatTitle = String(message.chatTitle || chatId || 'Chat');
+    chrome.tabs.create({ url, active }, (tab) => {
+      if (chrome.runtime.lastError || !tab?.id) {
+        sendResponse({ ok: false, error: 'Tab not found' });
+        return;
+      }
+      getOrCreateChatGroup(chatId, chatTitle, tab.id, 'purple', (groupRes) => {
+        sendResponse({ ok: true, tab, groupId: groupRes?.groupId ?? null });
+      });
+    });
+    return true;
+  }
+
+  // Group existing tab into a chat's tab group
+  if (message.type === 'GROUP_CHAT_TAB') {
+    const tabId = message.tabId;
+    if (!Number.isInteger(tabId) || tabId <= 0) { sendResponse({ ok: false, error: 'Tab not found' }); return false; }
+    const chatId = String(message.chatId || 'default');
+    const chatTitle = String(message.chatTitle || chatId || 'Chat');
+    const color = message.color || 'purple';
+    getOrCreateChatGroup(chatId, chatTitle, tabId, color, (groupRes) => {
+      if (!groupRes.ok) { sendResponse({ ok: false, error: 'Tab group operation failed' }); return; }
+      sendResponse({ ok: true, groupId: groupRes.groupId, title: groupRes.title });
+    });
+    return true;
+  }
+
+  // List all tabs belonging to a chat's tab group
+  if (message.type === 'GET_CHAT_TABS') {
+    const chatId = String(message.chatId || 'default');
+    getChatGroupInfo(chatId, (info) => {
+      if (!info?.groupId) {
+        sendResponse({ ok: true, tabs: [], groupId: null });
+        return;
+      }
+      chrome.tabs.query({ groupId: info.groupId }, (tabs) => {
+        if (chrome.runtime.lastError) {
+          sendResponse({ ok: true, tabs: [], groupId: info.groupId });
+        } else {
+          sendResponse({ ok: true, tabs: tabs || [], groupId: info.groupId, title: info.title });
+        }
+      });
+    });
+    return true;
+  }
+
+  // Navigate a chat tab in the background without stealing focus
+  if (message.type === 'NAVIGATE_CHAT_TAB') {
+    const tabId = message.tabId;
+    const url = message.url;
+    if (!Number.isInteger(tabId) || tabId <= 0) { sendResponse({ ok: false, error: 'Tab not found' }); return false; }
+    if (!url || typeof url !== 'string') { sendResponse({ ok: false, error: 'Invalid tab URL' }); return false; }
+    const active = Boolean(message.active);
+    chrome.tabs.update(tabId, { url, active }, (tab) => {
+      if (chrome.runtime.lastError || !tab) {
+        sendResponse({ ok: false, error: 'Tab not found' });
+        return;
+      }
+      sendResponse({ ok: true, tab });
+    });
+    return true;
+  }
+
+  // Close a chat tab
+  if (message.type === 'CLOSE_CHAT_TAB') {
+    const tabId = message.tabId;
+    if (!Number.isInteger(tabId) || tabId <= 0) { sendResponse({ ok: false, error: 'Tab not found' }); return false; }
+    chrome.tabs.remove(tabId, () => {
+      if (chrome.runtime.lastError) { sendResponse({ ok: false, error: 'Tab not found' }); return; }
+      sendResponse({ ok: true });
     });
     return true;
   }

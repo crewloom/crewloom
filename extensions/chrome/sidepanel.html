@@ -28,6 +28,31 @@
     <label><input type="checkbox" id="companionEnabled"> <span id="companionLabel">Browser companion</span></label>
 
     <main class="sp-main" role="main">
+      <!-- Chat Tab Group & Background Browsing Controls -->
+      <section class="chat-group-section" id="chatGroupSection" aria-label="Chat Tab Grouping">
+        <div class="chat-group-row">
+          <label class="chat-session-label" for="chatSessionInput" id="chatSessionLabel">Chat Session:</label>
+          <input type="text" id="chatSessionInput" value="Chat 1" placeholder="Chat name / session" class="chat-input" aria-label="Chat Session Name">
+        </div>
+        <div class="chat-group-actions">
+          <button id="groupChatBtn" class="btn-chat-action" title="Group Tab in Chat" aria-label="Group Tab in Chat">
+            <span class="chat-action-icon" aria-hidden="true">🏷️</span> <span id="groupChatBtnText">Group in Chat</span>
+          </button>
+          <button id="newBgTabBtn" class="btn-chat-action" title="Open Background Tab" aria-label="Open Background Tab">
+            <span class="chat-action-icon" aria-hidden="true">➕</span> <span id="newBgTabBtnText">+ Background Tab</span>
+          </button>
+        </div>
+        <div class="chat-tab-selector-row">
+          <label class="bg-mode-toggle" title="Perform browsing in background without focusing on tabs">
+            <input type="checkbox" id="bgBrowsingToggle" checked>
+            <span id="bgBrowsingLabel">Background browsing (no focus)</span>
+          </label>
+          <select id="targetTabSelect" class="target-tab-select" aria-label="Target Tab">
+            <option value="active" id="activeTabOption">Active Foreground Tab</option>
+          </select>
+        </div>
+      </section>
+
       <!-- Active Tab Banner -->
       <section class="tab-banner" id="tabBanner" aria-label="Active Tab Information">
         <div class="tab-info">

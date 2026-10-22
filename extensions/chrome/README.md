@@ -47,6 +47,9 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
   scrolls the element into view, focuses it, clicks it, and renders a click wave.
 - **Hover inspector** — highlights the element under the cursor with its tag, id, and pixel size.
 - **Vision capture** — `chrome.tabs.captureVisibleTab` for the focused window, previewed in-panel.
+- **Chat Tab Grouping (Claude-style)** — groups Chrome tabs per chat/task session with distinctive colors and titles (e.g. `Crewloom: Chat 1`). Keeps the user's workspace organized without scattering agent tabs.
+- **Background Browsing (No Focus Stealing)** — opens, navigates, indexes and interacts with tabs in the background with `active: false` and `preventScroll: true`, ensuring user tasks and media playback in the active foreground tab remain completely undisturbed.
+- **Target Tab Cockpit** — allows inspecting, auto-indexing and dispatching clicks to background tabs directly from the side panel selector without activating them in Chrome.
 - **Live tab tracking** — `chrome.tabs.onActivated` / `onUpdated` refresh the banner and reset
   stale indices when the tab changes or finishes loading.
 - **Bilingual EN/AR** — instant switch with full RTL flip; the choice is stored in
@@ -61,7 +64,8 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 | `sidePanel` | Opens the cockpit panel and the click-to-open behavior |
 | `activeTab`, `scripting` | Tab-scoped inspection and messaging |
 | `tabs` | Reads the active tab title, URL, and window id |
-| `storage` | Persists the EN/AR language choice |
+| `tabGroups` | Groups tabs per chat session into named, colored Chrome tab groups |
+| `storage` | Persists the EN/AR language choice and chat group bindings |
 | `contextMenus` | Adds the "Inspect with Crewloom" and "Capture Visual Frame" entries |
 | host `<all_urls>` | Injects the grounding overlay and lets `chrome.tabs.captureVisibleTab` produce a frame. Chrome rejects a capture without `<all_urls>` or a transient `activeTab` grant, and the panel cannot rely on a user gesture |
 | host `localhost` / `127.0.0.1` | Dashboard API calls only (implied by `<all_urls>`) |
@@ -71,6 +75,12 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 | Message | From → To | Payload → Response |
 | --- | --- | --- |
 | `GET_ACTIVE_TAB` | panel → background | `{windowId}` → `{ok, tab}` |
+| `GET_TARGET_TAB` | panel → background | `{tabId?, windowId?}` → `{ok, tab}` |
+| `CREATE_CHAT_TAB` | panel/agent → background | `{url?, chatId?, chatTitle?, active?}` → `{ok, tab, groupId}` (active defaults to false) |
+| `GROUP_CHAT_TAB` | panel/agent → background | `{tabId, chatId?, chatTitle?, color?}` → `{ok, groupId, title}` |
+| `GET_CHAT_TABS` | panel/agent → background | `{chatId?}` → `{ok, tabs, groupId, title}` |
+| `NAVIGATE_CHAT_TAB` | panel/agent → background | `{tabId, url, active?}` → `{ok, tab}` (active defaults to false) |
+| `CLOSE_CHAT_TAB` | panel/agent → background | `{tabId}` → `{ok}` |
 | `CAPTURE_TAB` | panel → background | `{windowId}` → `{ok, dataUrl}` |
 | `CHECK_LOCAL_DAEMON` | panel → background | `{}` → `{ok, connected, data}` |
 | `GET_SYSTEM_PERMISSIONS` | panel → background | `{}` → `{ok, data}` |

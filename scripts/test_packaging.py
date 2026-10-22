@@ -52,6 +52,15 @@ def declared_files(directory, skip=()):
 
 
 class DistributionMetadata(unittest.TestCase):
+    def test_documented_interop_imports_are_packaged_as_python_modules(self):
+        config = pyproject()['tool']['setuptools']
+        self.assertIn('adapters', config['packages'])
+        self.assertIn('adapters.interop', config['packages'])
+        self.assertEqual(config['package-dir']['adapters'], 'adapters')
+        self.assertIn('recursive-include adapters *.json *.js *.md *.png *.py', MANIFEST.read_text(encoding='utf-8'))
+        for name in ('__init__', 'crewai_sandbox', 'autogen_sandbox', 'langgraph_sandbox'):
+            self.assertTrue((ROOT / 'adapters/interop' / (name + '.py')).is_file())
+
     def test_release_version_has_a_matching_changelog_entry(self):
         version = pyproject()['project']['version']
         self.assertRegex(version, r'^\d+\.\d+\.\d+$')

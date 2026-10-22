@@ -168,7 +168,7 @@ class ManifestContractTest(unittest.TestCase):
         self.assertNotIn('default_popup', self.manifest['action'])
 
     def test_declared_permissions_cover_used_apis(self):
-        for permission in ('sidePanel', 'activeTab', 'scripting', 'storage', 'tabs', 'contextMenus'):
+        for permission in ('sidePanel', 'activeTab', 'scripting', 'storage', 'tabs', 'tabGroups', 'contextMenus'):
             self.assertIn(permission, self.manifest['permissions'])
 
     def test_host_permissions_allow_tab_capture(self):
@@ -513,6 +513,24 @@ class SidePanelTest(SidePanelHarness):
         finally:
             context.close()
 
+    def test_chat_grouping_and_background_browsing_ui(self):
+        context, page = self.new_page()
+        try:
+            self.open_panel(page)
+            self.assertEqual(page.input_value('#chatSessionInput'), 'Chat 1')
+            self.assertEqual(page.inner_text('#groupChatBtnText'), 'Group in Chat')
+            self.assertEqual(page.inner_text('#newBgTabBtnText'), '+ Background Tab')
+            self.assertEqual(page.inner_text('#bgBrowsingLabel'), 'Background browsing (no focus)')
+            self.assertTrue(page.is_checked('#bgBrowsingToggle'))
+
+            page.click('#langToggle')
+            page.wait_for_function("() => document.documentElement.dir === 'rtl'")
+            self.assertEqual(page.inner_text('#groupChatBtnText'), 'تجميع في الشات')
+            self.assertEqual(page.inner_text('#newBgTabBtnText'), '+ تبويب خلفي')
+            self.assertEqual(page.inner_text('#bgBrowsingLabel'), 'تصفح خلفي (بدون فوكس)')
+        finally:
+            context.close()
+
 
 class ContentScriptTest(unittest.TestCase):
     """In-page grounding: bounding cap, overlay isolation, and re-anchoring."""
@@ -848,7 +866,33 @@ class BackgroundServiceWorkerHeadlessTest(SidePanelHarness):
         },
         query: (query, cb) => {
           cb([{ id: 101, windowId: query.windowId, active: true }]);
+        },
+        create: (opts, cb) => {
+          const tab = { id: 301, windowId: 7, url: opts.url || 'about:blank', active: Boolean(opts.active) };
+          window.__createdTabs = window.__createdTabs || [];
+          window.__createdTabs.push(tab);
+          if (cb) cb(tab);
+        },
+        update: (tabId, opts, cb) => {
+          const tab = { id: tabId, url: opts.url, active: Boolean(opts.active) };
+          if (cb) cb(tab);
+        },
+        remove: (tabId, cb) => { if (cb) cb(); },
+        get: (tabId, cb) => { cb({ id: tabId, title: 'Mock Tab', url: 'https://example.com' }); },
+        group: (opts, cb) => {
+          const groupId = opts.groupId || 55;
+          window.__groupedTabs = window.__groupedTabs || [];
+          window.__groupedTabs.push({ tabIds: opts.tabIds, groupId });
+          if (cb) cb(groupId);
         }
+      },
+      tabGroups: {
+        update: (groupId, opts, cb) => {
+          window.__updatedTabGroups = window.__updatedTabGroups || [];
+          window.__updatedTabGroups.push({ groupId, opts });
+          if (cb) cb({ id: groupId, ...opts });
+        },
+        get: (groupId, cb) => { cb({ id: groupId, title: 'Crewloom Group' }); }
       }
     };
     """
@@ -985,6 +1029,68 @@ class BackgroundServiceWorkerHeadlessTest(SidePanelHarness):
             res_unsupported = self._dispatch(page, {'type': 'NONEXISTENT_TYPE'})
             self.assertFalse(res_unsupported['ok'])
             self.assertEqual(res_unsupported['error'], 'unknown error')
+        finally:
+            context.close()
+
+    def test_background_create_chat_tab_in_background_without_stealing_focus(self):
+        context, page = self.new_page()
+        try:
+            self._load_sw(page)
+            res = self._dispatch(page, {
+                'type': 'CREATE_CHAT_TAB',
+                'url': 'https://example.com/research',
+                'chatId': 'session-42',
+                'chatTitle': 'Researching Web',
+                'active': False
+            })
+            self.assertTrue(res['ok'])
+            self.assertEqual(res['tab']['id'], 301)
+            self.assertFalse(res['tab']['active'])
+            created = page.evaluate('() => window.__createdTabs')
+            self.assertEqual(len(created), 1)
+            self.assertFalse(created[0]['active'])
+            grouped = page.evaluate('() => window.__groupedTabs')
+            self.assertEqual(len(grouped), 1)
+            self.assertEqual(grouped[0]['tabIds'], [301])
+        finally:
+            context.close()
+
+    def test_background_group_chat_tab_and_get_chat_tabs(self):
+        context, page = self.new_page()
+        try:
+            self._load_sw(page)
+            res_group = self._dispatch(page, {
+                'type': 'GROUP_CHAT_TAB',
+                'tabId': 101,
+                'chatId': 'session-42',
+                'chatTitle': 'Coding Agent'
+            })
+            self.assertTrue(res_group['ok'])
+            self.assertEqual(res_group['groupId'], 55)
+
+            res_tabs = self._dispatch(page, {
+                'type': 'GET_CHAT_TABS',
+                'chatId': 'session-42'
+            })
+            self.assertTrue(res_tabs['ok'])
+            self.assertEqual(res_tabs['groupId'], 55)
+            self.assertEqual(len(res_tabs['tabs']), 1)
+        finally:
+            context.close()
+
+    def test_background_navigate_chat_tab_in_background(self):
+        context, page = self.new_page()
+        try:
+            self._load_sw(page)
+            res = self._dispatch(page, {
+                'type': 'NAVIGATE_CHAT_TAB',
+                'tabId': 301,
+                'url': 'https://example.com/updated',
+                'active': False
+            })
+            self.assertTrue(res['ok'])
+            self.assertEqual(res['tab']['url'], 'https://example.com/updated')
+            self.assertFalse(res['tab']['active'])
         finally:
             context.close()
 

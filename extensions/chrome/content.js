@@ -326,14 +326,89 @@ function clickElementByIndex(index, generation = indexGeneration, expectedDocume
   setTimeout(() => wave.remove(), 500);
 
   // Trigger real click
-  el.focus();
+  try {
+    el.focus?.({ preventScroll: true });
+  } catch {}
   if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el) || !hitTarget(el)) {
     return { ok: false, error: 'Target changed on focus; re-index the page' };
   }
+  const mouseOpts = { bubbles: true, cancelable: true, view: window, clientX: clickX, clientY: clickY };
+  try {
+    el.dispatchEvent(new PointerEvent('pointerdown', mouseOpts));
+    el.dispatchEvent(new MouseEvent('mousedown', mouseOpts));
+    el.dispatchEvent(new PointerEvent('pointerup', mouseOpts));
+    el.dispatchEvent(new MouseEvent('mouseup', mouseOpts));
+  } catch {}
   el.click();
 
   showHud('clicked', {index});
   return { ok: true, x: clickX, y: clickY, tag: el.tagName.toLowerCase() };
+}
+
+// Type text into indexed form elements without stealing focus
+function typeElementByIndex(index, text, clearBefore = false, pressEnter = false, generation = indexGeneration, expectedDocument = documentToken) {
+  if (!Number.isInteger(index) || index < 1 || generation !== indexGeneration) {
+    return { ok: false, error: 'Stale or invalid element index; re-index the page' };
+  }
+  if (expectedDocument !== documentToken) return { ok: false, error: 'Document changed; re-index the page' };
+  const entry = trackedTags.find((entry) => entry.index === index);
+  const el = entry?.element;
+  if (!el?.isConnected) return { ok: false, error: 'Indexed element was removed; re-index the page' };
+  if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el)) {
+    return { ok: false, error: 'Indexed element changed or is not interactive; re-index the page' };
+  }
+  try { el.focus?.({ preventScroll: true }); } catch {}
+
+  const formElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName);
+  if (formElement) {
+    if (clearBefore) el.value = '';
+    const proto = el.tagName === 'INPUT' ? window.HTMLInputElement.prototype : window.HTMLTextAreaElement.prototype;
+    const setter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+    const finalVal = (clearBefore ? '' : el.value) + text;
+    if (setter) {
+      setter.call(el, finalVal);
+    } else {
+      el.value = finalVal;
+    }
+    el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
+  } else if (el.isContentEditable) {
+    if (clearBefore) el.textContent = '';
+    el.textContent = (clearBefore ? '' : el.textContent) + text;
+    el.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+  }
+
+  if (pressEnter) {
+    const keyOpts = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true };
+    el.dispatchEvent(new KeyboardEvent('keydown', keyOpts));
+    el.dispatchEvent(new KeyboardEvent('keypress', keyOpts));
+    el.dispatchEvent(new KeyboardEvent('keyup', keyOpts));
+    if (el.form) {
+      try { el.form.requestSubmit ? el.form.requestSubmit() : el.form.submit(); } catch {}
+    }
+  }
+
+  return { ok: true, tag: el.tagName.toLowerCase(), length: text.length };
+}
+
+function scrollPage(deltaX = 0, deltaY = 400) {
+  window.scrollBy({ left: deltaX, top: deltaY, behavior: 'instant' });
+  return { ok: true, scrollX: window.scrollX, scrollY: window.scrollY };
+}
+
+function extractPageContent() {
+  const headings = Array.from(document.querySelectorAll('h1, h2, h3')).slice(0, 20).map(h => ({
+    tag: h.tagName.toLowerCase(),
+    text: (h.textContent || '').trim().slice(0, 100)
+  }));
+  const mainText = (document.body?.innerText || '').slice(0, 3000);
+  return {
+    ok: true,
+    title: document.title,
+    url: window.location.href,
+    headings,
+    textSnippet: mainText
+  };
 }
 
 // Mouse Inspector functionality
@@ -403,6 +478,24 @@ function handleMessage(message, sender, sendResponse) {
       sendResponse({ ok: false, error: 'Index generation and document token required; re-index the page' }); return;
     }
     sendResponse(clickElementByIndex(message.index, message.generation, message.documentToken));
+    return false;
+  }
+
+  if (message.type === 'TYPE_INDEX') {
+    if (!Number.isInteger(message.generation) || message.documentToken !== documentToken) {
+      sendResponse({ ok: false, error: 'Index generation and document token required; re-index the page' }); return;
+    }
+    sendResponse(typeElementByIndex(message.index, message.text || '', Boolean(message.clearBefore), Boolean(message.pressEnter), message.generation, message.documentToken));
+    return false;
+  }
+
+  if (message.type === 'SCROLL_PAGE') {
+    sendResponse(scrollPage(message.deltaX || 0, message.deltaY || 400));
+    return false;
+  }
+
+  if (message.type === 'EXTRACT_PAGE_CONTENT') {
+    sendResponse(extractPageContent());
     return false;
   }
 

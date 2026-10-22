@@ -70,6 +70,20 @@ class InstalledDistributionTests(unittest.TestCase):
     def tearDownClass(cls):
         shutil.rmtree(cls.work, ignore_errors=True)
 
+    def test_interop_modules_are_present_in_both_archives(self):
+        wheels = list(self.work.rglob('*.whl'))
+        archives = list(self.work.rglob('*.tar.gz'))
+        self.assertTrue(wheels)
+        self.assertTrue(archives)
+        for wheel in wheels:
+            with zipfile.ZipFile(wheel) as archive:
+                for name in ('crewai_sandbox', 'autogen_sandbox', 'langgraph_sandbox'):
+                    self.assertIn('adapters/interop/' + name + '.py', archive.namelist())
+        for distribution in archives:
+            with tarfile.open(distribution) as archive:
+                for name in ('crewai_sandbox', 'autogen_sandbox', 'langgraph_sandbox'):
+                    self.assertTrue(any(path.endswith('/adapters/interop/' + name + '.py') for path in archive.getnames()))
+
     @classmethod
     def _build_and_install(cls):
         cls.builder = cls.work / 'builder'

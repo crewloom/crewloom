@@ -48,6 +48,7 @@
     "scripting",
     "storage",
     "tabs",
+    "tabGroups",
     "contextMenus"
   ],
   "commands": {

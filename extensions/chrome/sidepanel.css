@@ -68,6 +68,109 @@ body {
   border-bottom: 1px solid var(--border-line);
 }
 
+/* Chat Tab Group & Background Browsing Controls */
+.chat-group-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-line);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.chat-group-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-session-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cyan);
+  white-space: nowrap;
+}
+
+.chat-input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-line);
+  color: var(--text-main);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  outline: none;
+}
+.chat-input:focus {
+  border-color: var(--cyan);
+}
+
+.chat-group-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.btn-chat-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: rgba(64, 221, 188, 0.08);
+  border: 1px solid var(--border-accent);
+  color: var(--text-main);
+  padding: 5px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-chat-action:hover:not(:disabled) {
+  background: rgba(64, 221, 188, 0.18);
+  border-color: var(--cyan);
+}
+.btn-chat-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.chat-tab-selector-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-line);
+}
+
+.bg-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-mute);
+  cursor: pointer;
+}
+.bg-mode-toggle input {
+  accent-color: var(--cyan);
+  cursor: pointer;
+}
+
+.target-tab-select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--border-line);
+  color: var(--text-main);
+  border-radius: 6px;
+  padding: 4px 6px;
+  font-size: 11.5px;
+  outline: none;
+}
+.target-tab-select:focus {
+  border-color: var(--cyan);
+}
+
 .sp-brand {
   display: flex;
   align-items: center;
