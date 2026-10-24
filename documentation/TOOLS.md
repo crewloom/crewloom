@@ -19,6 +19,9 @@ Run `python3 scripts/crewloom.py tools` to list these tools. `run` dispatches on
 | [context](../.agents/skills/context-guardian/scripts/context_pack.py) | Bounded English or Arabic context pack | `--skill context-guardian --out /tmp/context.md` |
 | [validate-skill](../.agents/skills/skill-forge-recruiter/scripts/validate_skill.py) | Validate role structure | `--skill context-guardian` |
 | [resource-budget](../.agents/skills/ultra-light-optimizer/scripts/check_resource_budget.py) | Heuristic resource-waste pattern scan | `--project-dir {input}` |
+| [launch-claims](../.agents/skills/launch-ops-orchestrator/scripts/check_launch_claims.py) | Flag launch-copy claims (measured numbers, competitor comparisons, guarantees, superlatives) that need evidence; exit 1 on findings | `--file {input}` |
+| [social-assets](../.agents/skills/social-presence-operator/scripts/check_social_assets.py) | Check a logo or cover PNG/JPEG against LinkedIn, Facebook or X size rules and detect blank renders | `--platform linkedin --kind logo --file {input}` |
+| [email-dns](../.agents/skills/domain-email-operator/scripts/check_email_dns.py) | Verify a domain's MX, single SPF, DMARC and optional Brevo records via dig or a recorded JSON file | `--domain {input} --sender brevo` |
 
 `{input}` means a real path supplied by you. Start with [the runnable examples](../examples/README.md). Commands do not install dependencies or authorize external operations. Tool messages may be English or Arabic.
 

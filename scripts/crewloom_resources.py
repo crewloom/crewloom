@@ -78,7 +78,7 @@ def distribution_root() -> Path:
 
 
 def roles_dir() -> Path:
-    """Return the directory holding the 44 role trees, each with SKILL.md, memory, and references."""
+    """Return the directory holding the 47 role trees, each with SKILL.md, memory, and references."""
     return layout()[1]
 
 

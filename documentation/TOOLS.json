@@ -238,6 +238,40 @@
       ],
       "effect": "dispatches-browser-and-os-computer-actions",
       "dashboard": "cli"
+    },
+    {
+      "id": "launch-claims",
+      "skill": "launch-ops-orchestrator",
+      "path": ".agents/skills/launch-ops-orchestrator/scripts/check_launch_claims.py",
+      "description": "Flag launch-copy claims (measured numbers, competitor comparisons, guarantees, superlatives) that need evidence; exit 1 on findings",
+      "example_args": "--file {input}",
+      "dependencies": [
+        "Python standard library"
+      ],
+      "effect": "read-only"
+    },
+    {
+      "id": "social-assets",
+      "skill": "social-presence-operator",
+      "path": ".agents/skills/social-presence-operator/scripts/check_social_assets.py",
+      "description": "Check a logo or cover PNG/JPEG against LinkedIn, Facebook or X size rules and detect blank renders",
+      "example_args": "--platform linkedin --kind logo --file {input}",
+      "dependencies": [
+        "Python standard library"
+      ],
+      "effect": "read-only"
+    },
+    {
+      "id": "email-dns",
+      "skill": "domain-email-operator",
+      "path": ".agents/skills/domain-email-operator/scripts/check_email_dns.py",
+      "description": "Verify a domain's MX, single SPF, DMARC and optional Brevo records via dig or a recorded JSON file",
+      "example_args": "--domain {input} --sender brevo",
+      "dependencies": [
+        "Python standard library",
+        "dig (optional; supply --records-json instead)"
+      ],
+      "effect": "read-only (DNS lookups)"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Skill catalog
 
-All 44 entries are English public adaptations. IDs stay stable across output languages. Read each procedure and its memory before use.
+All 47 entries are English public adaptations. IDs stay stable across output languages. Read each procedure and its memory before use.
 
 | Role | Procedure |
 | --- | --- |
@@ -19,12 +19,14 @@ All 44 entries are English public adaptations. IDs stay stable across output lan
 | Deal Closer | [deal-closer](../.agents/skills/deal-closer/SKILL.md) |
 | Delivery Director | [delivery-director](../.agents/skills/delivery-director/SKILL.md) |
 | Distributed Systems Architect | [distributed-systems-architect](../.agents/skills/distributed-systems-architect/SKILL.md) |
+| Domain Email Operator | [domain-email-operator](../.agents/skills/domain-email-operator/SKILL.md) |
 | Executive Accountant | [executive-accountant](../.agents/skills/executive-accountant/SKILL.md) |
 | Frontend Ux Auditor | [frontend-ux-auditor](../.agents/skills/frontend-ux-auditor/SKILL.md) |
 | Fullstack Mvp Engineer | [fullstack-mvp-engineer](../.agents/skills/fullstack-mvp-engineer/SKILL.md) |
 | Funnel Cro Auditor | [funnel-cro-auditor](../.agents/skills/funnel-cro-auditor/SKILL.md) |
 | Graphic Design Producer | [graphic-design-producer](../.agents/skills/graphic-design-producer/SKILL.md) |
 | Growth Director Orchestrator | [growth-director-orchestrator](../.agents/skills/growth-director-orchestrator/SKILL.md) |
+| Launch Ops Orchestrator | [launch-ops-orchestrator](../.agents/skills/launch-ops-orchestrator/SKILL.md) |
 | Legacy Code Rescue Specialist | [legacy-code-rescue-specialist](../.agents/skills/legacy-code-rescue-specialist/SKILL.md) |
 | Machine Control Operator | [machine-control-operator](../.agents/skills/machine-control-operator/SKILL.md) |
 | Mcp Integration Builder | [mcp-integration-builder](../.agents/skills/mcp-integration-builder/SKILL.md) |
@@ -34,11 +36,12 @@ All 44 entries are English public adaptations. IDs stay stable across output lan
 | Reverse Engineering Analyst | [reverse-engineering-analyst](../.agents/skills/reverse-engineering-analyst/SKILL.md) |
 | Rfp Proposal Engineer | [rfp-proposal-engineer](../.agents/skills/rfp-proposal-engineer/SKILL.md) |
 | Security Operations Guardian | [security-operations-guardian](../.agents/skills/security-operations-guardian/SKILL.md) |
+| Self-Editing Mode | [skill-improvement-engineer](../.agents/skills/skill-improvement-engineer/SKILL.md) |
 | Seo Growth Engineer | [seo-growth-engineer](../.agents/skills/seo-growth-engineer/SKILL.md) |
 | Short Form Paid Booster | [short-form-paid-booster](../.agents/skills/short-form-paid-booster/SKILL.md) |
 | Skill Forge Recruiter | [skill-forge-recruiter](../.agents/skills/skill-forge-recruiter/SKILL.md) |
-| Self-Editing Mode | [skill-improvement-engineer](../.agents/skills/skill-improvement-engineer/SKILL.md) |
 | Skill Performance Auditor | [skill-performance-auditor](../.agents/skills/skill-performance-auditor/SKILL.md) |
+| Social Presence Operator | [social-presence-operator](../.agents/skills/social-presence-operator/SKILL.md) |
 | Studio Director | [studio-director](../.agents/skills/studio-director/SKILL.md) |
 | Tech Stack Architect | [tech-stack-architect](../.agents/skills/tech-stack-architect/SKILL.md) |
 | Toolbox Integration Steward | [toolbox-integration-steward](../.agents/skills/toolbox-integration-steward/SKILL.md) |
