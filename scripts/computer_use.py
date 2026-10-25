@@ -119,6 +119,10 @@ def get_tool_input_schema() -> Dict[str, Any]:
                 "type": "boolean",
                 "description": "Whether the tab should be activated in the foreground (default false for background browsing).",
             },
+            "noFocus": {
+                "type": "boolean",
+                "description": "Whether to perform actions in the background without stealing element or tab focus (default true).",
+            },
             "index": {
                 "type": "integer",
                 "description": "Numeric target element index from the indexing overlay.",
@@ -420,6 +424,7 @@ def main() -> None:
     parser.add_argument("--chat-title", type=str, help="Title for the Chrome Tab Group")
     parser.add_argument("--tab-id", type=int, help="Target tab ID")
     parser.add_argument("--active", action="store_true", default=False, help="Activate tab (default background)")
+    parser.add_argument("--no-focus", action="store_true", default=True, help="Execute without stealing element or window focus")
     parser.add_argument("--index", type=int, help="Element index for indexed actions")
     parser.add_argument("--submit", action="store_true", help="Submit on type_index")
     parser.add_argument("--json", type=str, dest="json_payload", help="Raw JSON payload dictionary")
@@ -468,6 +473,7 @@ def main() -> None:
     if args.tab_id is not None:
         payload["tabId"] = args.tab_id
     payload["active"] = args.active
+    payload["noFocus"] = args.no_focus
     if args.index is not None:
         payload["index"] = args.index
     if args.submit:
