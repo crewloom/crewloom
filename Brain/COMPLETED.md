@@ -375,3 +375,5 @@
 - 2026-10-17 | Paired rendered browser46 passes (one optional screenshot skip); three new regressions reject the previous released source. Evaluator14 and context19 pass. Actual profile2.3.2 verifies Arabic HUD on English site, English HUD on Arabic site, exact click effects, saved Arabic after reopen and hidden-state preservation; companion disabled and owned tab/server closed.
 
 - 2026-10-17 | Capture-disable race translation and internal-error coverage check added after review. Initial corrected real-browser47 passes (one optional skip), and the additional internal-error check passes. Final combined48-case suite, normal gate and exact-head CI follow.
+
+- 2026-10-25 | Updated root `AGENTS.md` with clean-code and architecture acceptance rules; aligned `agent/packages/crewloom/ARCHITECTURE.md` to inspected package manifests/imports, clarified ownership and dependency direction, and linked compatibility, verification, and docs expectations. Documentation-only change; no build or tests run.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.2 — 2026-10-25
+
+- Add constitutional mandatory release governance and continuous release rule to `AGENTS.md` and repository policies.
+- Synchronize repository documentation and file integrity digests across 930 tracked assets in `documentation/MANIFEST.json`.
+- Update cognitive memory records in `Brain/CHALLENGES.md` and `Brain/COMPLETED.md` with package dependency mapping and structural alignment guidelines.
+
 ## 0.8.1 — 2026-10-18
 
 - Add native standard-library loopback gateways for local open-weights model runtimes: Ollama (`/api/chat`) and vLLM (`/v1/chat/completions`), with loopback host validation, explicit port enforcement, and transparent markdown code-fence stripping.
