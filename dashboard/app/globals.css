@@ -47,3 +47,6 @@ pre { background:var(--bg); border:1px solid var(--line); border-radius:8px; pad
 .companion-switch.on { background:#1678f9; }
 .companion-switch.on span { margin-inline-start:32px; }
 .companion-switch:disabled { opacity:.45; }
+.boot { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; }
+.boot p { margin:0; color:var(--mute); font-size:13px; }
+.logo-loader { display:inline-flex; line-height:0; user-select:none; }

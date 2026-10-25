@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.1 — 2026-10-25
+
+- Add the woven-mark loader to the dashboard: the opening screen and route loading show the Crewloom mark weaving itself, with the finished mark for visitors who reduce motion.
+
 ## 0.9.0 — 2026-10-25
 
 - Add no-focus browser actions: indexed click, typing and computer actions accept `noFocus`, which skips `focus()` and scrolls only when the target is outside the viewport. The side panel exposes it as a persisted "Background browsing (no focus)" toggle (default on), and `scripts/computer_use.py` forwards `noFocus` in its payload.

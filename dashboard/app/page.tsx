@@ -4,6 +4,7 @@ import ProjectsPanel from './projects-panel';
 import ComputerUsePanel from './computer-use-panel';
 import { parseToolArguments } from '../lib/tool-arguments';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { LogoLoader } from './logo-loader';
 
 type Skill = { id: string; description: string; lastActivity: string | null; openTasks: number; doneEntries: number; openChallenges: number; ideas: number; tools: string[]; runs: number; failedRuns: number; status: 'healthy' | 'attention' | 'idle' };
 type Tool = { id: string; skill: string; description: string; example_args: string; effect: string; dashboard?: 'cli' | 'project' };
@@ -112,7 +113,10 @@ export default function Dashboard() {
   };
 
   const totals = data?.totals ?? {};
-  if (auth === 'unknown') return <main className="wrap"><h1>Crewloom</h1><p>{lang === 'ar' ? 'جارٍ فتح اللوحة…' : 'Opening dashboard…'}</p></main>;
+  if (auth === 'unknown') {
+    const opening = lang === 'ar' ? 'جارٍ فتح اللوحة…' : 'Opening dashboard…';
+    return <main className="wrap boot"><LogoLoader label={opening} size={112} /><p>{opening}</p></main>;
+  }
   if (auth !== 'in') {
     return (
       <main className="wrap">
