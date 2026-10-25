@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.0 — 2026-10-25
+
+- Add no-focus browser actions: indexed click, typing and computer actions accept `noFocus`, which skips `focus()` and scrolls only when the target is outside the viewport. The side panel exposes it as a persisted "Background browsing (no focus)" toggle (default on), and `scripts/computer_use.py` forwards `noFocus` in its payload.
+- Add the `GET_ALL_TABS` background message and an all-tabs target picker that lists the chat tab group followed by every other open tab in the window.
+- Speed up the content script with a pooled click wave, a tracked-tag map for index lookups and cached ancestor visibility checks during indexing; stale, hidden and covered targets are still refused.
+- Add regression tests for focus preservation under `noFocus` and for `GET_ALL_TABS`, and rebuild `assets/crewloom-chrome-extension.zip` from `extensions/chrome`.
+- Add the parallel-work and documentation discipline rules to `AGENTS.md`, and record the Crewloom AI · Pulse integration in `Brain/`.
+
 ## 0.8.2 — 2026-10-25
 
 - Add constitutional mandatory release governance and continuous release rule to `AGENTS.md` and repository policies.
