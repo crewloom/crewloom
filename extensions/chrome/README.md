@@ -49,6 +49,8 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 - **Vision capture** — `chrome.tabs.captureVisibleTab` for the focused window, previewed in-panel.
 - **Chat Tab Grouping (Claude-style)** — groups Chrome tabs per chat/task session with distinctive colors and titles (e.g. `Crewloom: Chat 1`). Keeps the user's workspace organized without scattering agent tabs.
 - **Background Browsing (No Focus Stealing)** — opens, navigates, indexes and interacts with tabs in the background with `active: false` and `preventScroll: true`, ensuring user tasks and media playback in the active foreground tab remain completely undisturbed.
+- **No-focus toggle** — the panel's "Background browsing (no focus)" checkbox (persisted under `crewloom.bgBrowsing`, on by default) sends `noFocus` with each click so the page's active element, and the user's typing, are not disturbed. Typed text and computer actions accept the same `noFocus` option.
+- **All-tabs picker** — the target-tab selector lists the chat tab group first, then every other open tab in the window (`GET_ALL_TABS`).
 - **Target Tab Cockpit** — allows inspecting, auto-indexing and dispatching clicks to background tabs directly from the side panel selector without activating them in Chrome.
 - **Live tab tracking** — `chrome.tabs.onActivated` / `onUpdated` refresh the banner and reset
   stale indices when the tab changes or finishes loading.
@@ -78,6 +80,7 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 | `GET_TARGET_TAB` | panel → background | `{tabId?, windowId?}` → `{ok, tab}` |
 | `CREATE_CHAT_TAB` | panel/agent → background | `{url?, chatId?, chatTitle?, active?}` → `{ok, tab, groupId}` (active defaults to false) |
 | `GROUP_CHAT_TAB` | panel/agent → background | `{tabId, chatId?, chatTitle?, color?}` → `{ok, groupId, title}` |
+| `GET_ALL_TABS` | panel → background | `{windowId?}` → `{ok, tabs}`; lists every open tab in that window (all windows when omitted) so the panel can target tabs outside the chat group |
 | `GET_CHAT_TABS` | panel/agent → background | `{chatId?}` → `{ok, tabs, groupId, title}` |
 | `NAVIGATE_CHAT_TAB` | panel/agent → background | `{tabId, url, active?}` → `{ok, tab}` (active defaults to false) |
 | `CLOSE_CHAT_TAB` | panel/agent → background | `{tabId}` → `{ok}` |
@@ -88,7 +91,7 @@ Enable the companion explicitly using its checkbox. It starts disabled and activ
 | `CAPTURE_REQUEST` | background → panel | `{windowId}` → triggers a capture |
 | `INDEX_PAGE` | panel → content | `{includeFrames?, offset?, limit?}` → `{ok, documentToken, generation, count, total, truncated, limit, items}` |
 | `CLEAR_INDEX` | panel → content | `{}` → `{ok}` |
-| `CLICK_INDEX` | panel → content | `{index, generation, documentToken}` with target `frameId` → `{ok, x, y, tag}` |
+| `CLICK_INDEX` | panel → content | `{index, generation, documentToken, noFocus?}` with target `frameId` → `{ok, x, y, tag}`; `noFocus: true` skips `focus()` and scrolls only when the target is outside the viewport |
 | `TOGGLE_INSPECTOR` | panel or context menu → content | `{}` → `{ok, active}` |
 | `GET_PAGE_SUMMARY` | panel → content | `{}` → `{ok, title, url, elementsCount}` |
 
