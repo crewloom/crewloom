@@ -766,6 +766,42 @@ class ContentScriptTest(unittest.TestCase):
         finally:
             context.close()
 
+    def test_click_and_type_with_no_focus_does_not_steal_active_element(self):
+        context, page = self.new_page()
+        try:
+            self.fixture(page, 3)
+            res = page.evaluate("""() => {
+              const other = document.createElement('input');
+              other.id = 'unrelated-user-input';
+              document.body.appendChild(other);
+              other.focus();
+              const initialFocus = document.activeElement.id;
+
+              const indexed = indexInteractiveElements();
+              // Click with noFocus: true
+              const clickRes = clickElementByIndex(1, indexed.generation, documentToken, { noFocus: true });
+              const focusAfterClick = document.activeElement.id;
+
+              // Type with noFocus: true
+              const typeRes = typeElementByIndex(1, 'no-focus-text', false, false, indexed.generation, documentToken, { noFocus: true });
+              const focusAfterType = document.activeElement.id;
+
+              return {
+                initialFocus,
+                clickRes,
+                focusAfterClick,
+                typeRes,
+                focusAfterType
+              };
+            }""")
+            self.assertEqual(res['initialFocus'], 'unrelated-user-input')
+            self.assertTrue(res['clickRes']['ok'])
+            self.assertEqual(res['focusAfterClick'], 'unrelated-user-input')
+            self.assertTrue(res['typeRes']['ok'])
+            self.assertEqual(res['focusAfterType'], 'unrelated-user-input')
+        finally:
+            context.close()
+
     def test_disabled_control_blocks_content_actions_and_clears_overlay(self):
         context, page = self.new_page()
         try:
@@ -1091,6 +1127,17 @@ class BackgroundServiceWorkerHeadlessTest(SidePanelHarness):
             self.assertTrue(res['ok'])
             self.assertEqual(res['tab']['url'], 'https://example.com/updated')
             self.assertFalse(res['tab']['active'])
+        finally:
+            context.close()
+
+    def test_background_get_all_tabs(self):
+        context, page = self.new_page()
+        try:
+            self._load_sw(page)
+            res = self._dispatch(page, {'type': 'GET_ALL_TABS'})
+            self.assertTrue(res['ok'])
+            self.assertIsInstance(res['tabs'], list)
+            self.assertEqual(len(res['tabs']), 1)
         finally:
             context.close()
 

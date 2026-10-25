@@ -9,11 +9,38 @@ const INTERACTIVE_SELECTOR =
 
 let isInspectorActive = false;
 let inspectorBox = null;
+let inspectorFrame = null;
 let hudElement = null;
 let trackedTags = [];
+const trackedTagsMap = new Map();
 let repositionFrame = null;
 let indexGeneration = 0;
 const documentToken = globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+
+let pooledClickWave = null;
+let clickWaveTimeout = null;
+
+function triggerClickWave(x, y) {
+  if (clickWaveTimeout) {
+    clearTimeout(clickWaveTimeout);
+    clickWaveTimeout = null;
+  }
+  if (!pooledClickWave) {
+    pooledClickWave = document.createElement('div');
+    pooledClickWave.className = 'crewloom-click-wave';
+    document.body.appendChild(pooledClickWave);
+  }
+  pooledClickWave.style.left = `${x}px`;
+  pooledClickWave.style.top = `${y}px`;
+  pooledClickWave.style.display = 'block';
+  pooledClickWave.style.animation = 'none';
+  void pooledClickWave.offsetWidth;
+  pooledClickWave.style.animation = '';
+  clickWaveTimeout = setTimeout(() => {
+    if (pooledClickWave) pooledClickWave.style.display = 'none';
+    clickWaveTimeout = null;
+  }, 450);
+}
 
 function parentAcrossRoots(element) {
   if (element.parentElement) return element.parentElement;
@@ -22,14 +49,32 @@ function parentAcrossRoots(element) {
   try { return element.ownerDocument.defaultView.frameElement; } catch { return null; }
 }
 
-function canInteract(element) {
+function canInteract(element, ancestorCache = null) {
   if (!element.isConnected || element.disabled || element.getAttribute('aria-disabled') === 'true') return false;
   const rect = element.getBoundingClientRect();
   if (rect.width <= 8 || rect.height <= 8) return false;
+  if (element.hidden || element.inert) return false;
+
   for (let node = element; node; node = parentAcrossRoots(node)) {
-    const style = node.ownerDocument.defaultView.getComputedStyle(node);
-    if (node.inert || node.hidden || style.display === 'none' || style.visibility !== 'visible' ||
-        Number(style.opacity) === 0 || style.pointerEvents === 'none') return false;
+    if (ancestorCache && ancestorCache.has(node)) {
+      if (!ancestorCache.get(node)) return false;
+      continue;
+    }
+    if (node.inert || node.hidden) {
+      if (ancestorCache) ancestorCache.set(node, false);
+      return false;
+    }
+    const doc = node.ownerDocument;
+    const view = doc ? doc.defaultView : window;
+    const style = view ? view.getComputedStyle(node) : null;
+    if (style) {
+      if (style.display === 'none' || style.visibility !== 'visible' ||
+          Number(style.opacity) === 0 || style.pointerEvents === 'none') {
+        if (ancestorCache) ancestorCache.set(node, false);
+        return false;
+      }
+    }
+    if (ancestorCache) ancestorCache.set(node, true);
   }
   return true;
 }
@@ -199,11 +244,25 @@ function indexInteractiveElements(options = {}) {
     if (roots.has(root)) return;
     roots.add(root);
     elements.push(...root.querySelectorAll(INTERACTIVE_SELECTOR));
-    for (const node of root.querySelectorAll('*')) {
-      if (node.shadowRoot) collect(node.shadowRoot);
-      if (options.includeFrames !== false && node.tagName === 'IFRAME') {
-        try { if (node.contentDocument) collect(node.contentDocument); else blockedFrames++; }
-        catch { blockedFrames++; }
+    const doc = root.ownerDocument || (root.nodeType === 9 ? root : document);
+    if (doc?.createTreeWalker) {
+      const walker = doc.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+      let node = walker.nextNode();
+      while (node) {
+        if (node.shadowRoot) collect(node.shadowRoot);
+        if (options.includeFrames !== false && node.tagName === 'IFRAME') {
+          try { if (node.contentDocument) collect(node.contentDocument); else blockedFrames++; }
+          catch { blockedFrames++; }
+        }
+        node = walker.nextNode();
+      }
+    } else {
+      for (const node of root.querySelectorAll('*')) {
+        if (node.shadowRoot) collect(node.shadowRoot);
+        if (options.includeFrames !== false && node.tagName === 'IFRAME') {
+          try { if (node.contentDocument) collect(node.contentDocument); else blockedFrames++; }
+          catch { blockedFrames++; }
+        }
       }
     }
   }
@@ -220,12 +279,13 @@ function indexInteractiveElements(options = {}) {
   const limit = Number.isInteger(options.limit) && options.limit >= 0
     ? Math.min(options.limit, MAX_INDEXED_ELEMENTS) : MAX_INDEXED_ELEMENTS;
 
+  const ancestorCache = new Map();
   for (const el of elements) {
     // Skip our own overlay chrome
     if (el.closest('.crewloom-agent-hud') || el.closest('#crewloom-grounding-overlay')) continue;
 
     const rect = pageRect(el);
-    if (!canInteract(el)) continue;
+    if (!canInteract(el, ancestorCache)) continue;
 
     total += 1;
 
@@ -244,6 +304,7 @@ function indexInteractiveElements(options = {}) {
 
     const entry = { element: el, tag, index, fingerprint: targetFingerprint(el) };
     trackedTags.push(entry);
+    trackedTagsMap.set(index, entry);
     placeTag(entry);
 
     items.push({
@@ -295,21 +356,30 @@ function clearAllIndexTags() {
     overlay.style.display = 'none';
   }
   trackedTags = [];
+  trackedTagsMap.clear();
 }
 
 // Trigger simulated agent click with visual wave
-function clickElementByIndex(index, generation = indexGeneration, expectedDocument = documentToken) {
+function clickElementByIndex(index, generation = indexGeneration, expectedDocument = documentToken, options = {}) {
+  const noFocus = Boolean(options?.noFocus);
   if (!Number.isInteger(index) || index < 1 || generation !== indexGeneration) {
     return { ok: false, error: 'Stale or invalid element index; re-index the page' };
   }
   if (expectedDocument !== documentToken) return { ok: false, error: 'Document changed; re-index the page' };
-  const entry = trackedTags.find((entry) => entry.index === index);
+  const entry = trackedTagsMap.get(index);
   const el = entry?.element;
   if (!el?.isConnected) return { ok: false, error: 'Indexed element was removed; re-index the page' };
   if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el)) {
     return { ok: false, error: 'Indexed element changed or is not interactive; re-index the page' };
   }
-  el.scrollIntoView({ behavior: 'instant', block: 'center' });
+  if (!noFocus) {
+    el.scrollIntoView({ behavior: 'instant', block: 'center' });
+  } else {
+    const rect = el.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > window.innerHeight) {
+      el.scrollIntoView({ behavior: 'instant', block: 'nearest' });
+    }
+  }
   if (!canInteract(el) || targetFingerprint(el) !== entry.fingerprint || !hitTarget(el)) {
     return { ok: false, error: 'Indexed element is covered or changed; re-index the page' };
   }
@@ -318,19 +388,16 @@ function clickElementByIndex(index, generation = indexGeneration, expectedDocume
   const clickY = rect.top + rect.height / 2;
 
   // Render expanding click wave
-  const wave = document.createElement('div');
-  wave.className = 'crewloom-click-wave';
-  wave.style.left = `${clickX}px`;
-  wave.style.top = `${clickY}px`;
-  document.body.appendChild(wave);
-  setTimeout(() => wave.remove(), 500);
+  triggerClickWave(clickX, clickY);
 
   // Trigger real click
-  try {
-    el.focus?.({ preventScroll: true });
-  } catch {}
-  if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el) || !hitTarget(el)) {
-    return { ok: false, error: 'Target changed on focus; re-index the page' };
+  if (!noFocus) {
+    try {
+      el.focus?.({ preventScroll: true });
+    } catch {}
+    if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el) || !hitTarget(el)) {
+      return { ok: false, error: 'Target changed on focus; re-index the page' };
+    }
   }
   const mouseOpts = { bubbles: true, cancelable: true, view: window, clientX: clickX, clientY: clickY };
   try {
@@ -346,18 +413,21 @@ function clickElementByIndex(index, generation = indexGeneration, expectedDocume
 }
 
 // Type text into indexed form elements without stealing focus
-function typeElementByIndex(index, text, clearBefore = false, pressEnter = false, generation = indexGeneration, expectedDocument = documentToken) {
+function typeElementByIndex(index, text, clearBefore = false, pressEnter = false, generation = indexGeneration, expectedDocument = documentToken, options = {}) {
+  const noFocus = Boolean(options?.noFocus);
   if (!Number.isInteger(index) || index < 1 || generation !== indexGeneration) {
     return { ok: false, error: 'Stale or invalid element index; re-index the page' };
   }
   if (expectedDocument !== documentToken) return { ok: false, error: 'Document changed; re-index the page' };
-  const entry = trackedTags.find((entry) => entry.index === index);
+  const entry = trackedTagsMap.get(index);
   const el = entry?.element;
   if (!el?.isConnected) return { ok: false, error: 'Indexed element was removed; re-index the page' };
   if (targetFingerprint(el) !== entry.fingerprint || !canInteract(el)) {
     return { ok: false, error: 'Indexed element changed or is not interactive; re-index the page' };
   }
-  try { el.focus?.({ preventScroll: true }); } catch {}
+  if (!noFocus) {
+    try { el.focus?.({ preventScroll: true }); } catch {}
+  }
 
   const formElement = ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName);
   if (formElement) {
@@ -425,6 +495,10 @@ function toggleInspector(forceState) {
     document.addEventListener('mousemove', onInspectorMouseMove, { passive: true });
     showHud('inspector');
   } else {
+    if (inspectorFrame !== null) {
+      window.cancelAnimationFrame(inspectorFrame);
+      inspectorFrame = null;
+    }
     if (inspectorBox) inspectorBox.remove();
     inspectorBox = null;
     document.removeEventListener('mousemove', onInspectorMouseMove);
@@ -433,19 +507,26 @@ function toggleInspector(forceState) {
 
 function onInspectorMouseMove(e) {
   if (!isInspectorActive || !inspectorBox) return;
+  const clientX = e.clientX, clientY = e.clientY;
   const original = e.composedPath?.()[0];
-  const target = original?.nodeType === 1 ? original : document.elementFromPoint(e.clientX, e.clientY);
-  if (!target || target.closest('.crewloom-agent-hud') || target === inspectorBox) return;
 
-  const rect = target.getBoundingClientRect();
-  inspectorBox.style.left = `${rect.left}px`;
-  inspectorBox.style.top = `${rect.top}px`;
-  inspectorBox.style.width = `${rect.width}px`;
-  inspectorBox.style.height = `${rect.height}px`;
+  if (inspectorFrame !== null) return;
+  inspectorFrame = window.requestAnimationFrame(() => {
+    inspectorFrame = null;
+    if (!isInspectorActive || !inspectorBox) return;
+    const target = original?.nodeType === 1 ? original : document.elementFromPoint(clientX, clientY);
+    if (!target || target.closest('.crewloom-agent-hud') || target === inspectorBox) return;
 
-  const label = inspectorBox.querySelector('.crewloom-inspector-label');
-  const tagDesc = `${target.tagName.toLowerCase()}${target.id ? '#' + target.id : ''}`;
-  label.textContent = `<${tagDesc}> (${Math.round(rect.width)}×${Math.round(rect.height)})`;
+    const rect = target.getBoundingClientRect();
+    inspectorBox.style.left = `${rect.left}px`;
+    inspectorBox.style.top = `${rect.top}px`;
+    inspectorBox.style.width = `${rect.width}px`;
+    inspectorBox.style.height = `${rect.height}px`;
+
+    const label = inspectorBox.querySelector('.crewloom-inspector-label');
+    const tagDesc = `${target.tagName.toLowerCase()}${target.id ? '#' + target.id : ''}`;
+    label.textContent = `<${tagDesc}> (${Math.round(rect.width)}×${Math.round(rect.height)})`;
+  });
 }
 
 let currentCursor = { x: 0, y: 0 };
@@ -496,14 +577,11 @@ function executeComputerAction(message) {
   if (['left_click', 'right_click', 'middle_click', 'double_click', 'triple_click'].includes(action)) {
     renderAgentCursor(x, y);
     const target = resolvePointElement(x, y);
-    const wave = document.createElement('div');
-    wave.className = 'crewloom-click-wave';
-    wave.style.left = `${x}px`;
-    wave.style.top = `${y}px`;
-    document.body.appendChild(wave);
-    setTimeout(() => wave.remove(), 450);
+    triggerClickWave(x, y);
 
-    try { target.focus?.({ preventScroll: true }); } catch {}
+    if (!message.noFocus && message.focus !== false) {
+      try { target.focus?.({ preventScroll: true }); } catch {}
+    }
 
     const button = action === 'right_click' ? 2 : (action === 'middle_click' ? 1 : 0);
     const mouseOpts = { bubbles: true, cancelable: true, view: window, clientX: x, clientY: y, button, buttons: button === 2 ? 2 : (button === 1 ? 4 : 1) };
@@ -627,7 +705,7 @@ function handleMessage(message, sender, sendResponse) {
     if (!Number.isInteger(message.generation) || message.documentToken !== documentToken) {
       sendResponse({ ok: false, error: 'Index generation and document token required; re-index the page' }); return;
     }
-    sendResponse(clickElementByIndex(message.index, message.generation, message.documentToken));
+    sendResponse(clickElementByIndex(message.index, message.generation, message.documentToken, { noFocus: message.noFocus }));
     return false;
   }
 
@@ -635,7 +713,7 @@ function handleMessage(message, sender, sendResponse) {
     if (!Number.isInteger(message.generation) || message.documentToken !== documentToken) {
       sendResponse({ ok: false, error: 'Index generation and document token required; re-index the page' }); return;
     }
-    sendResponse(typeElementByIndex(message.index, message.text || '', Boolean(message.clearBefore), Boolean(message.pressEnter), message.generation, message.documentToken));
+    sendResponse(typeElementByIndex(message.index, message.text || '', Boolean(message.clearBefore), Boolean(message.pressEnter), message.generation, message.documentToken, { noFocus: message.noFocus }));
     return false;
   }
 

@@ -253,6 +253,21 @@ function handleMessage(message, sender, sendResponse) {
     return true;
   }
 
+  // List all open tabs in window
+  if (message.type === 'GET_ALL_TABS') {
+    const query = Number.isInteger(message.windowId) && message.windowId >= 0
+      ? { windowId: message.windowId }
+      : {};
+    chrome.tabs.query(query, (tabs) => {
+      if (chrome.runtime.lastError) {
+        sendResponse({ ok: false, error: chrome.runtime.lastError.message });
+      } else {
+        sendResponse({ ok: true, tabs: tabs || [] });
+      }
+    });
+    return true;
+  }
+
   // Navigate a chat tab in the background without stealing focus
   if (message.type === 'NAVIGATE_CHAT_TAB') {
     const tabId = message.tabId;

@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const activeTabOption = document.getElementById('activeTabOption');
 
   const LANG_KEY = 'crewloom.lang';
+  const BG_BROWSING_KEY = 'crewloom.bgBrowsing';
   const MAX_DIRECTORY_ROWS = 50;
   const RESTRICTED_URL = /^(chrome|edge|brave|about|chrome-extension|devtools|view-source):/i;
 
@@ -152,6 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
       bgBrowsingMode: "Background browsing (no focus)",
       activeForegroundTab: "Active Foreground Tab",
       chatTabOption: "Chat Tab #{id}: {title}",
+      chatTabsGroup: "Chat Tab Group",
+      otherTabsGroup: "Open Browser Tabs",
+      otherTabOption: "Tab #{id}: {title}",
       logTabGroupCreated: "Tab added to Chrome tab group for chat: {name}",
       logBgTabCreated: "Created background tab #{id} without stealing focus.",
       logBgNavigated: "Navigated background tab #{id} without stealing focus."
@@ -250,6 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
       bgBrowsingMode: "تصفح خلفي (بدون فوكس)",
       activeForegroundTab: "التبويب النشط الحالي",
       chatTabOption: "تبويب شات #{id}: {title}",
+      chatTabsGroup: "مجموعة تبويبات الشات",
+      otherTabsGroup: "تبويبات المتصفح المفتوحة",
+      otherTabOption: "تبويب #{id}: {title}",
       logTabGroupCreated: "تمت إضافة التبويب إلى مجموعة كروم للشات: {name}",
       logBgTabCreated: "تم إنشاء تبويب خلفي #{id} دون سحب الفوكس.",
       logBgNavigated: "تم توجيه التبويب الخلفي #{id} دون سحب الفوكس."
@@ -401,34 +408,57 @@ document.addEventListener('DOMContentLoaded', () => {
   function refreshChatTabsList() {
     const chatId = chatSessionInput?.value?.trim() || 'Chat 1';
     chrome.runtime.sendMessage({ type: 'GET_CHAT_TABS', chatId }, (res) => {
-      if (!res?.ok) return;
-      cachedChatTabs = res.tabs || [];
-      if (!targetTabSelect) return;
+      cachedChatTabs = (res?.ok && res.tabs) ? res.tabs : [];
+      chrome.runtime.sendMessage({ type: 'GET_ALL_TABS', windowId: panelWindowId }, (allRes) => {
+        const allTabs = (allRes?.ok && allRes.tabs) ? allRes.tabs : [];
+        if (!targetTabSelect) return;
 
-      const currentVal = targetTabSelect.value;
-      targetTabSelect.innerHTML = '';
+        const currentVal = targetTabSelect.value;
+        targetTabSelect.innerHTML = '';
 
-      const optActive = document.createElement('option');
-      optActive.value = 'active';
-      optActive.id = 'activeTabOption';
-      optActive.textContent = t('activeForegroundTab');
-      targetTabSelect.appendChild(optActive);
+        const optActive = document.createElement('option');
+        optActive.value = 'active';
+        optActive.id = 'activeTabOption';
+        optActive.textContent = t('activeForegroundTab');
+        targetTabSelect.appendChild(optActive);
 
-      cachedChatTabs.forEach((tab) => {
-        const opt = document.createElement('option');
-        opt.value = String(tab.id);
-        const title = tab.title ? (tab.title.length > 25 ? tab.title.slice(0, 25) + '...' : tab.title) : (tab.url || t('untitled'));
-        opt.textContent = t('chatTabOption', { id: tab.id, title });
-        targetTabSelect.appendChild(opt);
+        const chatTabIds = new Set(cachedChatTabs.map(t => t.id));
+
+        if (cachedChatTabs.length > 0) {
+          const groupChat = document.createElement('optgroup');
+          groupChat.label = t('chatTabsGroup');
+          cachedChatTabs.forEach((tab) => {
+            const opt = document.createElement('option');
+            opt.value = String(tab.id);
+            const title = tab.title ? (tab.title.length > 25 ? tab.title.slice(0, 25) + '...' : tab.title) : (tab.url || t('untitled'));
+            opt.textContent = t('chatTabOption', { id: tab.id, title });
+            groupChat.appendChild(opt);
+          });
+          targetTabSelect.appendChild(groupChat);
+        }
+
+        const otherTabs = allTabs.filter(tab => !chatTabIds.has(tab.id));
+        if (otherTabs.length > 0) {
+          const groupOther = document.createElement('optgroup');
+          groupOther.label = t('otherTabsGroup');
+          otherTabs.forEach((tab) => {
+            const opt = document.createElement('option');
+            opt.value = String(tab.id);
+            const title = tab.title ? (tab.title.length > 25 ? tab.title.slice(0, 25) + '...' : tab.title) : (tab.url || t('untitled'));
+            opt.textContent = t('otherTabOption', { id: tab.id, title });
+            groupOther.appendChild(opt);
+          });
+          targetTabSelect.appendChild(groupOther);
+        }
+
+        if (currentVal && [...targetTabSelect.querySelectorAll('option')].some(o => o.value === currentVal)) {
+          targetTabSelect.value = currentVal;
+          selectedTargetTabId = currentVal;
+        } else {
+          targetTabSelect.value = 'active';
+          selectedTargetTabId = 'active';
+        }
       });
-
-      if (currentVal && [...targetTabSelect.options].some(o => o.value === currentVal)) {
-        targetTabSelect.value = currentVal;
-        selectedTargetTabId = currentVal;
-      } else {
-        targetTabSelect.value = 'active';
-        selectedTargetTabId = 'active';
-      }
     });
   }
 
@@ -607,7 +637,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const activeTargetId = getTargetTabId();
     if (!activeTargetId || !target || target.tabId !== activeTargetId) return;
     log('logClick', 'action', { index });
-    const message = { type: 'CLICK_INDEX', index, generation: target.generation, documentToken:target.documentToken };
+    const noFocus = bgBrowsingToggle ? bgBrowsingToggle.checked : true;
+    const message = { type: 'CLICK_INDEX', index, generation: target.generation, documentToken: target.documentToken, noFocus };
     const reply = (res) => {
       if (res?.ok) {
         log('logClicked', 'success', {
@@ -788,12 +819,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setLanguage(language === 'ar' ? 'en' : 'ar', true);
   });
 
-  chrome.storage.local.get(LANG_KEY, (stored) => {
+  chrome.storage.local.get([LANG_KEY, BG_BROWSING_KEY], (stored) => {
     applyLanguage(stored?.[LANG_KEY]);
+    if (bgBrowsingToggle && typeof stored?.[BG_BROWSING_KEY] === 'boolean') {
+      bgBrowsingToggle.checked = stored[BG_BROWSING_KEY];
+    }
     log('logInit', 'info', { version: chrome.runtime.getManifest().version });
     refreshActiveTab();
     refreshChatTabsList();
   });
+
+  if (bgBrowsingToggle) {
+    bgBrowsingToggle.addEventListener('change', () => {
+      chrome.storage.local.set({ [BG_BROWSING_KEY]: bgBrowsingToggle.checked });
+    });
+  }
 
   const control = document.getElementById('companionEnabled');
   function showControl(enabled) {
