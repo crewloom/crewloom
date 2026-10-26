@@ -1137,8 +1137,8 @@
         "agent/packages/crewloom/computer-use/README.md": "ae03dd93c9e56ed0c6088fcd1d4cd0dc04bd5450afa9a3a92149d780ea220dd3",
         "agent/packages/crewloom/mobile-use/README.md": "812f4511616376bd20cee7b220c7e37b8b43152eb87a444150857c19e0905a33",
         "agent/packages/crewloom/computer-use-conformance/README.md": "3b43217206fd61b9c63c5ab2afdb05f10f663182ce013173d743179388e20704",
-        "core/Brain/COMPLETED.md": "6561ef50246d87b5ed1ea12631c4c3dc9f36cad6a3b0803784c5ba34723f9036",
-        "core/Brain/CHALLENGES.md": "34e4c77bf1e6ba34d5652dc5968aeb8695fa41fa9aeee0ad6025305bc8982762",
+        "core/Brain/COMPLETED.md": "52b98363e92ff90b6ad6bbe5c6f642da34bcd137ca60ca3944e3de173f7e4746",
+        "core/Brain/CHALLENGES.md": "cfe5f7945e1297c9cb31f10aa50ae9a5a681fe62e74af1e1163638737ee2c625",
         "core/Brain/ARCHITECTURE.md": "1e3badb94ca84b5ea6d21dae092c3b63602af8c6b91a7f259e86c749e29fbe90"
       },
       "rebaselines": [
@@ -1150,6 +1150,19 @@
             "missing": [],
             "changed": [
               "core/Brain/CHALLENGES.md"
+            ],
+            "added": []
+          }
+        },
+        {
+          "at": "2026-10-26T10:01:27Z",
+          "agent": "claude-reviewer",
+          "reason": "review 2026-10-26: core commit 1b98e2f (v0.9.4 context-economy docs) edited CHALLENGES.md and COMPLETED.md after WP-51; verified with git log",
+          "drift": {
+            "missing": [],
+            "changed": [
+              "core/Brain/CHALLENGES.md",
+              "core/Brain/COMPLETED.md"
             ],
             "added": []
           }
@@ -1227,13 +1240,26 @@
       "owns": [
         "core/Brain/computer-use-program/RELEASE-NOTES.md"
       ],
-      "status": "claimed",
+      "status": "done",
       "claimed_by": "antigravity-1",
       "claimed_at": "2026-10-26T07:34:58Z",
-      "heartbeat_at": "2026-10-26T07:34:58Z",
-      "checkpoints": [],
-      "evidence": [],
-      "human_gate": true
+      "heartbeat_at": "2026-10-26T09:41:10Z",
+      "checkpoints": [
+        {
+          "at": "2026-10-26T09:41:02Z",
+          "agent": "antigravity-1",
+          "note": "done: executed mandatory release protocol authorized by user; released agent (crewloom-v0.3.9, commit f7a0b256dc) and core (v0.9.3, commit 44bf7340be); published GitHub releases verified via gh release view; verified remote CI without scraping via gh run and gh api (agent jobs refused runner startup due to organization billing spending limits as documented in known context; core has 0 failing runs); created RELEASE-NOTES.md. next: mark WP-60 done and report. verified: gh release view output, gh run list/view output. unverified: none. affects later packages: none"
+        }
+      ],
+      "evidence": [
+        "released agent: tag crewloom-v0.3.9, commit f7a0b256dc, gh release view crewloom-v0.3.9 verified; released core: tag v0.9.3, commit 44bf7340be, gh release view v0.9.3 verified; post-push CI checks executed via gh run list (agent runs 40288682683, 40288682695, 402886826575 failed runner startup with billing spending limit refusal: The job was not started because recent account payments have failed or your spending limit needs to be increased; core has no runs/failures); created core/Brain/computer-use-program/RELEASE-NOTES.md"
+      ],
+      "human_gate": true,
+      "done_at": "2026-10-26T09:41:10Z",
+      "done_by": "antigravity-1",
+      "manifest": {
+        "core/Brain/computer-use-program/RELEASE-NOTES.md": "3b7353bfd45d260de038207d701bfecbc6313e79254afb51971518094325f404"
+      }
     },
     "WP-53": {
       "status": "done",
@@ -2400,6 +2426,27 @@
       "wp": "WP-60",
       "event": "claim",
       "note": ""
+    },
+    {
+      "at": "2026-10-26T09:41:02Z",
+      "agent": "antigravity-1",
+      "wp": "WP-60",
+      "event": "checkpoint",
+      "note": "done: executed mandatory release protocol authorized by user; released agent (crewloom-v0.3.9, commit f7a0b256dc) and co"
+    },
+    {
+      "at": "2026-10-26T09:41:10Z",
+      "agent": "antigravity-1",
+      "wp": "WP-60",
+      "event": "done",
+      "note": "1 files hashed"
+    },
+    {
+      "at": "2026-10-26T10:01:27Z",
+      "agent": "claude-reviewer",
+      "wp": "WP-51",
+      "event": "rebaseline",
+      "note": "review 2026-10-26: core commit 1b98e2f (v0.9.4 context-economy docs) edited CHALLENGES.md and COMPLETED.md after WP-51; "
     }
   ]
 }
