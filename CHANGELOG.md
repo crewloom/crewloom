@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.4 — 2026-10-26
+
+- Add the context-economy benchmark (`benchmarks/context-economy/`): ten read-only repository tasks measured from provider-reported tokens with graded answers, plus its first Claude Code baseline recorded in `Brain/COMPLETED.md`.
+- Record the Pulse placeholder-install issue and its follow-ups in `Brain/CHALLENGES.md` and `Brain/ROADMAP_TODO.md`.
+
 ## 0.9.3 — 2026-10-26
 
 - Universal Computer Use programme: deliver multi-platform desktop and mobile automation contracts, policy gate, audit trail, strategy ladders, and conformance harness.
