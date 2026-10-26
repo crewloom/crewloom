@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2 — 2026-10-26
+
+- Replace the README banner with the woven Crewloom mark and current counts (47 roles, 24 registered tools); the banner animates in browsers that run SVG animation.
+
 ## 0.9.1 — 2026-10-25
 
 - Add the woven-mark loader to the dashboard: the opening screen and route loading show the Crewloom mark weaving itself, with the finished mark for visitors who reduce motion.

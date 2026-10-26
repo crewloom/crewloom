@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.1",
+  "package_version": "0.9.2",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -498,7 +498,7 @@
     "Brain/COMPLETED.md": "fa0fc64419bde6a848cd95dc5965eb9ad844ca1ba5419a86785002399b0d3de5",
     "Brain/IDEAS_VAULT.md": "7e41e58f729c9993951a89fc5441972356ded4ab435f57f9cec0bd4afe30c169",
     "Brain/ROADMAP_TODO.md": "332ca256f8baf5b64ed138ca559650511b359f5e204d0daf8e0e3c4cbc45832c",
-    "CHANGELOG.md": "6c182d0f699adba53358651970c7cb11c158693edd3c0ae148e47a18b399eeb6",
+    "CHANGELOG.md": "ba91041bed8363bcd38abee645c404d2f8f7c4f6782b3acf75c48fc11fe77251",
     "CONTRIBUTING.md": "6237e5a0f8eed5addda8220f179a5fec831a45d6b950e7fab10669ed28dd59f9",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "MANIFEST.in": "350519cb71b6be3b612f01c9c484208182772c2897b65568099bf41cffbab1df",
@@ -519,7 +519,7 @@
     "adapters/interop/crewai_sandbox.py": "1d46ab2bdea046f0dbb4be24e0b9d92f234a094a104ed30cc42beccde4ce1319",
     "adapters/interop/langgraph_sandbox.py": "8eeb3b373d0ea65d239f9677b15708b7a805732b8e8436ca96e1c65f7446acb9",
     "adapters/opencode/crewloom-lifecycle.js": "1438a80ed3386b2255dc06c0db4fc670bc3b96062496cf09c836030f3b6ffc33",
-    "assets/crewloom-banner.svg": "2924a9bf3b2fa51960c8ad983aca4a5e546a1483dfe0c076d8dd950da5cbe8e9",
+    "assets/crewloom-banner.svg": "01b882148f3feb6eef83932a711580962f2153ea255a46c1837ac546316a0c58",
     "assets/crewloom-chrome-extension.zip": "fec9572f33e54dc13aabce512bff71f5b931082aab9144711a0d1c2a425f32d4",
     "assets/crewloom-computer-use-icon.png": "a2b12aa6ae074ed7c0c5fbdcaddd33f5a0d2556e7f3d76da6ac58d3d57151c3b",
     "assets/crewloom-computer-use-icon.svg": "e57e1b186a7f2c1dc2cd53ff7fb56a57e0b9da99ead063d9893299bf7070b984",
@@ -800,7 +800,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "a817be793abfa1d528c48848024992af3c761ebbf5e80a9ea5f441cf2e3fb901",
+    "pyproject.toml": "8ab922dee9260593af2bf2c9cbf06a59d051b772ca0a9e8b5415ca24af261ca7",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
