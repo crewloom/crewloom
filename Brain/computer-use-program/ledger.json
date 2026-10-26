@@ -1650,12 +1650,20 @@
       }
     },
     "WP-62": {
-      "status": "todo",
-      "claimed_by": null,
-      "claimed_at": null,
-      "heartbeat_at": null,
-      "checkpoints": [],
-      "evidence": [],
+      "status": "done",
+      "claimed_by": "antigravity-1",
+      "claimed_at": "2026-10-26T10:17:46Z",
+      "heartbeat_at": "2026-10-26T10:24:27.599Z",
+      "checkpoints": [
+        {
+          "at": "2026-10-26T10:18:46Z",
+          "agent": "antigravity-1",
+          "note": "Step 1 verified: adb devices -l shows emulator-5554 (transport_id:5). emulator -list-avds shows Chix_Isolated_QA, Flutter_Pixel_API_35_CLEAN_TEST. Read mobile-use/tests/android/{adb,text,ui}/live.spec.ts confirming devices.find(state===device) and expect(true).toBe(true) false passes."
+        }
+      ],
+      "evidence": [
+        "liveAndroidSerial unit tests passed (4 passed: refuses unset, physical devices, user emulators emulator-5554, accepts crewloom-conformance-*); with unset CREWLOOM_LIVE_ANDROID_SERIAL, vitest run packages/crewloom/mobile-use/tests/android/ shows 41 passed, 3 skipped, zero live adb calls; package tsc clean without TS errors."
+      ],
       "title": "Make Android live tests safe and non-vacuous",
       "lane": "fix",
       "role": "SDET",
@@ -1667,7 +1675,15 @@
         "agent/packages/crewloom/mobile-use/tests/android/text/live.spec.ts",
         "agent/packages/crewloom/mobile-use/tests/android/ui/live.spec.ts",
         "agent/packages/crewloom/mobile-use/tests/android/live-support.ts"
-      ]
+      ],
+      "done_at": "2026-10-26T10:24:27.599Z",
+      "done_by": "antigravity-1",
+      "manifest": {
+        "agent/packages/crewloom/mobile-use/tests/android/live-support.ts": "ff8486a52a1afdc7171372eb457a404f0bf7cef2633413384a4819506c43c5a1",
+        "agent/packages/crewloom/mobile-use/tests/android/adb/live.spec.ts": "b9427d084d0c122373fc087395e85fc434ac8a261179f89c708e818b333c082a",
+        "agent/packages/crewloom/mobile-use/tests/android/text/live.spec.ts": "cb8c806b31bc159946f60f6bfa7d2e9b4ab5e6c306bcd48fa1fc69ef0a6efbae",
+        "agent/packages/crewloom/mobile-use/tests/android/ui/live.spec.ts": "907ea0abd6c885abee0f03946ff26e478729ba26e2f5d8fd6b130d91f16da4a9"
+      }
     },
     "WP-63": {
       "status": "todo",
@@ -2510,6 +2526,27 @@
       "wp": "WP-34",
       "event": "edit",
       "note": "re-scoped: runs on the dedicated emulator of this machine; depends on WP-62"
+    },
+    {
+      "at": "2026-10-26T10:17:46Z",
+      "agent": "antigravity-1",
+      "wp": "WP-62",
+      "event": "claim",
+      "note": ""
+    },
+    {
+      "at": "2026-10-26T10:18:46Z",
+      "agent": "antigravity-1",
+      "wp": "WP-62",
+      "event": "checkpoint",
+      "note": "Step 1 verified: adb devices -l shows emulator-5554 (transport_id:5). emulator -list-avds shows Chix_Isolated_QA, Flutte"
+    },
+    {
+      "at": "2026-10-26T10:24:27.599Z",
+      "agent": "antigravity-1",
+      "wp": "WP-62",
+      "event": "done",
+      "note": "4 files hashed"
     }
   ]
 }
