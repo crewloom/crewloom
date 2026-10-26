@@ -1,5 +1,15 @@
 # Challenges
 
+### 2026-10-26 — Android ADB Unicode and Arabic input crashes InputShellCommand
+- Cause: `adb shell input text` internally relies on Android's `KeyCharacterMap` to convert characters into key event combinations. For non-ASCII characters (Arabic letters, Tashkeel diacritics, and emoji), `getEvents` returns `null`, causing an unhandled `NullPointerException` inside `com.android.server.input.InputShellCommand.sendText` on Android 10+ (empirically confirmed on Android 15 API 35).
+- Solution: Two-tier strategy selection in `src/android/text`: pure ASCII strings route to `input text`, while Arabic, mixed RTL/LTR, diacritics, and emoji route to base64-encoded clipboard transfer via Crewloom helper broadcast intent followed by `KEYCODE_PASTE` (key event 279), avoiding the shell character map entirely.
+- Status: Resolved in WP-33; tested and verified live on active emulator.
+
+### 2026-10-26 — ExactOptionalPropertyTypes with conditional option objects in TypeScript
+- Cause: Under `exactOptionalPropertyTypes: true`, passing an object literal with `{ property: options.property }` where `property?: T` causes TS2379 because `undefined` is not an assignable type when the property is defined as `property?: T`.
+- Solution: Use conditional object spreading `...(options.property !== undefined ? { property: options.property } : {})` or explicitly declare `readonly property?: T | undefined` on the interface.
+- Status: Resolved across `mobile-use` and `preset`.
+
 ### 2026-10-15 — Python 3.9 native lock construction
 - Cause: asyncio.Lock was created by a synchronous controller constructor; Python 3.9 eagerly binds it to an absent/old loop after asyncio.run, causing six hosted errors.
 - Solution: lazy allocation inside the running operation loop, explicit foreign-loop refusal and contended serialization regression; nine offline cases pass on actual Python 3.9 and 3.14, one approved-live case remains opt-in.
@@ -386,3 +396,5 @@
 - 2026-10-25 | The first hardware probe defaulted to 4 GB RAM / 10 GB disk when measurement failed or the OS was unsupported (Windows), which could mark a machine eligible without measuring it, and embedded Arabic copy in Rust. Fix: probes return `Option`, unmeasured values deny eligibility with `probe_unavailable`, the pure `assess` decision is unit-tested, and the UI maps reason codes to ar/en dictionary strings. Headless Antigravity cannot run commands without a permission bypass and OpenCode beam-free stalled on read-only review; verify delegated claims against the code instead of trusting them.
 
 - 2026-10-25 | Uncommitted parallel edits from another session were still being written to `extensions/chrome/content.js` while a release was attempted. Fix: back up `git diff --binary` plus file copies, wait until every changed file was idle for 180 seconds, re-run tests and `package_browser --check` on the final state, then commit by explicit path in separate units (rules in `AGENTS.md`). Known defect left for its author: `scripts/computer_use.py` defines `--no-focus` as `store_true` with `default=True`, so the flag cannot be turned off from the CLI.
+
+- 2026-10-26 | `install_pulse_engine` (`agent/apps/crewloom-desktop/src-tauri/src/hardware.rs`) previously wrote a small JSON descriptor named `pulse-1.5b.crw` and returned success without real weights. Fix: added `is_genuine_crw_weights` checking for genuine `CRW1` magic bytes. When missing or invalid, installation fails honestly with typed `weights_unavailable` error mapped in both Arabic and English dictionaries in `i18n.ts`. Unit test `weights_check_requires_crw1_magic_bytes` passes in Rust suite. In addition, `usage-ledger.ts` was wired into `storage.ts` behind `UsageRecord`, and all inline ternary localizations in `UsageView.tsx` were eliminated. All 137 desktop node tests and 45 Rust tests pass.

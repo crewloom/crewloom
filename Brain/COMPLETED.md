@@ -1,5 +1,10 @@
 # Completed work
 
+### 2026-10-26 — Universal Computer Use Programme: Desktop & Mobile Automation Architecture
+- Artifact: `packages/crewloom/contracts`, `packages/crewloom/computer-use`, `packages/crewloom/mobile-use`, `packages/crewloom/computer-use-conformance`, `.github/workflows/computer-use-conformance.yml`, `core/Brain/computer-use-program/`.
+- Impact: Unified hexagonal architecture for desktop (macOS Aqua, Windows, Linux) and mobile (Android ADB, iOS Simulator) computer use. Complete policy and security layer (`PolicyGate`, denylist, kill switch), deterministic action auditing (`AuditTrail`), multi-rung fallback (`StrategyLadder`), bilingual error messaging (Arabic & English), native macOS Aqua adapter, complete Android ADB automation (transport, UI hierarchy dump parsing, gestures, screenshot with secure surface detection, Arabic text input with clipboard-paste strategy), iOS Simulator adapter (simctl + WDA REST client), and CI matrix workflow.
+- Evidence: Over 220 tests passing across the Crewloom suite; live macOS Aqua conformance verified (I1, I2, I4, I5); live Android ADB execution verified against running API 35 emulator (`emulator-5554`); live iOS Simulator listing verified against Xcode xcrun.
+
 ### 2026-10-18 — Zero-friction developer experience, Cursor/Windsurf MCP, and competitive positioning
 - Artifact: `quickstart.sh`, `scripts/crewloom.py`, `examples/mcp/cursor.json`, `examples/mcp/windsurf.json`, `examples/mcp/README.md`, `README.md`, `README.ar.md`, `scripts/test_e2e_expansion.py`.
 - Impact: Fast zero-install quickstart script (`./quickstart.sh`) with dry-run support; rich interactive ANSI CLI walkthrough (`crewloom demo`); official MCP configurations for Cursor and Windsurf (resolving Issue #40); 7-dimension competitive framework comparison matrix and vector architecture workflow diagrams in English and Arabic.

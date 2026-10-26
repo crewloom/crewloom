@@ -1,5 +1,8 @@
 # Repository architecture
 
+### 2026-10-26 — Universal Computer Use architecture
+The Universal Computer Use programme establishes a hexagonal, port-and-adapter architecture for desktop and mobile automation across macOS, Windows, Linux, Android, and iOS. Core domain types and contracts reside in `@crewloom/contracts`, while application logic (policy gating, audit trail, strategy ladders, locale dictionaries) is provided by `@crewloom/plugin-computer-use` and `@crewloom/plugin-mobile-use`. Adapters map platform-specific primitives (Cua Driver for macOS, ADB for Android, xcrun simctl and WebDriverAgent for iOS) to unified `ComputerBackend<Action>` ports without leaking native mechanisms inwards. All actions execute through a layered decorator pipeline (`PolicyGate` -> `AuditTrail` -> `StrategyLadder` -> `Adapter`). Complete design authority, conformance tiers, and work packages are specified in `core/Brain/computer-use-program/`.
+
 ### 2026-10-15 — Release verification boundaries
 The default core remains standard-library compatible on Python 3.9+. Explicit integration CI installs the pinned MCP SDK and Playwright, runs actual SDK/container protocols and loads the unpacked extension in headed Chromium. Missing explicit prerequisites fail; optional native desktop approval remains outside CI. Dashboard development requires Node 24+, ES modules and lockfile installation.
 

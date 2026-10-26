@@ -1,0 +1,62 @@
+[
+  {
+    "id": "locate-string",
+    "kind": "specific",
+    "prompt": "In the desktop app, which file defines the English text 'Device readiness for local Pulse' and under which dictionary key? Answer with file path and key only. Do not modify any file.",
+    "mustMatch": ["i18n\\.en\\.ts", "pulseReadinessTitle"]
+  },
+  {
+    "id": "locate-constant",
+    "kind": "specific",
+    "prompt": "In the desktop app, what is the value of MAX_RECORDS and which file defines it? Answer briefly. Do not modify any file.",
+    "mustMatch": ["usage-tracker\\.ts", "5000|5,000|5_000"]
+  },
+  {
+    "id": "locate-component",
+    "kind": "specific",
+    "prompt": "Which React component renders the dictionary key pulseReadinessTitle in the desktop app? Answer with the file path only. Do not modify any file.",
+    "mustMatch": ["PulseReadiness\\.tsx"]
+  },
+  {
+    "id": "locate-rust-command",
+    "kind": "specific",
+    "prompt": "In the desktop app's Rust side, which file defines the Tauri command install_pulse_engine and which file registers it with the invoke handler? Answer with both paths. Do not modify any file.",
+    "mustMatch": ["hardware\\.rs", "lib\\.rs"]
+  },
+  {
+    "id": "locate-callbacks",
+    "kind": "specific",
+    "prompt": "In the bridge package, in which directory do button (callback) handlers live? Answer with the directory path only. Do not modify any file.",
+    "mustMatch": ["control-room/callbacks"]
+  },
+  {
+    "id": "locate-catalogs",
+    "kind": "specific",
+    "prompt": "Which two files hold the model catalogs (one in the bridge, one in the desktop app)? Answer with both paths only. Do not modify any file.",
+    "mustMatch": ["model-catalog\\.ts", "models-catalog\\.ts"]
+  },
+  {
+    "id": "locate-release-script",
+    "kind": "specific",
+    "prompt": "Which script releases the desktop app? Answer with its path only. Do not modify any file.",
+    "mustMatch": ["scripts/release\\.mjs"]
+  },
+  {
+    "id": "locate-storage-key",
+    "kind": "specific",
+    "prompt": "What localStorage key does the desktop usage tracker use for its records? Answer with the key only. Do not modify any file.",
+    "mustMatch": ["crewloom:usage_records:v1"]
+  },
+  {
+    "id": "diagnose-data-loss",
+    "kind": "vague",
+    "prompt": "Users report that old entries disappear from the desktop app's usage analytics after heavy use. Find the most likely cause in the code, with file and line evidence. Do not modify any file.",
+    "mustMatch": ["usage-tracker\\.ts", "MAX_RECORDS|5000"]
+  },
+  {
+    "id": "diagnose-slow-settings",
+    "kind": "vague",
+    "prompt": "The Settings screen in the desktop app feels slow to open and stutters when switching tabs. Investigate and give the most likely causes, ranked, with file:line evidence. Do not modify any file.",
+    "mustMatch": null
+  }
+]
