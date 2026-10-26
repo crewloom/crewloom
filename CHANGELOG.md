@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.3 — 2026-10-26
+
+- Universal Computer Use programme: deliver multi-platform desktop and mobile automation contracts, policy gate, audit trail, strategy ladders, and conformance harness.
+- Synchronize repository documentation manifest and scope specifications.
+
 ## 0.9.2 — 2026-10-26
 
 - Replace the README banner with the woven Crewloom mark and current counts (47 roles, 24 registered tools); the banner animates in browsers that run SVG animation.
