@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.3",
+  "package_version": "0.9.4",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -495,7 +495,7 @@
     "AGENTS.md": "7b2e01e69be10eef74994cc7a363de6257d2c6f08705fe67f3b220c34ef4473b",
     "Brain/ARCHITECTURE.md": "1e3badb94ca84b5ea6d21dae092c3b63602af8c6b91a7f259e86c749e29fbe90",
     "Brain/CHALLENGES.md": "cfe5f7945e1297c9cb31f10aa50ae9a5a681fe62e74af1e1163638737ee2c625",
-    "Brain/COMPLETED.md": "6561ef50246d87b5ed1ea12631c4c3dc9f36cad6a3b0803784c5ba34723f9036",
+    "Brain/COMPLETED.md": "52b98363e92ff90b6ad6bbe5c6f642da34bcd137ca60ca3944e3de173f7e4746",
     "Brain/IDEAS_VAULT.md": "7e41e58f729c9993951a89fc5441972356ded4ab435f57f9cec0bd4afe30c169",
     "Brain/ROADMAP_TODO.md": "7a7e005300a3573c2ae79a62d260eb12099aeab8d689a17356730091e4b38c78",
     "Brain/computer-use-program/AGENT-PROMPT-FIXES-2.md": "fae65fdeeba0000eaf3544183952d02648c5229fa83eb24e9e20186e12602466",
@@ -514,7 +514,7 @@
     "Brain/computer-use-program/security/THREAT-MODEL.md": "e71f25273c76167106a9dd5b021988cd81d8d716238be0dba05a065222af1e57",
     "Brain/computer-use-program/security/verify-references.mjs": "0939e775e71ba7097c19bbdbb742e7da7cb0c354e3b44e6dc74f802a19ade647",
     "Brain/computer-use-program/spikes/macos.md": "1ff9d32001a4f440b76de6e52aa9da49ef762d9ca354807217d21214aa6f39cd",
-    "CHANGELOG.md": "06065dac3b43c8868816335270aba916c7bd8f61cf964ff0cee56dc4f0860fa7",
+    "CHANGELOG.md": "fa9b91c2ef02658d018dc675980746a9c63ef18dad3c49f7fea106537c796f4a",
     "CONTRIBUTING.md": "6237e5a0f8eed5addda8220f179a5fec831a45d6b950e7fab10669ed28dd59f9",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "MANIFEST.in": "350519cb71b6be3b612f01c9c484208182772c2897b65568099bf41cffbab1df",
@@ -822,7 +822,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "d2c14131ded0191d534d5bb00c6dd1668d0bf3b29b893c4a72a0ded85fd084d4",
+    "pyproject.toml": "ff12fa7137ee27625d3b3f87389d8cc12e4ae6f3ee199ce447712bd10af8b64f",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
