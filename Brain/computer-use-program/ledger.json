@@ -921,7 +921,8 @@
       "lane": "mobile",
       "role": "SRE",
       "depends_on": [
-        "WP-32"
+        "WP-32",
+        "WP-62"
       ],
       "owns": [
         "agent/packages/crewloom/mobile-use/ci/android"
@@ -932,15 +933,15 @@
       "heartbeat_at": null,
       "checkpoints": [],
       "evidence": [],
-      "hw_gated": true,
-      "optional": true
+      "hw_gated": false,
+      "optional": false
     },
     "WP-35": {
       "title": "Android virtual display feasibility",
       "lane": "spike",
       "role": "Android lead",
       "depends_on": [
-        "WP-32"
+        "WP-34"
       ],
       "owns": [
         "core/Brain/computer-use-program/spikes/android-virtual-display.md"
@@ -951,8 +952,8 @@
       "heartbeat_at": null,
       "checkpoints": [],
       "evidence": [],
-      "hw_gated": true,
-      "optional": true
+      "hw_gated": false,
+      "optional": false
     },
     "WP-40": {
       "title": "iOS Simulator adapter",
@@ -1647,6 +1648,47 @@
         "core/Brain/computer-use-program/BUILD-CHECK.md": "63392ca8641ff1e4f709bf3bbb36df45455a9e62dc14a5b8863345bffdf2202e",
         "core/Brain/computer-use-program/CONFORMANCE.md": "3c9bf8c912cbe5a54280389b94054e391c2b95b8ec0e40f9debf708f21bd0e54"
       }
+    },
+    "WP-62": {
+      "status": "todo",
+      "claimed_by": null,
+      "claimed_at": null,
+      "heartbeat_at": null,
+      "checkpoints": [],
+      "evidence": [],
+      "title": "Make Android live tests safe and non-vacuous",
+      "lane": "fix",
+      "role": "SDET",
+      "depends_on": [
+        "WP-33"
+      ],
+      "owns": [
+        "agent/packages/crewloom/mobile-use/tests/android/adb/live.spec.ts",
+        "agent/packages/crewloom/mobile-use/tests/android/text/live.spec.ts",
+        "agent/packages/crewloom/mobile-use/tests/android/ui/live.spec.ts",
+        "agent/packages/crewloom/mobile-use/tests/android/live-support.ts"
+      ]
+    },
+    "WP-63": {
+      "status": "todo",
+      "claimed_by": null,
+      "claimed_at": null,
+      "heartbeat_at": null,
+      "checkpoints": [],
+      "evidence": [],
+      "title": "Android live conformance and matrix update",
+      "lane": "mobile",
+      "role": "SDET",
+      "depends_on": [
+        "WP-34",
+        "WP-62"
+      ],
+      "owns": [
+        "core/Brain/computer-use-program/CONFORMANCE.md",
+        "agent/packages/crewloom/computer-use-conformance/src/probes/android-focus.ts",
+        "agent/packages/crewloom/computer-use-conformance/tests/android-focus.spec.ts",
+        "agent/packages/crewloom/mobile-use/tests/android/live-conformance.spec.ts"
+      ]
     }
   },
   "log": [
@@ -2447,6 +2489,27 @@
       "wp": "WP-51",
       "event": "rebaseline",
       "note": "review 2026-10-26: core commit 1b98e2f (v0.9.4 context-economy docs) edited CHALLENGES.md and COMPLETED.md after WP-51; "
+    },
+    {
+      "at": "2026-10-26T10:10:52Z",
+      "agent": "claude-reviewer",
+      "wp": "WP-62",
+      "event": "add",
+      "note": "Make Android live tests safe and non-vacuous"
+    },
+    {
+      "at": "2026-10-26T10:10:52Z",
+      "agent": "claude-reviewer",
+      "wp": "WP-63",
+      "event": "add",
+      "note": "Android live conformance and matrix update"
+    },
+    {
+      "at": "2026-10-26T10:10:52Z",
+      "agent": "claude-reviewer",
+      "wp": "WP-34",
+      "event": "edit",
+      "note": "re-scoped: runs on the dedicated emulator of this machine; depends on WP-62"
     }
   ]
 }

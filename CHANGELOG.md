@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.5 — 2026-10-26
+
+- Maintenance, stabilization, and enhancements for Crewloom core components.
+
+
+
 ## 0.9.4 — 2026-10-26
 
 - Add the context-economy benchmark (`benchmarks/context-economy/`): ten read-only repository tasks measured from provider-reported tokens with graded answers, plus its first Claude Code baseline recorded in `Brain/COMPLETED.md`.
