@@ -13,8 +13,8 @@ type Overview = { activity?: Activity; controls?: Controls; projectRoot: string;
 type Detail = { id: string; skill: string; brain: Record<string, string> };
 
 const T = {
-  en: { skills: 'Roles', tools: 'Tools', attention: 'Need attention', tasks: 'Open tasks', challenges: 'Open challenges', failed: 'Failed runs (last 50)', live: 'Live', offline: 'Reconnecting', search: 'Search roles', all: 'All', run: 'Run', runs: 'Recent runs', checks: 'Run repository checks', args: 'Arguments (quoted text or JSON array, project-relative)', none: 'No runs recorded yet. Run a tool here or with the CLI.', role: 'Role', status: 'Status', activity: 'Last memory update', done: 'Done', open: 'Open', ideas: 'Ideas', lang: 'العربية', signIn: 'Sign in', signOut: 'Sign out', token: 'Dashboard access token', unauthorized: 'Sign in to view this project.' },
-  ar: { skills: 'الأدوار', tools: 'الأدوات', attention: 'تحتاج متابعة', tasks: 'مهام مفتوحة', challenges: 'تحديات مفتوحة', failed: 'تشغيل فاشل (آخر 50)', live: 'مباشر', offline: 'إعادة اتصال', search: 'ابحث في الأدوار', all: 'الكل', run: 'تشغيل', runs: 'آخر التشغيلات', checks: 'شغّل فحوص الريبو', args: 'المعاملات (نص مقتبس أو مصفوفة JSON، مسارات نسبية للمشروع)', none: 'لا توجد تشغيلات بعد. شغّل أداة من هنا أو من الـ CLI.', role: 'الدور', status: 'الحالة', activity: 'آخر تحديث للذاكرة', done: 'منجز', open: 'مفتوح', ideas: 'أفكار', lang: 'English', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج', token: 'رمز دخول لوحة المعلومات', unauthorized: 'سجّل الدخول لعرض هذا المشروع.' },
+  en: { skills: 'Roles', tools: 'Tools', attention: 'Need attention', tasks: 'Open tasks', challenges: 'Open challenges', failed: 'Failed runs (last 50)', live: 'Live', offline: 'Reconnecting', search: 'Search roles', all: 'All', run: 'Run', runs: 'Recent runs', checks: 'Run repository checks', args: 'Arguments (quoted text or JSON array, project-relative)', none: 'No runs recorded yet. Run a tool here or with the CLI.', role: 'Role', status: 'Status', activity: 'Last memory update', done: 'Done', open: 'Open', ideas: 'Ideas', lang: 'العربية', signIn: 'Sign in', signOut: 'Sign out', token: 'Dashboard access token', unauthorized: 'Sign in to view this project.', download: 'Download App', downloadAria: 'Download Crewloom Desktop & CLI' },
+  ar: { skills: 'الأدوار', tools: 'الأدوات', attention: 'تحتاج متابعة', tasks: 'مهام مفتوحة', challenges: 'تحديات مفتوحة', failed: 'تشغيل فاشل (آخر 50)', live: 'مباشر', offline: 'إعادة اتصال', search: 'ابحث في الأدوار', all: 'الكل', run: 'تشغيل', runs: 'آخر التشغيلات', checks: 'شغّل فحوص الريبو', args: 'المعاملات (نص مقتبس أو مصفوفة JSON، مسارات نسبية للمشروع)', none: 'لا توجد تشغيلات بعد. شغّل أداة من هنا أو من الـ CLI.', role: 'الدور', status: 'الحالة', activity: 'آخر تحديث للذاكرة', done: 'منجز', open: 'مفتوح', ideas: 'أفكار', lang: 'English', signIn: 'تسجيل الدخول', signOut: 'تسجيل الخروج', token: 'رمز دخول لوحة المعلومات', unauthorized: 'سجّل الدخول لعرض هذا المشروع.', download: 'تحميل التطبيق', downloadAria: 'تحميل تطبيق كرو لوم المكتبي والطرفية' },
 } as const;
 
 const ago = (iso: string | null) => {
@@ -123,6 +123,32 @@ export default function Dashboard() {
         <header className="top">
           <h1>Crewloom</h1>
           <div className="toolbar">
+            <a
+              href="https://crewloom.org/#install"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t.downloadAria}
+              title={t.downloadAria}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                background: 'var(--accent)',
+                color: '#fff',
+                textDecoration: 'none',
+                fontWeight: 600,
+                fontSize: '13px',
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span>{t.download}</span>
+            </a>
             <button className="ghost" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>{t.lang}</button>
           </div>
         </header>
@@ -144,6 +170,32 @@ export default function Dashboard() {
         <h1>Crewloom</h1>
         <div className="toolbar">
           <span className="live" role="status"><i className={`dot ${live ? 'on' : ''}`} />{live ? t.live : t.offline}</span>
+          <a
+            href="https://crewloom.org/#install"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t.downloadAria}
+            title={t.downloadAria}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: '8px',
+              background: 'var(--accent)',
+              color: '#fff',
+              textDecoration: 'none',
+              fontWeight: 600,
+              fontSize: '13px',
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            <span>{t.download}</span>
+          </a>
           {!local && <button className="ghost" onClick={signOut}>{t.signOut}</button>}
           <button className="ghost" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>{t.lang}</button>
         </div>
