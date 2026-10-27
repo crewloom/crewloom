@@ -2045,10 +2045,67 @@
         "agent/packages/crewloom/computer-use/src/adapters/windows/capabilities.ts": "232689080419ed9e527a5457fc06af902e2d09f7329ff85be1dd6eeabe450275",
         "agent/packages/crewloom/computer-use/src/adapters/windows/error-mapping.ts": "7b13e485692071a8e15495be3ecbac74cd7b8251fc04fd5646f3d544f765af5f",
         "agent/packages/crewloom/computer-use/src/adapters/windows/index.ts": "67324201b283d2b10cc1a687a9ecf3e161bcaf16b5e1eed7f7ec62397ec49d1a",
-        "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts": "36274f46ce891fb6526d873cf55c51569987e7c364320aac052f4dedc2f8794b",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts": "4c4cd960140c5beaf41ead8df6754a7fa602dd4f1f6d078b984044391e5ab2a0",
         "agent/packages/crewloom/computer-use/src/adapters/windows/types.ts": "bf6e81d5b6b74e87855a2a34dc2db1c30910cd0f3c4515320b42c9380afe23ae",
         "agent/packages/crewloom/computer-use/tests/adapters/windows/adapter.spec.ts": "58b1b99a3739c02e65badf51c5138f9508633fcadf7ce1e86ed7072897f2d63e",
-        "core/Brain/computer-use-program/spikes/windows-adapter-audit.md": "a732aabb33f7c5da417a55414eff6c9456362a7714e8af51f0d27ed43bc67aba"
+        "agent/packages/crewloom/computer-use/tests/adapters/windows/real-client.spec.ts": "91d1c8bfe311d663bb5ddf8a711a80692b7b5ec136f957f3baded1e5a7728fd1",
+        "core/Brain/computer-use-program/spikes/windows-adapter-audit.md": "3072bb9f13b3495f9ade23ab1f000dfe7cb93160d8f36b5325485bd7c387b86d"
+      },
+      "rebaselines": [
+        {
+          "at": "2026-10-27T13:39:20Z",
+          "agent": "claude-opus",
+          "reason": "WP-66 changed real-client.ts, added tests/adapters/windows/real-client.spec.ts, and corrected catch rows 7-10 in windows-adapter-audit.md",
+          "drift": {
+            "missing": [],
+            "changed": [
+              "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts",
+              "core/Brain/computer-use-program/spikes/windows-adapter-audit.md"
+            ],
+            "added": [
+              "agent/packages/crewloom/computer-use/tests/adapters/windows/real-client.spec.ts"
+            ]
+          }
+        }
+      ]
+    },
+    "WP-66": {
+      "title": "Real Windows client: foreground focus and visible dispose failures",
+      "lane": "fix",
+      "role": "Windows lead",
+      "depends_on": [
+        "WP-65"
+      ],
+      "owns": [
+        "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts",
+        "agent/packages/crewloom/computer-use/tests/adapters/windows",
+        "core/Brain/computer-use-program/spikes/windows-adapter-audit.md"
+      ],
+      "status": "done",
+      "claimed_by": "claude-opus",
+      "claimed_at": "2026-10-27T13:35:41Z",
+      "heartbeat_at": "2026-10-27T13:39:20Z",
+      "checkpoints": [
+        {
+          "at": "2026-10-27T13:39:20Z",
+          "agent": "claude-opus",
+          "note": "done: real-client.ts getFocusedApp reads GetForegroundWindow via -EncodedCommand and returns <process>#<hwnd>; dispose reports via onDisposeError or console.warn; new tests/adapters/windows/real-client.spec.ts; audit doc rows 7-10 and section 6.1. verified: new spec 6 failed/2 passed on WP-65 code, vitest computer-use 131 passed/1 skipped, build:artifacts 7/7 then build:check 2/2, oxlint 8 no-base-to-string errors all in untouched call() lines 143-230. unverified: PowerShell script never executed (no Windows, no pwsh on this Mac); 2000 ms timeout unmeasured."
+        }
+      ],
+      "evidence": [
+        "vitest run tests/adapters/windows/real-client.spec.ts on WP-65 code -> 6 failed, 2 passed (8)",
+        "pnpm exec vitest run packages/crewloom/computer-use -> Test Files 13 passed | 1 skipped (14), Tests 131 passed | 1 skipped (132)",
+        "pnpm run build:artifacts -> 7 passed; pnpm run build:check -> 2 passed, 0 failed",
+        "grep any/as unknown as/@ts-ignore in real-client.ts and real-client.spec.ts -> none",
+        "not run on Windows: which pwsh powershell -> neither found; the foreground-window PowerShell script has never executed"
+      ],
+      "done_at": "2026-10-27T13:39:20Z",
+      "done_by": "claude-opus",
+      "manifest": {
+        "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts": "4c4cd960140c5beaf41ead8df6754a7fa602dd4f1f6d078b984044391e5ab2a0",
+        "agent/packages/crewloom/computer-use/tests/adapters/windows/adapter.spec.ts": "58b1b99a3739c02e65badf51c5138f9508633fcadf7ce1e86ed7072897f2d63e",
+        "agent/packages/crewloom/computer-use/tests/adapters/windows/real-client.spec.ts": "91d1c8bfe311d663bb5ddf8a711a80692b7b5ec136f957f3baded1e5a7728fd1",
+        "core/Brain/computer-use-program/spikes/windows-adapter-audit.md": "3072bb9f13b3495f9ade23ab1f000dfe7cb93160d8f36b5325485bd7c387b86d"
       }
     }
   },
@@ -3130,6 +3187,41 @@
       "wp": "WP-65",
       "event": "done",
       "note": "10 files hashed"
+    },
+    {
+      "at": "2026-10-27T13:35:41Z",
+      "agent": "claude-reviewer",
+      "wp": "WP-66",
+      "event": "add",
+      "note": "Real Windows client: foreground focus and visible dispose failures"
+    },
+    {
+      "at": "2026-10-27T13:35:41Z",
+      "agent": "claude-opus",
+      "wp": "WP-66",
+      "event": "claim",
+      "note": ""
+    },
+    {
+      "at": "2026-10-27T13:39:20Z",
+      "agent": "claude-opus",
+      "wp": "WP-66",
+      "event": "checkpoint",
+      "note": "done: real-client.ts getFocusedApp reads GetForegroundWindow via -EncodedCommand and returns <process>#<hwnd>; dispose r"
+    },
+    {
+      "at": "2026-10-27T13:39:20Z",
+      "agent": "claude-opus",
+      "wp": "WP-66",
+      "event": "done",
+      "note": "4 files hashed"
+    },
+    {
+      "at": "2026-10-27T13:39:20Z",
+      "agent": "claude-opus",
+      "wp": "WP-65",
+      "event": "rebaseline",
+      "note": "WP-66 changed real-client.ts, added tests/adapters/windows/real-client.spec.ts, and corrected catch rows 7-10 in windows"
     }
   ]
 }

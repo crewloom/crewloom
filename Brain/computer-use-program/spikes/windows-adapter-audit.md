@@ -122,10 +122,16 @@ There are 10 `catch` sites in `agent/packages/crewloom/computer-use/src/adapters
 | 4 | `adapter.ts:94` | `probe()` | `err: unknown` | Maps error using `mapUpstreamError` into typed `Result.fail`. **Pass**: Preserves error detail. |
 | 5 | `adapter.ts:159` | `execute()` | `err: unknown` | Maps error using `mapUpstreamError` into typed `Result.fail`. **Pass**: Preserves error detail. |
 | 6 | `adapter.ts:170` | `dispose()` | `disposeErr: unknown` | Invokes `onDisposeError` callback if provided, else logs warning. **Pass**: Resource teardown reporting. |
-| 7 | `real-client.ts:86` | `getCapabilities()` | `error: unknown` | Sets `resolvedVersion = undefined`, returns reason in capability record. **Pass**: Reason preserved. |
-| 8 | `real-client.ts:199` | `getFocusedApp()` | `catch { return undefined }` | **DEFECT (Silent Catch):** Swallows PowerShell process failure and returns `undefined`, concealing failures from focus tracking. **Remediation:** Changed to rethrow typed error so `observeFocus` reports failure. |
-| 9 | `real-client.ts:209` | `dispose()` | `err: unknown` | Invokes `options.onDisposeError?.(err)`. **Pass**: Teardown callback. |
-| 10 | `real-client.ts:215` | `dispose()` | `err: unknown` | Invokes `options.onDisposeError?.(err)`. **Pass**: Teardown callback. |
+| 7 | `real-client.ts:131` | `getCapabilities()` | `error: unknown` | Sets `resolvedVersion = undefined`, returns reason in capability record. **Pass**: Reason preserved. |
+| 8 | `real-client.ts:240` | `getFocusedApp()` | `err: unknown` | WP-65 replaced `catch { return undefined }` with a rethrow. WP-66: the catch now wraps only the PowerShell run; output that is not `<process>\t<hwnd>` throws from `parseForegroundWindow`. **Pass** (unit tests only). |
+| 9 | `real-client.ts:253` | `dispose()` (`driver.shutdown()`) | `err: unknown` | **WP-65 rated this Pass; corrected by WP-66.** It called `options.onDisposeError?.(err)`, and `createWindowsAdapter` passes that callback only when the caller supplies one, so by default the error was dropped. Now `reportDisposeError` calls the callback or `console.warn`, as the macOS client does. |
+| 10 | `real-client.ts:259` | `dispose()` (`driver.uniffiDestroy()`) | `err: unknown` | Same defect and same fix as row 9. |
+
+### 6.1 WP-66: `getFocusedApp()` did not read the foreground window
+
+WP-65 left `getFocusedApp()` running `Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and $_.MainWindowTitle } | Select-Object -First 1`. That returns the first process with a titled window in `Get-Process` order, not the window with focus, so `focusChanged` in `adapter.ts` (invariant I1) compared values unrelated to focus. WP-66 replaced it with a PowerShell script that calls `GetForegroundWindow` and `GetWindowThreadProcessId` through `Add-Type`, passed with `-EncodedCommand`, and returns `<processName>#<hwnd>`, so a switch between two windows of one process is also a focus change.
+
+Evidence on this Mac: `tests/adapters/windows/real-client.spec.ts` (8 tests) with an injected PowerShell runner; 6 of them failed against the WP-65 code and all 8 pass after the fix. `which pwsh powershell` found neither, so **the script itself has never run**. WP-04 must check that it compiles and returns the expected window, and measure whether `Add-Type` plus PowerShell start-up fits in the 2000 ms `FOCUS_QUERY_TIMEOUT_MS` (unmeasured; a timeout makes every `execute()` fail with `BACKEND_FAILURE`).
 
 ---
 
@@ -136,6 +142,7 @@ Packages `WP-04` ("Windows hardware spike") and `WP-21` ("Windows adapter") rema
 1. **Invariant I1 (Focus Preservation):**
    - Probe foreground window using Win32 API `GetForegroundWindow` before and after dispatching targeted input to a background window.
    - Assert `focusChanged === false` empirically for background clicks and background typing.
+   - Run the `getFocusedApp()` PowerShell script from WP-66 and confirm it returns the foreground window's process and handle within `FOCUS_QUERY_TIMEOUT_MS`.
 2. **Invariant I2 (Hardware Pointer Stability):**
    - Query pointer coordinates using Win32 API `GetCursorPos` before and after targeted clicks and scrolls.
    - Assert physical cursor coordinate delta is exactly `(0, 0)`.
