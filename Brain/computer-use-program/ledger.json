@@ -2003,12 +2003,30 @@
       }
     },
     "WP-65": {
-      "status": "todo",
-      "claimed_by": null,
-      "claimed_at": null,
-      "heartbeat_at": null,
-      "checkpoints": [],
-      "evidence": [],
+      "status": "done",
+      "claimed_by": "antigravity-1",
+      "claimed_at": "2026-10-27T11:47:28Z",
+      "heartbeat_at": "2026-10-27T11:56:33Z",
+      "checkpoints": [
+        {
+          "at": "2026-10-27T11:49:58Z",
+          "agent": "antigravity-1",
+          "note": "done: verified all review findings on windows adapter via commands. next: create audit spike document. verified: commit b4029feefd added files; capabilities.ts declares 9 features supported without Windows run; hardware-input present in virtualCursor; cua-driver-win32 binary absent on macOS host (only darwin-arm64 found); silent catch in real-client.ts getFocusedApp; unit test passes 16 tests with fake client. unverified: Windows execution (none on this Mac host)."
+        },
+        {
+          "at": "2026-10-27T11:56:18Z",
+          "agent": "antigravity-1",
+          "note": "done: produced windows-adapter-audit.md; updated capabilities.ts (degraded for 9 features, stripped hardware-input); updated probe in adapter.ts with platform & build < 18362 refusal; fixed silent catch in real-client.ts; updated README.md status line; updated adapter.spec.ts with 20 passing unit tests. verified: vitest passes 20/20 in windows adapter and 123/124 in computer-use; build:check passes 2/2; old capability test failed on line 192 (expected 'degraded' to be 'supported'). unverified: real Windows execution (none on this Mac host)."
+        }
+      ],
+      "evidence": [
+        "vitest windows: 1 test file passed, 20/20 unit tests passed (including platform refusal, build < 18362 refusal, and degraded capabilities assertions)",
+        "vitest computer-use: 12 passed, 1 skipped, 123 tests passed, 1 skipped",
+        "build:check: 2 passed, 0 failed in 5.89s (client aggregate check PASS, host aggregate check PASS)",
+        "test honesty: running old test asserted line 192 axTree support === 'supported' and failed with AssertionError: expected 'degraded' to be 'supported'",
+        "feature status audit: 9 features degraded ('not validated on Windows hardware (WP-04 pending)'), 3 unsupported ('isolatedSession', 'gestures', 'rotation'), 'hardware-input' stripped from virtualCursor",
+        "audit document: core/Brain/computer-use-program/spikes/windows-adapter-audit.md created with 156 lines documenting all 10 catch blocks, cua binary absence, and WP-04 hardware checklist"
+      ],
       "title": "Audit the Windows adapter that entered outside the ledger",
       "lane": "fix",
       "role": "Windows lead",
@@ -2017,7 +2035,21 @@
         "agent/packages/crewloom/computer-use/src/adapters/windows",
         "agent/packages/crewloom/computer-use/tests/adapters/windows",
         "core/Brain/computer-use-program/spikes/windows-adapter-audit.md"
-      ]
+      ],
+      "done_at": "2026-10-27T11:56:33Z",
+      "done_by": "antigravity-1",
+      "manifest": {
+        "agent/packages/crewloom/computer-use/src/adapters/windows/README.md": "71af69023c6a922c40e4977d6fd943b18ab32b55a11e0bcb2e1fc410153d2778",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/action-mapping.ts": "8279093e176ad6848bc383d60da4cd2e972075602f83a9d6a756e136779bcbfd",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/adapter.ts": "9901110275f0dfb5956df56ef8fe4899d5a988ba8629735b7850cf7152bcd751",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/capabilities.ts": "232689080419ed9e527a5457fc06af902e2d09f7329ff85be1dd6eeabe450275",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/error-mapping.ts": "7b13e485692071a8e15495be3ecbac74cd7b8251fc04fd5646f3d544f765af5f",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/index.ts": "67324201b283d2b10cc1a687a9ecf3e161bcaf16b5e1eed7f7ec62397ec49d1a",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/real-client.ts": "36274f46ce891fb6526d873cf55c51569987e7c364320aac052f4dedc2f8794b",
+        "agent/packages/crewloom/computer-use/src/adapters/windows/types.ts": "bf6e81d5b6b74e87855a2a34dc2db1c30910cd0f3c4515320b42c9380afe23ae",
+        "agent/packages/crewloom/computer-use/tests/adapters/windows/adapter.spec.ts": "58b1b99a3739c02e65badf51c5138f9508633fcadf7ce1e86ed7072897f2d63e",
+        "core/Brain/computer-use-program/spikes/windows-adapter-audit.md": "a732aabb33f7c5da417a55414eff6c9456362a7714e8af51f0d27ed43bc67aba"
+      }
     }
   },
   "log": [
@@ -3070,6 +3102,34 @@
       "wp": "WP-21",
       "event": "note",
       "note": "commit b4029feefd added adapters/windows outside the ledger; WP-21 stays waiting-deps; see WP-65"
+    },
+    {
+      "at": "2026-10-27T11:47:28Z",
+      "agent": "antigravity-1",
+      "wp": "WP-65",
+      "event": "claim",
+      "note": ""
+    },
+    {
+      "at": "2026-10-27T11:49:58Z",
+      "agent": "antigravity-1",
+      "wp": "WP-65",
+      "event": "checkpoint",
+      "note": "done: verified all review findings on windows adapter via commands. next: create audit spike document. verified: commit "
+    },
+    {
+      "at": "2026-10-27T11:56:18Z",
+      "agent": "antigravity-1",
+      "wp": "WP-65",
+      "event": "checkpoint",
+      "note": "done: produced windows-adapter-audit.md; updated capabilities.ts (degraded for 9 features, stripped hardware-input); upd"
+    },
+    {
+      "at": "2026-10-27T11:56:33Z",
+      "agent": "antigravity-1",
+      "wp": "WP-65",
+      "event": "done",
+      "note": "10 files hashed"
     }
   ]
 }

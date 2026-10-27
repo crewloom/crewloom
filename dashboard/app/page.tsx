@@ -42,6 +42,64 @@ export default function Dashboard() {
   const [auth, setAuth] = useState<'unknown' | 'in' | 'out' | 'error'>('unknown');
   const openId = useRef<string | null>(null);
 
+  const [device, setDevice] = useState<{ os: 'windows' | 'macos-arm' | 'macos-intel' | 'linux' | 'unknown'; nameEn: string; nameAr: string; downloadUrl: string; command: string }>({
+    os: 'unknown',
+    nameEn: 'App & CLI',
+    nameAr: 'التطبيق والطرفية',
+    downloadUrl: 'https://crewloom.org/#install',
+    command: 'curl -fsSL https://crewloom.org/install.sh | bash',
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !navigator) return;
+    const ua = navigator.userAgent || '';
+    const platform = (navigator as unknown as { userAgentData?: { platform?: string } }).userAgentData?.platform || navigator.platform || '';
+
+    if (/Win/i.test(platform) || /Windows/i.test(ua)) {
+      setDevice({
+        os: 'windows',
+        nameEn: 'Windows (Recommended)',
+        nameAr: 'ويندوز (موصى به لجهازك)',
+        downloadUrl: 'https://crewloom.org/install.ps1',
+        command: 'irm https://crewloom.org/install.ps1 | iex',
+      });
+      return;
+    }
+    if (/Mac/i.test(platform) || /Macintosh|MacIntel/i.test(ua)) {
+      let isAppleSilicon = true;
+      try {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        if (gl && 'getExtension' in gl) {
+          const debugInfo = (gl as WebGLRenderingContext).getExtension('WEBGL_debug_renderer_info');
+          if (debugInfo) {
+            const renderer = (gl as WebGLRenderingContext).getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '';
+            if (/Intel/i.test(renderer)) isAppleSilicon = false;
+          }
+        }
+      } catch {}
+
+      setDevice({
+        os: isAppleSilicon ? 'macos-arm' : 'macos-intel',
+        nameEn: isAppleSilicon ? 'macOS Apple Silicon (Recommended)' : 'macOS Intel (Recommended)',
+        nameAr: isAppleSilicon ? 'ماك Apple Silicon (موصى به)' : 'ماك معالجات إنتل (موصى به)',
+        downloadUrl: 'https://crewloom.org/Crewloom.dmg',
+        command: 'curl -fsSL https://crewloom.org/install.sh | bash',
+      });
+      return;
+    }
+    if (/Linux/i.test(platform) || /Linux/i.test(ua)) {
+      setDevice({
+        os: 'linux',
+        nameEn: 'Linux CLI (Recommended)',
+        nameAr: 'لينكس الطرفية (موصى به)',
+        downloadUrl: 'https://crewloom.org/#install',
+        command: 'curl -fsSL https://crewloom.org/install.sh | bash',
+      });
+      return;
+    }
+  }, []);
+
   const session = useCallback(async () => {
     try {
       const res = await fetch('/api/auth/session', { cache: 'no-store' });
@@ -124,11 +182,12 @@ export default function Dashboard() {
           <h1>Crewloom</h1>
           <div className="toolbar">
             <a
-              href="https://crewloom.org/#install"
-              target="_blank"
+              href={device.downloadUrl}
+              download={device.os === 'windows' ? 'install.ps1' : device.os.startsWith('macos') ? 'Crewloom.dmg' : undefined}
+              target={device.os === 'linux' || device.os === 'unknown' ? '_blank' : undefined}
               rel="noopener noreferrer"
-              aria-label={t.downloadAria}
-              title={t.downloadAria}
+              aria-label={`${t.downloadAria} - ${lang === 'ar' ? device.nameAr : device.nameEn}`}
+              title={`${t.downloadAria} - ${lang === 'ar' ? device.nameAr : device.nameEn}`}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -142,12 +201,22 @@ export default function Dashboard() {
                 fontSize: '13px',
               }}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span>{t.download}</span>
+              {device.os === 'windows' ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+              ) : device.os.startsWith('macos') ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.13c.63-.77 1.06-1.84.94-2.91-.91.04-2.02.61-2.67 1.38-.58.67-1.09 1.76-.95 2.81 1.02.08 2.05-.51 2.68-1.28z"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+              )}
+              <span>{lang === 'ar' ? device.nameAr : device.nameEn}</span>
             </a>
             <button className="ghost" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>{t.lang}</button>
           </div>
@@ -171,11 +240,12 @@ export default function Dashboard() {
         <div className="toolbar">
           <span className="live" role="status"><i className={`dot ${live ? 'on' : ''}`} />{live ? t.live : t.offline}</span>
           <a
-            href="https://crewloom.org/#install"
-            target="_blank"
+            href={device.downloadUrl}
+            download={device.os === 'windows' ? 'install.ps1' : device.os.startsWith('macos') ? 'Crewloom.dmg' : undefined}
+            target={device.os === 'linux' || device.os === 'unknown' ? '_blank' : undefined}
             rel="noopener noreferrer"
-            aria-label={t.downloadAria}
-            title={t.downloadAria}
+            aria-label={`${t.downloadAria} - ${lang === 'ar' ? device.nameAr : device.nameEn}`}
+            title={`${t.downloadAria} - ${lang === 'ar' ? device.nameAr : device.nameEn}`}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -189,17 +259,87 @@ export default function Dashboard() {
               fontSize: '13px',
             }}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span>{t.download}</span>
+            {device.os === 'windows' ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+              </svg>
+            ) : device.os.startsWith('macos') ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.13c.63-.77 1.06-1.84.94-2.91-.91.04-2.02.61-2.67 1.38-.58.67-1.09 1.76-.95 2.81 1.02.08 2.05-.51 2.68-1.28z"/>
+              </svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+            )}
+            <span>{lang === 'ar' ? device.nameAr : device.nameEn}</span>
           </a>
           {!local && <button className="ghost" onClick={signOut}>{t.signOut}</button>}
           <button className="ghost" onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}>{t.lang}</button>
         </div>
       </header>
+      <section
+        className="card"
+        aria-label={lang === 'ar' ? 'النسخة الموصى بها للجهاز' : 'Recommended device build'}
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+          padding: '12px 16px',
+          marginBottom: '16px',
+          background: 'var(--panel)',
+          border: '1px solid var(--accent)',
+          borderRadius: '10px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '20px' }}>
+            {device.os === 'windows' ? '🪟' : device.os.startsWith('macos') ? '🍏' : '🐧'}
+          </span>
+          <div>
+            <strong style={{ fontSize: '13px' }}>
+              {lang === 'ar' ? 'الترشيح التلقائي عبر المتصفح للجهاز الحالي:' : 'Browser-recommended build for your device:'}
+            </strong>
+            <div style={{ fontSize: '12px', color: 'var(--mute)' }}>
+              {lang === 'ar' ? device.nameAr : device.nameEn}
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
+          <code style={{ fontSize: '11px', padding: '5px 10px', background: 'var(--bg)', border: '1px solid var(--line)', borderRadius: '6px' }} dir="ltr">
+            {device.command}
+          </code>
+          <a
+            href={device.downloadUrl}
+            download={device.os === 'windows' ? 'install.ps1' : device.os.startsWith('macos') ? 'Crewloom.dmg' : undefined}
+            target={device.os === 'linux' || device.os === 'unknown' ? '_blank' : undefined}
+            rel="noopener noreferrer"
+            style={{
+              padding: '6px 14px',
+              borderRadius: '6px',
+              background: 'var(--accent)',
+              color: '#fff',
+              textDecoration: 'none',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}
+          >
+            {lang === 'ar' ? 'تحميل مباشر' : 'Download Now'}
+          </a>
+          <a
+            href="https://crewloom.org/#install"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: '12px', color: 'var(--mute)', textDecoration: 'underline' }}
+          >
+            {lang === 'ar' ? 'كافة الأنظمة' : 'All Platforms'}
+          </a>
+        </div>
+      </section>
       <p>{lang === "ar" ? "المشروع الحالي" : "Current project"}: <code dir="ltr">{data?.projectRoot ?? "…"}</code></p>
       {data?.toolkitRoot && <details><summary>{lang === 'ar' ? 'مصدر تشغيل اللوحة' : 'Dashboard runtime source'}</summary>
         <code dir="ltr">{data.toolkitRoot}</code>

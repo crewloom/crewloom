@@ -156,3 +156,7 @@ Added private source copies, automatic chained Git protection for new user conte
 - Patched dashboard PostCSS through a locked 8.5.29 override; regression refuses an untrusted external source map without reading its file.
 
 - Reuse validated inherited privacy guards across linked worktrees instead of chaining owned wrappers recursively.
+
+## Unreleased — audit remediation evidence
+
+- Record verified containment work, Android repeat acceptance, website v1.0.6 and explicit release blockers without re-stamping uncommitted computer-use sources.

@@ -398,3 +398,17 @@
 - 2026-10-25 | Uncommitted parallel edits from another session were still being written to `extensions/chrome/content.js` while a release was attempted. Fix: back up `git diff --binary` plus file copies, wait until every changed file was idle for 180 seconds, re-run tests and `package_browser --check` on the final state, then commit by explicit path in separate units (rules in `AGENTS.md`). Known defect left for its author: `scripts/computer_use.py` defines `--no-focus` as `store_true` with `default=True`, so the flag cannot be turned off from the CLI.
 
 - 2026-10-26 | `install_pulse_engine` (`agent/apps/crewloom-desktop/src-tauri/src/hardware.rs`) previously wrote a small JSON descriptor named `pulse-1.5b.crw` and returned success without real weights. Fix: added `is_genuine_crw_weights` checking for genuine `CRW1` magic bytes. When missing or invalid, installation fails honestly with typed `weights_unavailable` error mapped in both Arabic and English dictionaries in `i18n.ts`. Unit test `weights_check_requires_crw1_magic_bytes` passes in Rust suite. In addition, `usage-ledger.ts` was wired into `storage.ts` behind `UsageRecord`, and all inline ternary localizations in `UsageView.tsx` were eliminated. All 137 desktop node tests and 45 Rust tests pass.
+
+### 2026-10-27 — Remediation release gates and concurrent ownership
+- Cause: full agent lint exposes existing first-party/style violations outside the audited fixes; agent/Pulse hosted jobs cannot start because GitHub reports failed payments or a spending limit. Bridge's earlier npm publish job reports an invalid or missing NPM_TOKEN.
+- Response: retain the failing evidence, keep rules enabled, and block publication of unverified subprojects. Website workflows are independently successful and its v1.0.6 release is verified. An external session committed shared website changes while review was running; preserve that commit and archive only our subsequent generated build deltas.
+- Status: operator action is required for account billing and npm publishing credentials; CLI publication still needs a repository owner. Local source changes and backups remain reviewable.
+
+### 2026-10-27 — Denied tool display and approval run binding
+- Cause: UI approval used a conversation ID while the host registered each assistant reply ID. Denied tool completion used an empty target, leaving its running card and a false changed-file claim.
+- Fix: render assistant replies in AgentMessage and bind approval to message.id; return the denied target identity, and exclude unfinished/failed tools from changed-file summaries. Preserve the public ChatView interface and existing rendering during extraction.
+- Evidence: actual native HTTP plan injection was refused without file effects; the display regression has a passing Node test. Final native display/approval acceptance is tracked with the remediation evidence.
+
+- Final gate evidence: agent lint reports 1535 errors in 81 files. Core repository validation rejects omitted/stale manifest entries; publication remains blocked, with no digest rebaseline over pending sources. Final native display and explicit-approval acceptance passed.
+
+- Proposal actions are batch operations: labels now say Apply All/Discard All in both dictionaries, one resolution owns every card, and in-flight buttons share a disabled state. Native two-file apply/discard verified preserved bytes and correct card states.

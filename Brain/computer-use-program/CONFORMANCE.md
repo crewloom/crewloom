@@ -30,3 +30,7 @@ This matrix records empirical verification of invariants I1 through I5 across de
 - **`fake only (<test-file>)`**: Verified in-memory against a mock/fake test fixture (such as `FakeBackend`, mock HTTP server, or fake CLI binaries); verifies harness contract mechanisms, but does not provide empirical evidence of invariant compliance on an actual display server, real device, or active OS session.
 - **`n/a (no pointer on this platform)`**: Invariant does not apply because the platform lacks a physical mouse/pointer (e.g. touch/gesture mobile surfaces on Android and iOS).
 - **`not run`**: No empirical verification has been executed for this invariant on this backend/platform yet (e.g. pending hardware spike, or probe unavailable on platform).
+
+### 2026-10-27 — Android repeat verification in the remediation worktree
+
+A dedicated emulator-5580 (crewloom-conformance-35, API 35) passed 7 live conformance cases plus 7 emulator lifecycle cases in one owned start/wait/test/stop batch. The personal emulator-5554 kept transport_id 5; its AVD was not recreated or stopped. I1 and I5 have local live evidence; I2 is not applicable; I3 and I4 remain not run. Offline focus parsing/probe tests also passed. This is worktree evidence, not a new released-commit attestation: the ledger is deliberately unchanged until agent source ownership and commits are settled.
