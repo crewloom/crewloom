@@ -1,5 +1,15 @@
 # Completed work
 
+### 2026-10-27 — Desktop reply suggestions (agent questions with Tab insertion)
+- Artifact: `agent/apps/crewloom-desktop/src/features/reply-suggestions/`, `src/components/AgentMessage.tsx`, `src/components/Composer.tsx`, `src/lib/i18n.ar.ts`, `src/lib/i18n.en.ts`, `tests/reply-suggestions.test.mjs` (agent commit a4651c3, release `crewloom-v0.3.18`).
+- Impact: Matches the Claude-style pattern — when the agent's reply ends with a question, the question card now quotes the actual question asked, offers ordered answer chips (proceed / explain / modify / "not now, later"), and the first chip is insertable with Tab from the composer (click = send, Tab = type into the input without sending). Question detection (Arabic and English) and chip generation moved into one pure module `features/reply-suggestions` shared by the card and the composer so Tab always matches the visible chips; new keys `agentSuggestDefer`, `agentQuestionQuote`, `agentSuggestTabHint` in both dictionaries; styles use logical properties so RTL/LTR both work.
+- Evidence: full desktop suite `node --test tests/*.test.mjs` 168/168 pass, including the new regression suite; `pnpm run typecheck` (agent) 5/5 gates pass; release `crewloom-v0.3.18` published and its CI runs verified via `gh run list/watch` (see CHALLENGES note on the release-script cwd pitfall).
+
+### 2026-10-27 — Windows native agent: secrets persistence and download surface
+- Artifact: `agent/apps/crewloom-desktop/src-tauri/src/secrets.rs`, `website/hooks/useDeviceOS.ts`, `website/lib/constants.ts`, `website/lib/github-releases.ts`, `core/dashboard/app/page.tsx`.
+- Impact: Implemented Windows Credential Manager storage for API keys/tokens (replacing the no-op stub that dropped secrets on Windows), keeping the Tauri desktop app functional on Windows. Aligned website and dashboard download surfaces to the native NSIS `.exe` installer instead of the console `.bat` shim.
+- Evidence: `cargo build` and `cargo test` (58 passed) succeed on the host; `npm run build` succeeds for the website.
+
 ### 2026-10-26 — Universal Computer Use Programme: Desktop & Mobile Automation Architecture
 - Artifact: `packages/crewloom/contracts`, `packages/crewloom/computer-use`, `packages/crewloom/mobile-use`, `packages/crewloom/computer-use-conformance`, `.github/workflows/computer-use-conformance.yml`, `core/Brain/computer-use-program/`.
 - Impact: Unified hexagonal architecture for desktop (macOS Aqua, Windows, Linux) and mobile (Android ADB, iOS Simulator) computer use. Complete policy and security layer (`PolicyGate`, denylist, kill switch), deterministic action auditing (`AuditTrail`), multi-rung fallback (`StrategyLadder`), bilingual error messaging (Arabic & English), native macOS Aqua adapter, complete Android ADB automation (transport, UI hierarchy dump parsing, gestures, screenshot with secure surface detection, Arabic text input with clipboard-paste strategy), iOS Simulator adapter (simctl + WDA REST client), and CI matrix workflow.
@@ -398,3 +408,19 @@
 - Final native acceptance: a fresh Arabic Plan request rendered one failed card and no running/changed-file claim; its error translated in both languages. Build staged without writing and the target appeared only after explicit Apply Changes, verifying the assistant-message approval binding.
 
 Final batch acceptance / قبول الدفعة: native Tauri applied two proposals only after explicit approval, updated both cards, and then discarded a fresh two-file batch while preserving external file changes. English apply and Arabic discard labels name the complete batch.
+
+### 2026-10-27 — CLI ownership and public distribution closed
+- Artifact: website `cli/`, `scripts/build-cli.mjs`, portable-download regression suite, installer URLs and explicit Vercel install/build commands. The prior workspace `cli/bin/` paths forward to the canonical source; no private agent implementation is packaged.
+- Evidence: 16 source/download cases passed on current Node and Node18, 8 legacy-adapter cases passed, and the published source tarball matched its local hash and passed an isolated install/init/verify smoke. Website build, four asset cases and SEO verification passed. Website release v1.0.8 is published with CLI1.0.1 assets; official CI run40510102271 succeeded on647c5d0. Vercel production deployment dpl_8U6dpGPDwec2VL3F2byyXXnoTNJk is READY; actual HTTPS launcher bytes match the tested bundles and version/init/verify smoke passed outside the source workspace.
+- Limits: npm registry publication was not performed; actual Windows PowerShell installation was not run. This closes the earlier missing CLI repository owner/release blocker. Other agent/Pulse/core release gates remain open.
+
+### 2026-10-27 — Desktop sub-sessions, phase 1 (unreleased)
+- Artifacts: `Conversation.parentId`/`brief`, `ChatMessage.subsessionReport`, `src/features/subsessions/` (nesting, proposals with a cap of 3 per parent, parent reports), nested sidebar rows, "New task" cards, and a context-menu "New sub-session". Side chat now opens as a sub-session of the active chat.
+- Evidence: `tsc --noEmit` passed; `web:build` passed; desktop Node tests 150 pass, including new `tests/subsessions.test.mjs` and storage lineage cases. Checked in the Vite web preview in English/LTR and Arabic/RTL: nesting, report card, Start, Do it here, and context menu.
+- Limits: no proposal producer yet (phase 2 model tool, phase 3 Pulse). A report from a real provider run was not exercised: there is no provider in web mode, and the report was produced from a seeded finished reply. App.tsx grew by 56 lines of wiring. Not committed or released.
+
+
+### 2026-10-27 — Deep Skills, phase 0: depth decision and stopping rule
+- Artifacts: `agent/packages/crewloom/contracts/src/deep-execution.ts` (`decideDepth`, `checkDepthPolicy`, `shouldStop`, `MAX_REPAIRS_PER_CAUSE`), `agent/apps/crewloom-desktop/src/lib/depth.ts` (`resolveDepth` reads `Settings.reasoningEffort` and the task text), spec `DEEP-SKILLS-SPEC.ar.md` at the workspace root.
+- Evidence: contracts vitest `deep-execution.spec.ts` 17 pass; desktop `node --test tests/depth.test.mjs` 6 pass; desktop `tsc --noEmit` and agent `pnpm run typecheck` pass; oxlint clean on the new files.
+- Limits: no run path calls `resolveDepth`, so `reasoningEffort` still has no effect in the running app; no verifier runner; Pulse signal disabled (no runtime). Repository signals (files, layers, challenges) are reported as unknown.

@@ -1,5 +1,10 @@
 # Challenges
 
+### 2026-10-27 — Desktop release script reads paths relative to the working directory
+- Cause: `apps/crewloom-desktop/scripts/release.mjs` resolves `package.json` / `src-tauri/*` relative to the CWD, so running it from the `agent/` root parses the harness `package.json` and fails with `Version "0.2.1-rc.2" is not MAJOR.MINOR.PATCH` — a misleading error that looks like corrupted version state when the real versions (0.3.17) are fine.
+- Solution: run it from inside `apps/crewloom-desktop` (as the documented commands do). Consider a smarter follow-up: resolve `pkgPath` against the script's own directory so a root invocation refuses loudly with an actionable hint instead of reading a foreign manifest.
+- Status: Worked around; release `crewloom-v0.3.18` published successfully.
+
 ### 2026-10-26 — Android ADB Unicode and Arabic input crashes InputShellCommand
 - Cause: `adb shell input text` internally relies on Android's `KeyCharacterMap` to convert characters into key event combinations. For non-ASCII characters (Arabic letters, Tashkeel diacritics, and emoji), `getEvents` returns `null`, causing an unhandled `NullPointerException` inside `com.android.server.input.InputShellCommand.sendText` on Android 10+ (empirically confirmed on Android 15 API 35).
 - Solution: Two-tier strategy selection in `src/android/text`: pure ASCII strings route to `input text`, while Arabic, mixed RTL/LTR, diacritics, and emoji route to base64-encoded clipboard transfer via Crewloom helper broadcast intent followed by `KEYCODE_PASTE` (key event 279), avoiding the shell character map entirely.
@@ -412,3 +417,8 @@
 - Final gate evidence: agent lint reports 1535 errors in 81 files. Core repository validation rejects omitted/stale manifest entries; publication remains blocked, with no digest rebaseline over pending sources. Final native display and explicit-approval acceptance passed.
 
 - Proposal actions are batch operations: labels now say Apply All/Discard All in both dictionaries, one resolution owns every card, and in-flight buttons share a disabled state. Native two-file apply/discard verified preserved bytes and correct card states.
+
+### 2026-10-27 — Published source and production launcher diverged
+- Cause: CLI source previously had no owning Git repository and download copies drifted. GitHub Actions success did not establish the production-domain version: crewloom.org was still served by a previous Vercel deployment. An inherited NODE_TEST_CONTEXT also suppressed a child Node test runner during a real verification regression.
+- Fix: canonical CLI source belongs to the website; build all launchers from it, clear only the inherited Node test-runner marker for independent checks, use deployed payload URLs, and select npm ci plus CLI tests/full build in Vercel configuration. GitHub Pages now uses its custom workflow; production Vercel deployment is separately verified.
+- Evidence: source/download and published-package tests pass; both live launcher hashes match local builds, hosted installers select those paths, and explicit production logs show16 passing CLI cases before build. CLI ownership and distribution are resolved; prior lint, billing and core manifest gates are not reclassified.
