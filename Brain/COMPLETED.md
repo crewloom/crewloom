@@ -1,5 +1,10 @@
 # Completed work
 
+### 2026-10-27 — CI: Dependabot uv updates unblocked
+- Artifact: `agent/.github/dependabot.yml` (agent commit 24a9714, release `crewloom-v0.3.20`).
+- Impact: The scheduled `uv in /python/sdk` update job no longer fails; the locally built `deepseek-harness-runtime-bin` is excluded from registry updates while all other Python dependencies keep updating.
+- Evidence: fresh Dependabot run `40599654184` = success with `ignore-conditions` applied from the config and no recorded job errors.
+
 ### 2026-10-27 — Desktop reply suggestions (agent questions with Tab insertion)
 - Artifact: `agent/apps/crewloom-desktop/src/features/reply-suggestions/`, `src/components/AgentMessage.tsx`, `src/components/Composer.tsx`, `src/lib/i18n.ar.ts`, `src/lib/i18n.en.ts`, `tests/reply-suggestions.test.mjs` (agent commit a4651c3, release `crewloom-v0.3.18`).
 - Impact: Matches the Claude-style pattern — when the agent's reply ends with a question, the question card now quotes the actual question asked, offers ordered answer chips (proceed / explain / modify / "not now, later"), and the first chip is insertable with Tab from the composer (click = send, Tab = type into the input without sending). Question detection (Arabic and English) and chip generation moved into one pure module `features/reply-suggestions` shared by the card and the composer so Tab always matches the visible chips; new keys `agentSuggestDefer`, `agentQuestionQuote`, `agentSuggestTabHint` in both dictionaries; styles use logical properties so RTL/LTR both work.

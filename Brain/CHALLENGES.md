@@ -1,5 +1,11 @@
 # Challenges
 
+### 2026-10-27 — Dependabot uv job fails on the editable runtime binary
+- Cause: `python/sdk/pyproject.toml` pins `deepseek-harness-runtime-bin==0.0.0.dev0`, a version published nowhere, because the package is built from `../sdk-runtime` and injected as an editable path source. Dependabot reads only registry metadata, tried to "upgrade" the pin to a prerelease (`0.1.5rc1`), then failed with `dependency_file_not_resolvable`: circular "project depends on ==0.1.5rc1 but no such version" while the real project specifier is `==0.0.0.dev0`.
+- Solution: `.github/dependabot.yml` → the `/python/sdk` uv entry ignores `deepseek-harness-runtime-bin` with a comment naming the local editable source. The package stays owned by the repo build; every other dependency still updates.
+- Evidence: the config push triggered a fresh uv run (`40599654184`, success). Its log shows the applied `ignore-conditions` entry and `All versions of deepseek-harness-runtime-bin ignored, no update allowed`, with zero `record_update_job_error` entries. Released as `crewloom-v0.3.20`.
+- Status: Resolved.
+
 ### 2026-10-27 — Desktop release script reads paths relative to the working directory
 - Cause: `apps/crewloom-desktop/scripts/release.mjs` resolves `package.json` / `src-tauri/*` relative to the CWD, so running it from the `agent/` root parses the harness `package.json` and fails with `Version "0.2.1-rc.2" is not MAJOR.MINOR.PATCH` — a misleading error that looks like corrupted version state when the real versions (0.3.17) are fine.
 - Solution: run it from inside `apps/crewloom-desktop` (as the documented commands do). Consider a smarter follow-up: resolve `pkgPath` against the script's own directory so a root invocation refuses loudly with an actionable hint instead of reading a foreign manifest.
