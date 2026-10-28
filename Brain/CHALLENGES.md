@@ -1,5 +1,11 @@
 # Challenges
 
+### 2026-10-27 — `gh run watch --exit-status` reported failure for a successful run
+- Cause: the watcher aborted on a transient network error (the same window produced `net/http: TLS handshake timeout` from `gh api`), and `--exit-status` propagates a non-zero code that reads exactly like a red CI run.
+- Solution: treat `gh run watch` only as a completion signal; confirm the outcome with `gh run view <id> --json conclusion` or the REST API (`conclusion`, `run_attempt`) before reporting or reverting anything. Also distinguish `cancelled` from `failure`: pushes in this repository cancel earlier branch runs through a concurrency group, while tag runs stay authoritative.
+- Evidence: run `40603793536` watched as `exit=1`, but GitHub reports `conclusion=success`, `run_attempt=1` with both jobs green.
+- Status: Resolved as a reporting practice; no code change.
+
 ### 2026-10-27 — Dependabot uv job fails on the editable runtime binary
 - Cause: `python/sdk/pyproject.toml` pins `deepseek-harness-runtime-bin==0.0.0.dev0`, a version published nowhere, because the package is built from `../sdk-runtime` and injected as an editable path source. Dependabot reads only registry metadata, tried to "upgrade" the pin to a prerelease (`0.1.5rc1`), then failed with `dependency_file_not_resolvable`: circular "project depends on ==0.1.5rc1 but no such version" while the real project specifier is `==0.0.0.dev0`.
 - Solution: `.github/dependabot.yml` → the `/python/sdk` uv entry ignores `deepseek-harness-runtime-bin` with a comment naming the local editable source. The package stays owned by the repo build; every other dependency still updates.
