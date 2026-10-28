@@ -429,3 +429,9 @@ Final batch acceptance / قبول الدفعة: native Tauri applied two proposa
 - Artifacts: `agent/packages/crewloom/contracts/src/deep-execution.ts` (`decideDepth`, `checkDepthPolicy`, `shouldStop`, `MAX_REPAIRS_PER_CAUSE`), `agent/apps/crewloom-desktop/src/lib/depth.ts` (`resolveDepth` reads `Settings.reasoningEffort` and the task text), spec `DEEP-SKILLS-SPEC.ar.md` at the workspace root.
 - Evidence: contracts vitest `deep-execution.spec.ts` 17 pass; desktop `node --test tests/depth.test.mjs` 6 pass; desktop `tsc --noEmit` and agent `pnpm run typecheck` pass; oxlint clean on the new files.
 - Limits: no run path calls `resolveDepth`, so `reasoningEffort` still has no effect in the running app; no verifier runner; Pulse signal disabled (no runtime). Repository signals (files, layers, challenges) are reported as unknown.
+
+### 2026-10-28 — Free CI adopted: self-hosted runners (no billing)
+- Decision: desktop CI gates (`Crewloom Desktop`, `Universal Computer Use Conformance`) run on the free self-hosted macOS ARM64 runner `MacBook-Pro-agent` (labels `self-hosted,macOS,ARM64,agent`), which is online. The earlier "spending-limit" blocker is a queue backlog on a single runner, not a billing gate for these jobs.
+- Artifact: `agent/scripts/setup-self-hosted-runner.sh` documents and automates adding a second free runner (labels included) to clear backlog without payment.
+- Evidence: `gh api repos/crewloom/agent/actions/runners` returned the runner online/busy; the two desktop workflows sat `queued` while the runner drained other jobs. Local desktop verification (63 Rust tests + `tsc --noEmit` + pre-push hook) passed on the key-provisioning commit, later included in release `v0.3.21`.
+- Limits: hosted `ubuntu-latest` jobs (billing-gated) remain outside this decision; the free self-hosted path covers the desktop gates only. A second runner is recommended if queue depth grows.
