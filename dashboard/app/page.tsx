@@ -60,7 +60,7 @@ export default function Dashboard() {
         os: 'windows',
         nameEn: 'Windows (Recommended)',
         nameAr: 'ويندوز (موصى به لجهازك)',
-        downloadUrl: 'https://crewloom.org/Crewloom-Agent-Setup.bat',
+        downloadUrl: 'https://crewloom.org/Crewloom-Agent-Setup.exe',
         command: 'irm https://crewloom.org/install.ps1 | iex',
       });
       return;

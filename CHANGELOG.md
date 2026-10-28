@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.6 — 2026-10-28
+
+- Record the agent skills squads, Remotion video stack, and backend squad in `Brain/COMPLETED.md` and `Brain/ROADMAP_TODO.md`.
+- Dashboard: point the Windows download at the `.exe` installer, require Node `^22.19.0 || >=24.0.0`, and load PostCSS directly in the CSS privacy test.
+- Let the computer-use and program-ledger tests run from inside `scripts/` as well as the repository root.
+- Synchronize the documentation manifest.
+
 ## 0.9.5 — 2026-10-26
 
 - Maintenance, stabilization, and enhancements for Crewloom core components.

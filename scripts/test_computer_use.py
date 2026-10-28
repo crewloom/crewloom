@@ -6,7 +6,10 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-import scripts.computer_use as cu
+try:
+    import computer_use as cu
+except ModuleNotFoundError:
+    import scripts.computer_use as cu
 
 
 class ClaudeComputerUseSchemaTest(unittest.TestCase):

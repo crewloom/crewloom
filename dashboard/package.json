@@ -4,7 +4,7 @@
   "type": "module",
   "version": "0.1.0",
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^22.19.0 || >=24.0.0"
   },
   "scripts": {
     "dev": "node server.mjs --dev",
@@ -18,7 +18,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.6.5",
     "@types/react": "^19.0.0",
     "typescript": "^5.6.0"
   },

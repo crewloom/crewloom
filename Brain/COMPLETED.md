@@ -435,3 +435,26 @@ Final batch acceptance / قبول الدفعة: native Tauri applied two proposa
 - Artifact: `agent/scripts/setup-self-hosted-runner.sh` documents and automates adding a second free runner (labels included) to clear backlog without payment.
 - Evidence: `gh api repos/crewloom/agent/actions/runners` returned the runner online/busy; the two desktop workflows sat `queued` while the runner drained other jobs. Local desktop verification (63 Rust tests + `tsc --noEmit` + pre-push hook) passed on the key-provisioning commit, later included in release `v0.3.21`.
 - Limits: hosted `ubuntu-latest` jobs (billing-gated) remain outside this decision; the free self-hosted path covers the desktop gates only. A second runner is recommended if queue depth grows.
+
+### 2026-10-28 — Production Agent Skills installed and organized into specialized squads
+- Decision: Integrated top GitHub-starred, high-value agent skills (from Anthropic, Matt Pocock, Vercel Labs, and local high-density invariants) and partitioned them into 6 specialized engineering squads aligned with Crewloom's subprojects.
+- Artifacts: Installed in `.agents/skills/` and symlinked into `.agent/skills/` for universal discovery across Antigravity, Claude Code, and workspace agents. New catalog created at `core/Brain/SKILLS_AND_TEAMS_CATALOG.md`.
+  - Frontend & UI/UX Squad: `frontend-design`, `ui-ux-pro-max`, `web-design-guidelines`, `vercel-react-best-practices`, `vercel-composition-patterns`.
+  - Architecture & Planning Squad: `grill-me` / `grilling`, `codebase-design`, `wayfinder`, `yagni-discipline`.
+  - QA & Debugging Squad: `tdd`, `diagnosing-bugs`, `code-review`, `webapp-testing`, `crewloom-release-verifier`.
+  - AI Protocols & Performance Squad: `crewloom-ai-pulse`, `caveman`, `crewloom-context-memory-guard`.
+  - Integration & Skills Studio Squad: `mcp-builder`, `skill-creator`.
+  - Scientific Research & Review Squad: `crewloom-scientific-peer-review`, `experimental-design`, `hypothesis-generation`, `statistical-analysis`, `uncertainty-and-units`, `literature-review`, `scientific-critical-thinking`.
+- Evidence: All skills verified present in `.agent/skills/` and `.agents/skills/`, YAML frontmatter and discovery contracts validated.
+
+### 2026-10-28 — Remotion Video Engineering Stack installed and verified end-to-end
+- Decision: Integrated official `remotion-dev/skills` (`remotion-best-practices`, `remotion-create`, `remotion-markup`, `remotion-captions`, `remotion-render`, `remotion-studio`) and established the 7th squad: Media & Video Engineering Squad.
+- Artifacts: Installed in `.agents/skills/remotion-*` and symlinked to `.agent/skills/`. Configured local headless Chrome acceleration in `output/remotion-test/remotion.config.ts`. Added `@remotion/google-fonts` and `@remotion/captions`. Created executable studio launcher `scripts/video-studio.sh`.
+- Verification Evidence:
+  1. Horizontal (16:9) composition `CrewloomMotion` rendered via `npx remotion render` to `output/remotion-test/crewloom-motion.mp4` (622 KB, 3.00s @ 30fps) in 25s with 8x threads. Still at `output/remotion-test/out.png` (288 KB) in 1.35s.
+  2. Vertical (9:16) Reels/TikTok Arabic composition `CrewloomReelsArabic` (1080x1920 @ 30fps, 90 frames) featuring Cairo Arabic font, RTL layout, and glowing orbs rendered to `output/remotion-test/crewloom-reels-ar.mp4` (626 KB, 3.00s) in 15.1s. Still frame at `output/remotion-test/out-reels-ar.png` (368 KB) in 1.9s.
+
+### 2026-10-28 — Backend Squad, PR workflow, and unified skills catalogue finalized
+- Decision: Expanded engineering squads to 8 by establishing Team 8: Backend, Database & Infrastructure Squad (`postgres`, `mcp-builder`, `distributed-systems-architect`). Added Matt Pocock's `pr` workflow skill.
+- Artifacts: Linked `postgres` and `pr` in `.agent/skills/` and `.agents/skills/`. Updated `core/Brain/SKILLS_AND_TEAMS_CATALOG.md` (Mermaid diagram and squad profiles) and cross-referenced in `AGENTS.md`.
+- Evidence: All 8 squads verified, links resolve to active skill files, and non-destructive backwards compatibility preserved.

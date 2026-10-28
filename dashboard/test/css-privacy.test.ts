@@ -6,7 +6,6 @@ import { createRequire } from 'node:module';
 import test from 'node:test';
 
 const require = createRequire(import.meta.url);
-const nextRequire = createRequire(require.resolve('next/package.json'));
 
 test('Next CSS processing refuses an absolute source map outside its input', async () => {
   const folder = mkdtempSync(join(tmpdir(), 'crewloom-css-private-'));
@@ -21,7 +20,7 @@ test('Next CSS processing refuses an absolute source map outside its input', asy
       if (path === file) privateReads++;
       return (originalRead as any)(path, ...args);
     }) as typeof fs.readFileSync;
-    const postcss = nextRequire('postcss');
+    const postcss = require('postcss');
     const result = await postcss([{ postcssPlugin: 'privacy-fixture', Once() {} }]).process(`a{color:red}\n/*# sourceMappingURL=${file} */`,
       { from: undefined, map: { inline: false } });
     assert.equal(privateReads, 0, 'untrusted CSS must not read an external private source map');

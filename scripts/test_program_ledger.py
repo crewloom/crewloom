@@ -7,7 +7,10 @@ import unittest
 from datetime import timedelta
 from pathlib import Path
 
-import scripts.program_ledger as pl
+try:
+    import program_ledger as pl
+except ModuleNotFoundError:
+    import scripts.program_ledger as pl
 
 
 def make_ledger(extra=None):
