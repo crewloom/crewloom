@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.9",
+  "package_version": "0.9.10",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -499,6 +499,7 @@
     "Brain/ARTIFACT_TAXONOMY.md": "1c593f7d624bbe1dde80fbc987a8e2e7940a3f6ad239cddef27311afa03151f2",
     "Brain/CHALLENGES.md": "83149ec1bcf669b6d749e2297621459cd56719a6078890d0618dde4670ed2093",
     "Brain/COMPLETED.md": "ac3a0cd6d9a3ebabe6fc8829331fc801dee5130eff2b2e65adfe67b6dd6839c7",
+    "Brain/DESIGN_SELECTION_SHADOW_LOG.md": "e98cf58fb1ea912ad57030ce37d75cba0a34537e2b680c6b978b360a4d4cdf82",
     "Brain/IDEAS_VAULT.md": "7e41e58f729c9993951a89fc5441972356ded4ab435f57f9cec0bd4afe30c169",
     "Brain/PROTOCOL_MODEL_ESCALATION.md": "9e5559e97ac29edd55c9c11548a190446e8c152a4599d4b6c546cae4a2f99347",
     "Brain/ROADMAP_TODO.md": "834f46c15373ef78bef3cd1c23864ee7e95a01c3965263631c8baece03351f8f",
@@ -524,7 +525,7 @@
     "Brain/computer-use-program/spikes/android-virtual-display.md": "b82b6746a74ab80091b30b5a60f79f1d9a149ce255b0babb384fc51bb242890b",
     "Brain/computer-use-program/spikes/macos.md": "1ff9d32001a4f440b76de6e52aa9da49ef762d9ca354807217d21214aa6f39cd",
     "Brain/computer-use-program/spikes/windows-adapter-audit.md": "3072bb9f13b3495f9ade23ab1f000dfe7cb93160d8f36b5325485bd7c387b86d",
-    "CHANGELOG.md": "30696814afac3179d36268dd616bb8049c822af8f7dd71a48a2cec3ff606b694",
+    "CHANGELOG.md": "24091b8a8e21efe1bb417740e155e87cc9e1f669f7dfae15ec57e7eaa65a1c19",
     "CONTRIBUTING.md": "6237e5a0f8eed5addda8220f179a5fec831a45d6b950e7fab10669ed28dd59f9",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "MANIFEST.in": "350519cb71b6be3b612f01c9c484208182772c2897b65568099bf41cffbab1df",
@@ -832,7 +833,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "d51ced885eefb2970be8ebc5e47083d7a109d450f86851982f1578ac9d8b9804",
+    "pyproject.toml": "902bba6e4d0d43e102867b015b6f4dce93ae4fece896e48ecb50fac7781feff1",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
