@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.10 — 2026-10-31
+
+- Add the design for opt-in selection measurement (`Brain/DESIGN_SELECTION_SHADOW_LOG.md`): findings on the usage ledger, the missing verifier runner and the staged plan.
+
 ## 0.9.9 — 2026-10-31
 
 - Add the `model-escalation` protocol (`Brain/PROTOCOL_MODEL_ESCALATION.md`) and register model cost class, selection and escalation artifacts in `Brain/ARTIFACT_INDEX.md`.
