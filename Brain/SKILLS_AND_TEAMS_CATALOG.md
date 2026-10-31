@@ -68,6 +68,7 @@
 | **`pptx`** | `anthropics/skills` | Anthropic | عروض PowerPoint (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
 | **`xlsx`** | `anthropics/skills` | Anthropic | جداول Excel (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
 | **`web-artifacts-builder`** | `anthropics/skills` | Anthropic | بناء artifacts ويب متعددة المكونات. |
+| **`council`** | `0xNyk/council-of-high-intelligence` | ~4.7k | مجلس من 18 شخصية فكرية (Socrates, Feynman, Munger, Taleb…) بمداولة مستقلة ثم مناظرة مجهولة الهوية وحكم رئيس المجلس. أدوات الأعضاء مقيّدة بـ Read/Grep/Glob. المحاكاة لأسلوب التفكير وليست اقتباسات. |
 
 ---
 
@@ -212,6 +213,7 @@ flowchart TD
   * Cloudflare: `agents-sdk`, `durable-objects`, `workers-best-practices`, `workers-profiling`, `wrangler`, `web-perf`, `nextjs-on-cloudflare`, `cloudflare-email-service`.
   * Google: `agent-platform-eval-flywheel`, `agent-platform-skill-registry`, `agent-platform-prompt-management`, `agent-platform-rag-engine-management`, `google-cloud-solution-multi-agent-security`, `google-cloud-waf-security`, `apigee-agent-gateway-governance`, `retrieving-developer-knowledge`, `finding-google-skills`, `migrate-to-rust`.
   * Anthropic: `doc-coauthoring`, `docx`, `pdf`, `pptx`, `xlsx`, `web-artifacts-builder`.
+  * مجلس القرار: `council` (استخدم `--triad` أو `--duo` يومياً؛ `--full` يشغّل 18 وكيلاً وهو مكلف).
 * **ملاحظة:** كلها من النوع Skill في `ARTIFACT_TAXONOMY.md`؛ تُحمَّل بالكشف التدريجي ولا تُحقن كاملة في الـ prompt.
 
 ---

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.8 — 2026-10-31
+
+- Register the `council` skill (Council of High Intelligence) in `Brain/SKILLS_AND_TEAMS_CATALOG.md`.
+- Synchronize the documentation manifest.
+
 ## 0.9.7 — 2026-10-31
 
 - Register 24 skills from Cloudflare, Google, and Anthropic in `Brain/SKILLS_AND_TEAMS_CATALOG.md` and add the Cloud Agents & Documents squad.
