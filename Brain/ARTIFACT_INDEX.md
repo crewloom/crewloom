@@ -23,7 +23,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 |---|---|---|---|---|---|
 | release | any verified modification completes | tag exists locally and on remote; GitHub Release published; CI green | `scripts/release.sh` (steps 3-4); rest advisory | `AGENTS.md` § Mandatory Release Protocol | active |
 | post-push-ci-verification | any push, merge or release | all workflow runs for `HEAD` pass, checked with `gh` only | advisory | `AGENTS.md` § Non-negotiable 7; skill `crewloom-release-verifier` | active |
-| model-escalation | a task is submitted for execution | verified result, or escalation limit (2) reached | Guard (planned) | to be created | planned |
+| model-escalation | a task is submitted and more than one model could run it | verified result, or `escalate` returns `stop` | advisory; Guard planned | `PROTOCOL_MODEL_ESCALATION.md` | written, not wired into any run path |
 
 ## Contracts
 
@@ -32,16 +32,16 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | shared-contracts | Cross-package types and `Result<T,E>` | TypeScript `strict`, tests | `agent/packages/crewloom/contracts` | active |
 | model-cost-class | Cost class of a model: `local`, `free` or `paid` (unregistered ids are `paid`) | vitest: `contracts/tests/model-catalog.spec.ts`; desktop drift test `apps/crewloom-desktop/tests/model-cost-drift.spec.ts` | `agent/packages/crewloom/contracts/src/model-catalog.ts` | active (bridge not yet migrated; free list unverified against providers) |
 | model-metadata | Names, descriptions, context labels for UI | none; duplicated in `bridge/src/domain/model-catalog.ts` and `agent/apps/crewloom-desktop/src/lib/models-catalog.ts`, and the two disagree on context windows and free membership | both files until moved | planned |
-| model-selection | Deterministic choice of model for a task class, free/local first | Guard (planned) | to be created | planned |
+| model-selection | Deterministic choice and escalation ladder, free/local first (`selectModel`, `buildLadder`, `escalate`) | vitest: `contracts/tests/model-selection.spec.ts`; no Guard yet | `agent/packages/crewloom/contracts/src/model-selection.ts` | active as pure functions; no caller yet |
 
 ## Roles (model selection)
 
 | name | responsibility | runs on | status |
 |---|---|---|---|
 | classifier | Assigns the task to a task class | Pulse (local) | planned |
-| selector | Applies the selection contract to pick a model | deterministic code | planned |
+| selector | Applies the selection contract to pick a model | deterministic code (`selectModel`) | partial: function exists, no caller |
 | verifier | Checks the result against tests or schema | deterministic code first, free model second | planned |
-| escalator | Decides to move up a tier after a failed verification or rate limit; escalates automatically, no operator prompt | deterministic code | planned |
+| escalator | Moves up a tier after a failed verification or rate limit; automatic, no operator prompt | deterministic code (`escalate`) | partial: function exists, no caller |
 
 ## Guards
 
