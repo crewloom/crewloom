@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.6",
+  "package_version": "0.9.7",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -494,6 +494,9 @@
     ".gitignore": "476e48d1cd9188f2851bba2b189f375753faa36d88c98211a48a2d6f40be6d16",
     "AGENTS.md": "7b2e01e69be10eef74994cc7a363de6257d2c6f08705fe67f3b220c34ef4473b",
     "Brain/ARCHITECTURE.md": "1e3badb94ca84b5ea6d21dae092c3b63602af8c6b91a7f259e86c749e29fbe90",
+    "Brain/ARTIFACT_INDEX.md": "a67c5d85b9edb0ebfa9d9565e31f464a00cc6ee8cb137a133e33340f4455a7fc",
+    "Brain/ARTIFACT_TAXONOMY.ar.md": "651f05b6e8a3963bd5389b69fcd592f7ededa57ab6f856c93d9fe07bf59fb1a4",
+    "Brain/ARTIFACT_TAXONOMY.md": "1c593f7d624bbe1dde80fbc987a8e2e7940a3f6ad239cddef27311afa03151f2",
     "Brain/CHALLENGES.md": "83149ec1bcf669b6d749e2297621459cd56719a6078890d0618dde4670ed2093",
     "Brain/COMPLETED.md": "ac3a0cd6d9a3ebabe6fc8829331fc801dee5130eff2b2e65adfe67b6dd6839c7",
     "Brain/IDEAS_VAULT.md": "7e41e58f729c9993951a89fc5441972356ded4ab435f57f9cec0bd4afe30c169",
@@ -828,7 +831,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "b5ba781bc33f369fd54c085eb0a0036d4a43d9b17b11bcacd11a837e7efbef24",
+    "pyproject.toml": "56c6480b9d51f60a2e4dba360ce31f846274f94758f87527e4a4c6a902c7f2de",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
