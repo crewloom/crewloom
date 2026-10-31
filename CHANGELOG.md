@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.9 — 2026-10-31
+
+- Add the `model-escalation` protocol (`Brain/PROTOCOL_MODEL_ESCALATION.md`) and register model cost class, selection and escalation artifacts in `Brain/ARTIFACT_INDEX.md`.
+
 ## 0.9.8 — 2026-10-31
 
 - Register the `council` skill (Council of High Intelligence) in `Brain/SKILLS_AND_TEAMS_CATALOG.md`.
