@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.7 — 2026-10-31
+
+- Register 24 skills from Cloudflare, Google, and Anthropic in `Brain/SKILLS_AND_TEAMS_CATALOG.md` and add the Cloud Agents & Documents squad.
+- Add the artifact taxonomy (`Brain/ARTIFACT_TAXONOMY.md`, Arabic twin) and `Brain/ARTIFACT_INDEX.md` as a draft pending operator review.
+- Synchronize the documentation manifest.
+
 ## 0.9.6 — 2026-10-28
 
 - Record the agent skills squads, Remotion video stack, and backend squad in `Brain/COMPLETED.md` and `Brain/ROADMAP_TODO.md`.

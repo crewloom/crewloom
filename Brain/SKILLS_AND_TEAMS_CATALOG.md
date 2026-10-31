@@ -44,6 +44,30 @@
 | **`crewloom-ai-pulse`** | Local (Crewloom) | خاص بالمشروع | مواصفات محرك القرارات المحلي Pulse وبث `.crw` المشفر والـ sidecar. |
 | **`peer-review`** | Local | معيار علمي | صياغة مراجعات تحكيم علمي منظمة ومقيدة بالأدلة. |
 | **`scientific-critical-thinking`** | Local | معيار علمي | تقييم جودة الأدلة والتحيزات والعوامل المربكة في الادعاءات العلمية. |
+| **`agents-sdk`** | `cloudflare/skills` | Cloudflare | بناء وتصحيح ومراجعة وكلاء Cloudflare Agents SDK (حالة دائمة، WebSockets، أدوات). |
+| **`durable-objects`** | `cloudflare/skills` | Cloudflare | حالة متسقة ومنسّقة على الـ edge عبر Durable Objects. |
+| **`workers-best-practices`** | `cloudflare/skills` | Cloudflare | أفضل ممارسات كتابة Workers ومراجعتها. |
+| **`workers-profiling`** | `cloudflare/skills` | Cloudflare | تحليل أداء Workers وتحديد الاختناقات. |
+| **`wrangler`** | `cloudflare/skills` | Cloudflare | الإعداد والنشر عبر Wrangler CLI. |
+| **`web-perf`** | `cloudflare/skills` | Cloudflare | تدقيق أداء الويب (Core Web Vitals) لموقع `website/`. |
+| **`nextjs-on-cloudflare`** | `cloudflare/skills` | Cloudflare | نشر Next.js على Cloudflare. |
+| **`cloudflare-email-service`** | `cloudflare/skills` | Cloudflare | إرسال واستقبال البريد عبر Cloudflare Email. |
+| **`agent-platform-eval-flywheel`** | `google/skills` | Google | حلقة تقييم مستمر للوكلاء والنماذج. |
+| **`agent-platform-skill-registry`** | `google/skills` | Google | أنماط إدارة سجل المهارات. |
+| **`agent-platform-prompt-management`** | `google/skills` | Google | إدارة وإصدار الـ prompts. |
+| **`agent-platform-rag-engine-management`** | `google/skills` | Google | إدارة محركات RAG. |
+| **`google-cloud-solution-multi-agent-security`** | `google/skills` | Google | أمان أنظمة الوكلاء المتعددين. |
+| **`google-cloud-waf-security`** | `google/skills` | Google | ركيزة الأمان في Well-Architected Framework. |
+| **`apigee-agent-gateway-governance`** | `google/skills` | Google | حوكمة بوابات الوكلاء (ينفّذ سكربتات؛ راجعها قبل التشغيل). |
+| **`retrieving-developer-knowledge`** | `google/skills` | Google | استرجاع وثائق المطورين الحديثة. |
+| **`finding-google-skills`** | `google/skills` | Google | اكتشاف مهارات Google المناسبة للمهمة. |
+| **`migrate-to-rust`** | `google/skills` | Google | ترحيل الشيفرة إلى Rust (يخدم `src-tauri`). |
+| **`doc-coauthoring`** | `anthropics/skills` | Anthropic | تأليف مستندات مشتركة منظمة. |
+| **`docx`** | `anthropics/skills` | Anthropic | قراءة وإنشاء وتعديل Word (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
+| **`pdf`** | `anthropics/skills` | Anthropic | معالجة PDF (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
+| **`pptx`** | `anthropics/skills` | Anthropic | عروض PowerPoint (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
+| **`xlsx`** | `anthropics/skills` | Anthropic | جداول Excel (ترخيص مملوك؛ لا يُنقل لمستودعات عامة). |
+| **`web-artifacts-builder`** | `anthropics/skills` | Anthropic | بناء artifacts ويب متعددة المكونات. |
 
 ---
 
@@ -178,6 +202,17 @@ flowchart TD
   * `mcp-builder`: بناء وربط خوادم وموصلات البروتوكول المعياري للبيانات.
   * `postgres` (احتياطي، غير مستخدم حالياً): تصميم المخططات والفهارس وتحسين استعلامات SQL عند إضافة قاعدة بيانات خادم.
 * **ملاحظة تسمية:** `distributed-systems-architect` دور منتج داخل `core/.agents/skills/` وليس مهارة تطوير؛ مهارة التطوير المثبتة اسمها `distributed-systems-architecture`.
+
+---
+
+### الفريق التاسع: فريق الوكلاء السحابيين والمستندات (Cloud Agents & Documents Squad)
+* **المسؤولية:** نشر وكلاء وبوابات على الـ edge، تقييم الوكلاء وأمانهم، ومعالجة المستندات.
+* **النطاق البرمجي:** `bridge/` (قنوات وبوابة)، `website/`، `agent/apps/crewloom-desktop/src-tauri` (Rust). مهارات Cloudflare وGoogle مرجعية؛ الحدود المعمارية في `AGENTS.md` أعلى منها.
+* **حزمة المهارات المعتمدة:**
+  * Cloudflare: `agents-sdk`, `durable-objects`, `workers-best-practices`, `workers-profiling`, `wrangler`, `web-perf`, `nextjs-on-cloudflare`, `cloudflare-email-service`.
+  * Google: `agent-platform-eval-flywheel`, `agent-platform-skill-registry`, `agent-platform-prompt-management`, `agent-platform-rag-engine-management`, `google-cloud-solution-multi-agent-security`, `google-cloud-waf-security`, `apigee-agent-gateway-governance`, `retrieving-developer-knowledge`, `finding-google-skills`, `migrate-to-rust`.
+  * Anthropic: `doc-coauthoring`, `docx`, `pdf`, `pptx`, `xlsx`, `web-artifacts-builder`.
+* **ملاحظة:** كلها من النوع Skill في `ARTIFACT_TAXONOMY.md`؛ تُحمَّل بالكشف التدريجي ولا تُحقن كاملة في الـ prompt.
 
 ---
 
