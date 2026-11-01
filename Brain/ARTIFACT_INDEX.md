@@ -24,6 +24,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | release | any verified modification completes | tag exists locally and on remote; GitHub Release published; CI green | `scripts/release.sh` (steps 3-4); rest advisory | `AGENTS.md` § Mandatory Release Protocol | active |
 | post-push-ci-verification | any push, merge or release | all workflow runs for `HEAD` pass, checked with `gh` only | advisory | `AGENTS.md` § Non-negotiable 7; skill `crewloom-release-verifier` | active |
 | model-escalation | a task is submitted and more than one model could run it | verified result, or `escalate` returns `stop` | advisory; Guard planned | `PROTOCOL_MODEL_ESCALATION.md` | written, not wired into any run path |
+| skill-vetting | a third-party skill is proposed for `.agent/skills/` or `~/.agents/skills/` | verdict recorded in `SKILL_VETTING_LOG.md`; accepted skill has `SOURCE.md` whose manifest matches its files | `scripts/vet-skill.py` (scan) and `scripts/skill-pins.py check` (pin Guard), run by hand; not in CI; rest advisory | `PROTOCOL_SKILL_VETTING.md` | active (no skill has been fully vetted yet; 59 legacy skills are pinned, not approved) |
 
 ## Contracts
 
@@ -49,6 +50,8 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 |---|---|---|---|
 | check-architecture | dependency direction | `scripts/check-architecture.mjs` | active |
 | bridge-prompt-guards | checks before a prompt is submitted | `bridge/src/control-room/submit/guards.ts` | active (path per `AGENTS.md`, not re-verified) |
+| vet-skill | static scan of a skill folder, fail-closed: exit 0 no known pattern, 1 REVIEW, 2 REJECT or scan error | `scripts/vet-skill.py`, tests in `scripts/tests/test_vet_skill.py` | active (regex-based; no known pattern is not safe) |
+| skill-pins | a vetted skill matches its `SOURCE.md` manifest; legacy skills match `.agent/skills/.legacy-baseline.json` | `scripts/skill-pins.py`, tests in `scripts/tests/test_skill_pins.py` | active; not wired into CI |
 
 ## Known misclassifications (to resolve)
 
