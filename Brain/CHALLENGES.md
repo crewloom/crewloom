@@ -439,3 +439,8 @@
 - Cause: a small model (`qwen2.5-coder:1.5b`) copies a reply it can see in the history, and the loop guard only checks repetition inside one reply. A long system prompt also makes generic refusals likelier.
 - Fix (desktop v0.8.0): for models `isWeakModel` flags, `dropRepeatedReplies` removes every copy of a repeated reply from the request, a warning toast reports a repeat, and `buildCompactSystemPrompt` replaces the full prompt.
 - Evidence: real prompt, same stuck history, 5 seeds: copied 3/5 with two copies, 1/5 with one, 0/5 with none. Compact prompt: 0/10 copies; refusals 2/20 against 4/20 for the full prompt (small sample). Weak models still answer factual questions wrongly, and one visible copy can still be copied.
+
+### 2026-11-03 — Local models without tool support failed inside a project
+- Cause: every project request carries tools, and Ollama answers HTTP 400 `does not support tools` for such a model (reproduced with `tinyllama`, capabilities `completion` only). A Modelfile with a tool-less `TEMPLATE` does not reproduce it: Ollama 0.40.13 still reports `tools` for that model.
+- Fix (desktop v0.8.1): on that error the run retries once on the same model without tools, tells the model it has none, and emits `chat:tools_unsupported` so the app shows a notice.
+- Evidence: Rust matcher test failed before the change; the built app answered on `tinyllama` with the notice in both languages.

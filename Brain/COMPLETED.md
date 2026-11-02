@@ -458,3 +458,8 @@ Final batch acceptance / قبول الدفعة: native Tauri applied two proposa
 - Decision: Expanded engineering squads to 8 by establishing Team 8: Backend, Database & Infrastructure Squad (`postgres`, `mcp-builder`, `distributed-systems-architect`). Added Matt Pocock's `pr` workflow skill.
 - Artifacts: Linked `postgres` and `pr` in `.agent/skills/` and `.agents/skills/`. Updated `core/Brain/SKILLS_AND_TEAMS_CATALOG.md` (Mermaid diagram and squad profiles) and cross-referenced in `AGENTS.md`.
 - Evidence: All 8 squads verified, links resolve to active skill files, and non-destructive backwards compatibility preserved.
+
+### 2026-11-03 — Desktop local models run as selected
+- Decision: smart escalation no longer moves a prompt off the selected model. It offers a stronger connection through a one-click notice, once per model each session; `smartEscalation` only controls that notice.
+- Artifacts: `useSmartEscalation.ts`, `suggestStrongerModel` in `model-strength.ts`, `model_rejects_tools` in `providers/chat.rs` (desktop v0.7.3 and v0.8.1).
+- Evidence: Ollama received the prompt on `phi4-mini:3.8b` in the web preview; `tinyllama` answered inside a project in the built app with the notice shown in Arabic and English.
