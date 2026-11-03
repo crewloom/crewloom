@@ -444,3 +444,8 @@
 - Cause: every project request carries tools, and Ollama answers HTTP 400 `does not support tools` for such a model (reproduced with `tinyllama`, capabilities `completion` only). A Modelfile with a tool-less `TEMPLATE` does not reproduce it: Ollama 0.40.13 still reports `tools` for that model.
 - Fix (desktop v0.8.1): on that error the run retries once on the same model without tools, tells the model it has none, and emits `chat:tools_unsupported` so the app shows a notice.
 - Evidence: Rust matcher test failed before the change; the built app answered on `tinyllama` with the notice in both languages.
+
+### 2026-11-03 — Replies stayed on "thinking" after the app closed
+- Cause: `loadConversationsAsync` returned SQLite records as saved, while only the `localStorage` path turned a running reply into a stopped one, so a live timer survived restarts.
+- Fix (desktop v0.8.2): both paths use `settleSavedConversation`.
+- Evidence: a regression test in `tests/storage-recovery.test.mjs` failed before the change; the installed app was checked after restart.
