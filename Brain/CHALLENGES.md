@@ -1,5 +1,17 @@
 # Challenges
 
+### 2026-11-03 — The Crewloom preset and the desktop MCP client had no caller
+- Cause: `@crewloom/preset-enterprise` is not imported by any app, and `mcp.rs` was declared in `lib.rs` but never called. A plan to "wire upstream packages into the preset" would have changed nothing a user runs; the desktop runtime is Rust (`providers/chat.rs`, `orchestrator.rs`).
+- Solution: before wiring a capability, find the runtime that actually runs it (`grep` for importers or callers). The desktop MCP owner is now `mcp.rs` through `mcp_tool.rs`; upstream `dsh-mcp-client` stays CLI-only.
+- Evidence: `grep` for `preset-enterprise` found only the package itself; `grep` for `mcp::` found no caller outside `mcp.rs`.
+- Status: Resolved for MCP; the preset still has no consumer.
+
+### 2026-11-03 — A release tag was pushed without its version bump
+- Cause: in zsh, `git add $F` with a space-separated variable passes one path, so `git add` and the release commit failed, and the following `git tag` and `git push` still ran. `crewloom-v0.12.0` landed on a commit whose version files say 0.11.0.
+- Solution: list release files literally (or use an array) and stop on the first failed step (`|| exit 1`) before tagging. The wrong tag was left in place without a GitHub release and its run was cancelled; the change was released as `crewloom-v0.12.1`.
+- Evidence: agent tag `crewloom-v0.12.0` points at 02b9a67f0f; `crewloom-v0.12.1` points at 8db809519e with the four version files at 0.12.1.
+- Status: Resolved; the orphan tag `crewloom-v0.12.0` remains.
+
 ### 2026-10-27 — `gh run watch --exit-status` reported failure for a successful run
 - Cause: the watcher aborted on a transient network error (the same window produced `net/http: TLS handshake timeout` from `gh api`), and `--exit-status` propagates a non-zero code that reads exactly like a red CI run.
 - Solution: treat `gh run watch` only as a completion signal; confirm the outcome with `gh run view <id> --json conclusion` or the REST API (`conclusion`, `run_attempt`) before reporting or reverting anything. Also distinguish `cancelled` from `failure`: pushes in this repository cancel earlier branch runs through a concurrency group, while tag runs stay authoritative.

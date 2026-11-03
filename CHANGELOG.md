@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.11 — 2026-11-03
+
+- Record the desktop MCP client work and two challenges (no caller for the preset or `mcp.rs`; a release tag pushed without its version bump) in `Brain/COMPLETED.md` and `Brain/CHALLENGES.md`.
+
 ## 0.9.10 — 2026-10-31
 
 - Add the design for opt-in selection measurement (`Brain/DESIGN_SELECTION_SHADOW_LOG.md`): findings on the usage ledger, the missing verifier runner and the staged plan.

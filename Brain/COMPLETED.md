@@ -1,5 +1,10 @@
 # Completed work
 
+### 2026-11-03 — Desktop MCP: Rust client wired into the chat loop
+- Artifact: `agent/apps/crewloom-desktop/src-tauri/src/mcp.rs`, `src-tauri/src/mcp_tool.rs`, `src-tauri/src/tool_authority.rs`, `src-tauri/src/orchestrator.rs`, `src/components/settings/toolsCatalog.ts`, `agent/packages/crewloom/ARCHITECTURE.md` (section "Desktop MCP client"); agent commit 41c498d849, release `crewloom-v0.12.1`.
+- Impact: The desktop app can use MCP servers. The model gets one `mcp` tool (`list_servers`, `list_tools`, `call`) over stdio servers from `~/.crewloom/mcp.json` (the `.mcp.json` format), gated by an explicit Tools grant in build or auto mode and off by default. Secret-looking variables are dropped from a server's environment and its stderr is reported on failure. Not done: a settings screen for servers, resources and prompts, remote servers (use a stdio bridge such as `mcp-remote`), and sandboxing.
+- Evidence: on the release head, `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings` and `cargo test` (275 passed, two of them against a real fake server run with Node) pass, `node --test tests/*.test.mjs` 443/443 and `tsc --noEmit` pass; the Tools card was checked in the running app in English (LTR) and Arabic (RTL).
+
 ### 2026-10-27 — CI: Dependabot uv updates unblocked
 - Artifact: `agent/.github/dependabot.yml` (agent commit 24a9714, release `crewloom-v0.3.20`).
 - Impact: The scheduled `uv in /python/sdk` update job no longer fails; the locally built `deepseek-harness-runtime-bin` is excluded from registry updates while all other Python dependencies keep updating.
