@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.9.11 — 2026-11-04
+
+- Isolate regression subprocess Git scope after staged-index validation so fixture repositories cannot inherit a commit hook index.
+
+- Fail closed on scientific manuscript publication approval when citation, evidence and benchmark verification are unavailable.
+- Keep an explicit structure-only drafting check and document its limits in Arabic and English.
+- Add regression coverage showing fabricated evidence cannot receive publication certification.
+
 ## 0.9.10 — 2026-10-31
 
 - Add the design for opt-in selection measurement (`Brain/DESIGN_SELECTION_SHADOW_LOG.md`): findings on the usage ledger, the missing verifier runner and the staged plan.

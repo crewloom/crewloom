@@ -351,7 +351,8 @@ def run_suites(root=ROOT, python=None, timeout=SUITE_TIMEOUT, runner=subprocess.
         return 1
     for module, argv in suite_plan(root, python):
         try:
-            result = runner(argv, timeout=timeout, check=False)
+            # Staged-index verification has already run in main; fixture repositories must not inherit its Git scope.
+            result = runner(argv, timeout=timeout, check=False, env=git_environment())
         except subprocess.TimeoutExpired:
             print(f'SUITE TIMED OUT after {timeout}s: {module}', file=sys.stderr)
             return 1

@@ -242,7 +242,7 @@ class GateRunTests(unittest.TestCase):
                                           f'.agents/skills/{SUITES[2]}/scripts/test_ui.py': PASSING_MODULE})
             seen = []
 
-            def recorder(argv, timeout=None, check=None):
+            def recorder(argv, timeout=None, check=None, env=None):
                 seen.append((argv[-1], timeout))
                 return subprocess.CompletedProcess(argv, 0)
 
@@ -272,7 +272,7 @@ class GateRunTests(unittest.TestCase):
                                           'scripts/test_later.py': PASSING_MODULE})
             seen = []
 
-            def recorder(argv, timeout=None, check=None):
+            def recorder(argv, timeout=None, check=None, env=None):
                 seen.append(argv[-1])
                 return subprocess.CompletedProcess(argv, 7 if argv[-1] == 'test_bad.py' else 0)
 
@@ -285,7 +285,7 @@ class GateRunTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             root = build_root(directory, {'scripts/test_slow.py': PASSING_MODULE})
 
-            def stalling(argv, timeout=None, check=None):
+            def stalling(argv, timeout=None, check=None, env=None):
                 raise subprocess.TimeoutExpired(argv, timeout)
 
             with captured() as messages:
@@ -330,7 +330,7 @@ class GateRunTests(unittest.TestCase):
             module = build_nested(root)
             seen = []
 
-            def recorder(argv, timeout=None, check=None):
+            def recorder(argv, timeout=None, check=None, env=None):
                 seen.append((argv[argv.index('-p') + 1], timeout))
                 return subprocess.CompletedProcess(argv, 0)
 

@@ -116,3 +116,9 @@ A release tag is created only after the final-head required GitHub checks pass a
 ## 0.6.1 language follow-up
 
 Browser companion2.3.2 follows the saved language for known error details and its own in-page status, including Arabic RTL and English LTR. Language changes preserve the underlying site and hidden HUD state. Empty capture and accessible control labels are localized. Paired rendered regressions cover reload, frame propagation and refusal states. See [language support](LANGUAGES.md) for exact scope; unknown external diagnostics and technical identifiers remain intact.
+
+### Git index isolation during regression tests
+
+The parent repository gate verifies the actual staged index before starting regressions. Child test processes receive the existing `repo_map.git_environment()` scope filter so temporary fixture repositories cannot inherit the commit hook’s `GIT_INDEX_FILE`, `GIT_DIR` or other repository selectors. This preserves staged privacy validation and all suite assertions while preventing fixture Git commands from targeting the parent commit index.
+
+تفحص بوابة المستودع الفهرس المرحلي الحقيقي أولًا، ثم تعزل متغيرات نطاق Git عن عمليات الاختبار الفرعية كي لا تستهدف مستودعات الاختبار فهرس الالتزام الأصلي. تبقى فحوص الخصوصية والاختبارات كاملة دون تجاوزها.
