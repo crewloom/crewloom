@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.16 — 2026-11-05
+
+- Run the unchanged case-insensitive filesystem checks on the documented macOS 15 Intel hosted label after repeated arm64 runner acquisition failures.
+- Record evidence-bounded optional voice-engine integration and conversation-owned browser session verification.
+
 ## 0.9.15 — 2026-11-04
 
 - Resolve the shipped program ledger within its own checkout regardless of the checkout directory name; preserve the explicit workspace root for manifest hashing.

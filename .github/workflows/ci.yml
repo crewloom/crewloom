@@ -100,7 +100,8 @@ jobs:
     timeout-minutes: 10
     # The alias boundaries reproduce a real bypass on a case-insensitive filesystem, so they are
     # proved on one; the two reserved-name cases still run everywhere.
-    runs-on: macos-latest
+    # The filesystem check is CPU-independent; Intel avoids the overloaded hosted arm64 pool.
+    runs-on: macos-15-intel
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       # Git's background maintenance can add object-store files while a fixture runs and race the

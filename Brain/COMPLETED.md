@@ -468,3 +468,7 @@ Final batch acceptance / قبول الدفعة: native Tauri applied two proposa
 - Decision: smart escalation no longer moves a prompt off the selected model. It offers a stronger connection through a one-click notice, once per model each session; `smartEscalation` only controls that notice.
 - Artifacts: `useSmartEscalation.ts`, `suggestStrongerModel` in `model-strength.ts`, `model_rejects_tools` in `providers/chat.rs` (desktop v0.7.3 and v0.8.1).
 - Evidence: Ollama received the prompt on `phi4-mini:3.8b` in the web preview; `tinyllama` answered inside a project in the built app with the notice shown in Arabic and English.
+
+### 2026-11-05 — Optional voice platform and conversation browser ownership
+
+Desktop review verified opening the original pinned VoiceStudio web platform inside a conversation's browser, keeping other chat tabs separate, and returning to the original live tabs. The original engine stays separately installed; no speech model weights were installed and no quality superiority was measured. Production lifecycle regressions cover stale attach/detach and partial restoration retry. The private Agent repository owns implementation and detailed evidence.

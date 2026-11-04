@@ -461,3 +461,9 @@
 - Cause: `loadConversationsAsync` returned SQLite records as saved, while only the `localStorage` path turned a running reply into a stopped one, so a live timer survived restarts.
 - Fix (desktop v0.8.2): both paths use `settleSavedConversation`.
 - Evidence: a regression test in `tests/storage-recovery.test.mjs` failed before the change; the installed app was checked after restart.
+
+### 2026-11-05 — Hosted macOS capacity and partial browser startup
+
+Core run 41907906015 passed eight jobs, but its hosted macOS arm64 job was cancelled because no runner acquired it. The official runner-images table documents `macos-15-intel`; the identical case-insensitive filesystem checks now target that Intel pool. No check was removed.
+
+Browser startup may create a page before navigation reports failure. Returning early loses the rest of the restore plan, and a simple resume cannot complete it. Keep a conversation-owned pending plan, serialize its startup, and retry missing tabs without duplication. Preserve a pending restore marker across app interruption. A process-boundary regression reproduced the missing-tab failure before the fix; live chat switching was also inspected.

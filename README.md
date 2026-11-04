@@ -215,7 +215,7 @@ python3 scripts/crewloom.py context frontend-ux-auditor --language ar --out /tmp
 | [examples](examples) | Synthetic inputs with runnable commands and expected results |
 | [Brain](Brain) | Shared architecture, decisions, challenges, ideas, and roadmap |
 | [scripts](scripts) | CLI and repository validation |
-| [.github/workflows](.github/workflows) | Python 3.9 and 3.14 CI checks |
+| [.github/workflows](.github/workflows) | Python 3.9 and 3.14 checks; case-insensitive path checks on macOS 15 Intel |
 
 ## How checks work
 
