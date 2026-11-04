@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.15 — 2026-11-04
+
+- Resolve the shipped program ledger within its own checkout regardless of the checkout directory name; preserve the explicit workspace root for manifest hashing.
+
 ## 0.9.14 — 2026-11-04
 
 - Pin the Python validation job to Ubuntu 24.04 to retain the Python 3.9 and 3.14 matrix.

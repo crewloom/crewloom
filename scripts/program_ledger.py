@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence
 
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_LEDGER = WORKSPACE_ROOT / "core" / "Brain" / "computer-use-program" / "ledger.json"
+DEFAULT_LEDGER = Path(__file__).resolve().parents[1] / "Brain" / "computer-use-program" / "ledger.json"
 DEFAULT_WORK_PACKAGES = DEFAULT_LEDGER.parent / "WORK-PACKAGES.md"
 
 STATUSES = ("todo", "claimed", "done", "blocked", "dormant")

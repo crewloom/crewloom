@@ -285,3 +285,5 @@ See the [Arabic/English developer pilot](examples/bilingual-evaluation/README.md
 [Private customization and selected publication](documentation/PRIVACY.md) keeps conversation inputs and project memory local, chains commit guards and builds reviewed file-selection packets. Known-pattern scanning does not prove content is safe to publish.
 
 Optional [native prompt capture](documentation/USER_CONTEXT.md) preserves exact private user messages after task opt-in and blocks actions on unresolved source-linked questions. The separate [scoped native AX acceptance](documentation/NATIVE_DESKTOP.md) client targets an account-free synthetic application; live control requires human-approved driver capabilities and actual Accessibility verification.
+
+The program ledger CLI resolves its default shipped ledger relative to this repository, independently of the checkout folder name. `--ledger` still selects an explicit ledger and `--root` still selects the workspace used for manifest hashing.
