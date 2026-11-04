@@ -1,12 +1,16 @@
 # Changelog
 
-## 0.9.11 — 2026-11-04
+## 0.9.12 — 2026-11-04
 
 - Isolate regression subprocess Git scope after staged-index validation so fixture repositories cannot inherit a commit hook index.
 
 - Fail closed on scientific manuscript publication approval when citation, evidence and benchmark verification are unavailable.
 - Keep an explicit structure-only drafting check and document its limits in Arabic and English.
 - Add regression coverage showing fabricated evidence cannot receive publication certification.
+
+## 0.9.11 — 2026-11-03
+
+- Record the desktop MCP client work and two challenges (no caller for the preset or `mcp.rs`; a release tag pushed without its version bump) in `Brain/COMPLETED.md` and `Brain/CHALLENGES.md`.
 
 ## 0.9.10 — 2026-10-31
 
