@@ -122,3 +122,9 @@ Browser companion2.3.2 follows the saved language for known error details and it
 The parent repository gate verifies the actual staged index before starting regressions. Child test processes receive the existing `repo_map.git_environment()` scope filter so temporary fixture repositories cannot inherit the commit hook’s `GIT_INDEX_FILE`, `GIT_DIR` or other repository selectors. This preserves staged privacy validation and all suite assertions while preventing fixture Git commands from targeting the parent commit index.
 
 تفحص بوابة المستودع الفهرس المرحلي الحقيقي أولًا، ثم تعزل متغيرات نطاق Git عن عمليات الاختبار الفرعية كي لا تستهدف مستودعات الاختبار فهرس الالتزام الأصلي. تبقى فحوص الخصوصية والاختبارات كاملة دون تجاوزها.
+
+### Manual CI verification
+
+`Core checks` supports `workflow_dispatch` with the same jobs and checks as push and pull requests. If a release commit has no workflow run, dispatch `gh workflow run ci.yml --ref main`, then locate the resulting run with `gh run list --commit <sha>` and inspect it with `gh run view <id>`. A dispatch starts checks; success must still be verified. The reason earlier pushes produced no visible run has not been established.
+
+يدعم سير `Core checks` التشغيل اليدوي عبر `workflow_dispatch` بنفس الفحوص دون تخفيفها. عند غياب تشغيل مرتبط بالتزام الإصدار، ابدأه بأمر `gh workflow run ci.yml --ref main` ثم تحقّق من نتيجته عبر `gh`. سبب غياب التشغيل السابق غير مثبت.

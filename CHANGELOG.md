@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.13 — 2026-11-04
+
+- Enable manual dispatch of the unchanged Core CI jobs for explicit post-release verification.
+- Register the standalone scientific publication guard with its fail-closed limitation and structure-only boundary.
+- Document manual CI verification without asserting an unverified cause for earlier missing runs.
+
 ## 0.9.12 — 2026-11-04
 
 - Isolate regression subprocess Git scope after staged-index validation so fixture repositories cannot inherit a commit hook index.

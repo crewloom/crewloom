@@ -49,6 +49,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | name | enforces | owner | status |
 |---|---|---|---|
 | check-architecture | dependency direction | `scripts/check-architecture.mjs` | active |
+| scientific-publication | manuscript publication gate fails closed with exit 2 while citation, claim evidence and frozen benchmark verification are unavailable; explicit `--structure-only` success grants no approval | `scripts/verify_patent_protocol.py`; limits in `documentation/SCIENTIFIC_VERIFICATION.md`; regressions in `scripts/test_patent_protocol_gate.py` | active as standalone CLI; no automatic publication integration |
 | bridge-prompt-guards | checks before a prompt is submitted | `bridge/src/control-room/submit/guards.ts` | active (path per `AGENTS.md`, not re-verified) |
 | vet-skill | static scan of a skill folder, fail-closed: exit 0 no known pattern, 1 REVIEW, 2 REJECT or scan error | `scripts/vet-skill.py`, tests in `scripts/tests/test_vet_skill.py` | active (regex-based; no known pattern is not safe) |
 | skill-pins | a vetted skill matches its `SOURCE.md` manifest; legacy skills match `.agent/skills/.legacy-baseline.json` | `scripts/skill-pins.py`, tests in `scripts/tests/test_skill_pins.py` | active; not wired into CI |
