@@ -128,3 +128,7 @@ The parent repository gate verifies the actual staged index before starting regr
 `Core checks` supports `workflow_dispatch` with the same jobs and checks as push and pull requests. If a release commit has no workflow run, dispatch `gh workflow run ci.yml --ref main`, then locate the resulting run with `gh run list --commit <sha>` and inspect it with `gh run view <id>`. A dispatch starts checks; success must still be verified. The reason earlier pushes produced no visible run has not been established.
 
 يدعم سير `Core checks` التشغيل اليدوي عبر `workflow_dispatch` بنفس الفحوص دون تخفيفها. عند غياب تشغيل مرتبط بالتزام الإصدار، ابدأه بأمر `gh workflow run ci.yml --ref main` ثم تحقّق من نتيجته عبر `gh`. سبب غياب التشغيل السابق غير مثبت.
+
+The Python validation matrix uses `ubuntu-24.04` so Python 3.9 remains available; both Python versions and every check remain enabled. Dashboard dependency changes must synchronize `package-lock.json` with the declared `package.json` before `npm ci` can run. A lock-only repair resolves existing declarations without running package scripts or installing modules.
+
+تستخدم مصفوفة التحقق `ubuntu-24.04` للحفاظ على اختبار Python 3.9، وتبقى جميع الفحوص مفعّلة. يجب مزامنة قفل اعتماديات لوحة التحكم مع التصريحات الحالية؛ إصلاح القفل وحده لا يشغّل سكربتات الحزم ولا يثبّت الوحدات.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.14 — 2026-11-04
+
+- Pin the Python validation job to Ubuntu 24.04 to retain the Python 3.9 and 3.14 matrix.
+- Synchronize the dashboard lockfile with existing declared dependencies; package declarations and CI checks remain unchanged.
+
 ## 0.9.13 — 2026-11-04
 
 - Enable manual dispatch of the unchanged Core CI jobs for explicit post-release verification.
