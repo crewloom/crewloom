@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.18 — 2026-11-05
+
+- Record the distinction between transient browser pages and real persistence failures, with regression evidence.
+
 ## 0.9.17 — 2026-11-05
 
 - Record the isolated web compiler dependency failure and its regression checks without publishing private implementation details.

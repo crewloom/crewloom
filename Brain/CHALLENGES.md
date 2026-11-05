@@ -471,3 +471,7 @@ Browser startup may create a page before navigation reports failure. Returning e
 ### 2026-11-05 — Ambient dependencies can hide isolated build failures
 
 A web build can pass inside a large workspace while failing in a standalone package because parent dependencies supply Node globals or a test framework. Keep production compiler inputs separate from workspace-only tests. Derive browser timer types from browser APIs and use portable runtime primitives instead of undeclared Node types. A browser-only compiler regression reproduced the missing-global errors in under one second, then passed alongside binary encoding round-trip checks.
+
+### 2026-11-05 — Transient browser pages are not storage failures
+
+A failed local-service navigation can expose an internal browser error-page URL. Rejecting that URL at the persistence boundary is correct, but reporting the rejected snapshot as a storage-quota failure is misleading. Keep URL policy in one owner, retain the last restorable snapshot for transient pages, and show storage errors only after attempted writes fail. A production lifecycle regression failed on the false warning before the fix; another regression retains the genuine quota-failure warning.

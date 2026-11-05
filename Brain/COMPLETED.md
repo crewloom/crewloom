@@ -476,3 +476,7 @@ Desktop review verified opening the original pinned VoiceStudio web platform ins
 ### 2026-11-05 — Browser compiler dependency regression
 
 Production compiler input checks now reject accidental inclusion of workspace test files. A separate DOM-only compilation verifies voice helpers and recorder timer types without Node ambient declarations; empty, padded, binary and large standard-base64 samples round-trip successfully. These checks establish type and encoding compatibility, not real speech-engine quality.
+
+### 2026-11-05 — Browser error-state persistence regression
+
+Lifecycle checks now distinguish transient internal network-error pages from failed storage writes while retaining previously restorable URLs. The network error remains visible in the browser view; a separate quota-rejection test confirms real save failures remain visible.
