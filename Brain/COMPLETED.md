@@ -477,6 +477,11 @@ Desktop review verified opening the original pinned VoiceStudio web platform ins
 
 Production compiler input checks now reject accidental inclusion of workspace test files. A separate DOM-only compilation verifies voice helpers and recorder timer types without Node ambient declarations; empty, padded, binary and large standard-base64 samples round-trip successfully. These checks establish type and encoding compatibility, not real speech-engine quality.
 
+### 2026-11-05 — Desktop browser packaging repaired
+- Artifact: desktop release `crewloom-v0.17.3` prepares the pinned browser executable in the normal Tauri hooks, declares the sidecar, and checks its presence in extracted packages. Architecture and desktop build instructions document the same boundary.
+- Evidence: 39 release-tool tests and 25 focused browser tests passed; a normal local native build and strict code-signature verification passed. A real page rendered inside the installed 0.19.0 app, which retains the packaging fix; the test tab was closed and the original UI restored. Arabic/RTL and English/LTR were checked in the built app.
+- Limits: runtime verification does not certify a downloadable installer. Frozen-tag native packaging and conformance CI are tracked in the desktop release notes; broader pre-existing lint, documentation and upstream fixture typing failures remain outside this repair.
+
 ### 2026-11-05 — Browser error-state persistence regression
 
 Lifecycle checks now distinguish transient internal network-error pages from failed storage writes while retaining previously restorable URLs. The network error remains visible in the browser view; a separate quota-rejection test confirms real save failures remain visible.

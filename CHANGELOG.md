@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.9.18 — 2026-11-05
+## 0.9.19 — 2026-11-05
 
 - Record the distinction between transient browser pages and real persistence failures, with regression evidence.
+
+## 0.9.18 — 2026-11-05
+
+- Record the desktop browser packaging root cause, regression evidence, installed-app verification and CI infrastructure recovery lessons.
 
 ## 0.9.17 — 2026-11-05
 
