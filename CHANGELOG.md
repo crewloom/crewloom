@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.18 — 2026-11-05
+
+- Record the desktop browser packaging root cause, regression evidence, installed-app verification and CI infrastructure recovery lessons.
+
 ## 0.9.17 — 2026-11-05
 
 - Record the isolated web compiler dependency failure and its regression checks without publishing private implementation details.
