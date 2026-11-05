@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.17",
+  "package_version": "0.9.18",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -837,7 +837,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "815f0479e8afdb900b2fdc90cdc638b159176824e722e97a79684c3f48f3dd38",
+    "pyproject.toml": "5c0cbef9f4ae8691f6edb1af40a2f9f5caf543ccef9a055057ceff602bde5260",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
