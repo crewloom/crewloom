@@ -472,3 +472,7 @@ Final batch acceptance / قبول الدفعة: native Tauri applied two proposa
 ### 2026-11-05 — Optional voice platform and conversation browser ownership
 
 Desktop review verified opening the original pinned VoiceStudio web platform inside a conversation's browser, keeping other chat tabs separate, and returning to the original live tabs. The original engine stays separately installed; no speech model weights were installed and no quality superiority was measured. Production lifecycle regressions cover stale attach/detach and partial restoration retry. The private Agent repository owns implementation and detailed evidence.
+
+### 2026-11-05 — Browser compiler dependency regression
+
+Production compiler input checks now reject accidental inclusion of workspace test files. A separate DOM-only compilation verifies voice helpers and recorder timer types without Node ambient declarations; empty, padded, binary and large standard-base64 samples round-trip successfully. These checks establish type and encoding compatibility, not real speech-engine quality.

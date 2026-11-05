@@ -467,3 +467,7 @@
 Core run 41907906015 passed eight jobs, but its hosted macOS arm64 job was cancelled because no runner acquired it. The official runner-images table documents `macos-15-intel`; the identical case-insensitive filesystem checks now target that Intel pool. No check was removed.
 
 Browser startup may create a page before navigation reports failure. Returning early loses the rest of the restore plan, and a simple resume cannot complete it. Keep a conversation-owned pending plan, serialize its startup, and retry missing tabs without duplication. Preserve a pending restore marker across app interruption. A process-boundary regression reproduced the missing-tab failure before the fix; live chat switching was also inspected.
+
+### 2026-11-05 — Ambient dependencies can hide isolated build failures
+
+A web build can pass inside a large workspace while failing in a standalone package because parent dependencies supply Node globals or a test framework. Keep production compiler inputs separate from workspace-only tests. Derive browser timer types from browser APIs and use portable runtime primitives instead of undeclared Node types. A browser-only compiler regression reproduced the missing-global errors in under one second, then passed alongside binary encoding round-trip checks.

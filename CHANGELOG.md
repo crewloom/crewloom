@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.17 — 2026-11-05
+
+- Record the isolated web compiler dependency failure and its regression checks without publishing private implementation details.
+
 ## 0.9.16 — 2026-11-05
 
 - Run the unchanged case-insensitive filesystem checks on the documented macOS 15 Intel hosted label after repeated arm64 runner acquisition failures.
