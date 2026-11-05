@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.20 — 2026-11-05
+
+- Record the Elephant-Goldfish Model plugin vetting (ADAPT, pinned in `crewloom/agent` `crewloom-v0.19.5`) in the skill vetting log.
+
 ## 0.9.19 — 2026-11-05
 
 - Record the distinction between transient browser pages and real persistence failures, with regression evidence.
