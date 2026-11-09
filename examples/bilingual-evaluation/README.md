@@ -55,3 +55,19 @@ Before any provider trials, the preparation audit explicitly refroze the fixture
 Offline verification also checks an independently audited required-source list, exact translated quotes, authoritative scope/current request and selected-arm user/task isolation. This rejects missing input evidence before a trial; it does not establish model quality or a complete semantic interpretation of every request.
 
 Private collection: `crewloom evaluate-bilingual --understanding --project /path/to/bound/project --output .crewloom/private/evaluations/new-study --host codex --model codex=MODEL`. Every selected host requires an explicit model. An existing study is never restarted or overwritten; failed and blocked trials remain recorded. Native CLI generation is not an OS sandbox.
+
+## Comparative arms (protocol `crewloom-comparative-arms-v1`)
+
+`scripts/comparative_evaluation.py` runs several arms on the same frozen tasks. An arm is a host, an explicit model, and a mode: `plain` (requirements only) or `role` (the Crewloom `fullstack-mvp-engineer` role plus requirements). Same model in `plain` and `role` isolates what Crewloom adds; different models show the cross-model spread.
+
+```bash
+python3 scripts/comparative_evaluation.py --output /tmp/cmp-run --repeats 3 \
+  --arm label=claude-plain,host=claude,model=MODEL,mode=plain \
+  --arm label=claude-crewloom,host=claude,model=MODEL,mode=role \
+  --arm label=codex-crewloom,host=codex,model=MODEL,mode=role
+(cd scripts && python3 -m unittest test_comparative_evaluation)   # offline, no model calls
+```
+
+The report keeps failed and blocked trials, freezes input hashes, and gives per-arm mean case pass, full-pass rate, latency, tokens and cost, plus pairwise paired differences and the English-minus-Arabic gap per arm. Intervals resample **tasks**, not trials, since a task's languages and repeats are correlated. A verdict other than "underpowered" needs at least 8 tasks. The comparative set is the 2 frozen pilot tasks plus 7 in [comparative-tasks.json](comparative-tasks.json) (`parse_duration`, `merge_intervals`, `rate_limit`, `semver_sort`, `wrap_text`, `allocate`, `csv_row`), 9 in total, each with matched English/Arabic prompts, grader-only [references](references/) and 21 to 29 held-out cases (at least 8 error cases). `tasks.json` stays untouched so the 2026-10-10 pilot record remains valid. Expected values were computed by the references and the key cases were also fixed by hand in the builder; the real Docker grader accepts every reference case and rejects `return None` and always-raise implementations.
+
+**Pending owner approval:** the Arabic prompts of the 7 new tasks were AI-drafted, then re-read against the English by the same AI (`ar_review: ai-reviewed-owner-pending`). That review fixed wording and one precision issue, but it is not independent and not native-owner approval. Approve or rewrite them before treating Arabic results as a language-gap measurement. The set is still small and synthetic; seven single-function tasks cannot support a claim about real client work. No live provider run has been recorded for this protocol yet.

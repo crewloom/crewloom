@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.21 — 2026-11-09
+
+- Add the comparative arms evaluation (`scripts/comparative_evaluation.py`, `scripts/comparative_stats.py`): plain versus Crewloom-role arms per host and model, graded by the held-out Docker grader, with task-level paired bootstrap intervals and an English-minus-Arabic gap. No live provider run is recorded yet.
+- Add seven comparative tasks (`examples/bilingual-evaluation/comparative-tasks.json`) with grader-only references; the frozen pilot `tasks.json` is unchanged. Arabic prompts are AI-drafted and re-read, pending owner approval.
+
 ## 0.9.20 — 2026-11-05
 
 - Record the Elephant-Goldfish Model plugin vetting (ADAPT, pinned in `crewloom/agent` `crewloom-v0.19.5`) in the skill vetting log.

@@ -1,0 +1,1952 @@
+{
+ "protocol": "crewloom-comparative-tasks-v1",
+ "note": "Extends tasks.json; do not edit tasks.json (frozen). Arabic prompts were AI-drafted and then re-read against the English for equivalence and fixed; owner approval or rewrite is still pending.",
+ "ar_review": "ai-reviewed-owner-pending",
+ "tasks": [
+  {
+   "id": "parse_duration",
+   "api": "parse_duration(text)",
+   "output": "src/parse_duration.py",
+   "prompts": {
+    "en": "Implement parse_duration(text) in src/parse_duration.py. text is a string made of one or more segments, each an ASCII-digit count followed by one unit letter: d (86400 seconds), h (3600), m (60), s (1). Units may each appear at most once and only in the order d, h, m, s. Return the total number of seconds as an int. No spaces, signs, decimals or non-ASCII digits (for example Arabic-Indic digits) are allowed; a segment without digits or without a unit is invalid; the empty string is invalid; a non-string is invalid. Leading zeros are allowed. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ parse_duration(text) في src/parse_duration.py. text نص يتكوّن من مقطع واحد أو أكثر، كل مقطع عدد بأرقام ASCII متبوعًا بحرف وحدة واحد: d (86400 ثانية) وh (3600) وm (60) وs (1). يجوز ظهور كل وحدة مرة واحدة على الأكثر وبالترتيب d ثم h ثم m ثم s فقط. أرجع مجموع الثواني عددًا صحيحًا int. لا مسافات ولا إشارات ولا كسور ولا أرقام غير ASCII (مثل الأرقام الهندية العربية)؛ المقطع بلا أرقام أو بلا وحدة غير صالح؛ النص الفارغ غير صالح؛ وغير النص غير صالح. الأصفار البادئة مسموحة. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": "45s",
+     "expected": 45
+    },
+    {
+     "id": "valid-1",
+     "input": "2d",
+     "expected": 172800
+    },
+    {
+     "id": "valid-2",
+     "input": "1h30m",
+     "expected": 5400
+    },
+    {
+     "id": "valid-3",
+     "input": "1d2h3m4s",
+     "expected": 93784
+    },
+    {
+     "id": "valid-4",
+     "input": "90m",
+     "expected": 5400
+    },
+    {
+     "id": "valid-5",
+     "input": "007s",
+     "expected": 7
+    },
+    {
+     "id": "valid-6",
+     "input": "0s",
+     "expected": 0
+    },
+    {
+     "id": "valid-7",
+     "input": "1d0h0m0s",
+     "expected": 86400
+    },
+    {
+     "id": "invalid-0",
+     "input": "",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": "s",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": "5",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": "5x",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": "1h1h",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": "1m1h",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": "2d 3h",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": "+5s",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": "-5s",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": "1.5h",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": "٣s",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-11",
+     "input": "5m3",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-12",
+     "input": "h5",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-13",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-14",
+     "input": 5,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-15",
+     "input": [
+      "5s"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "merge_intervals",
+   "api": "merge_intervals(intervals)",
+   "output": "src/merge_intervals.py",
+   "prompts": {
+    "en": "Implement merge_intervals(intervals) in src/merge_intervals.py. intervals is a list of two-element lists [start, end] of ints (bool is invalid) with start <= end; an empty list is valid. Merge intervals that overlap or touch (next start <= current end). Return a new list of [start, end] lists sorted by start, with no two returned intervals overlapping or touching. Input order is arbitrary. A non-list, an element that is not a list of exactly two ints, or start > end is invalid. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ merge_intervals(intervals) في src/merge_intervals.py. intervals قائمة من قوائم ثنائية [start, end] عنصراها عددان صحيحان int (القيمة المنطقية غير صالحة) وفيها start <= end؛ والقائمة الفارغة صالحة. ادمج الفترات المتداخلة أو المتلامسة (بداية التالية <= نهاية الحالية). أرجع قائمة جديدة من القوائم [start, end] مرتبة حسب البداية بحيث لا تتداخل فترتان مُرجعتان ولا تتلامسان. ترتيب المدخل عشوائي. غير القائمة، أو عنصر ليس قائمة من عددين صحيحين بالضبط، أو start > end كلها غير صالحة. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": [],
+     "expected": []
+    },
+    {
+     "id": "valid-1",
+     "input": [
+      [
+       1,
+       3
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       3
+      ]
+     ]
+    },
+    {
+     "id": "valid-2",
+     "input": [
+      [
+       1,
+       3
+      ],
+      [
+       2,
+       6
+      ],
+      [
+       8,
+       10
+      ],
+      [
+       15,
+       18
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       6
+      ],
+      [
+       8,
+       10
+      ],
+      [
+       15,
+       18
+      ]
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": [
+      [
+       1,
+       4
+      ],
+      [
+       4,
+       5
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       5
+      ]
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": [
+      [
+       5,
+       6
+      ],
+      [
+       1,
+       2
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       2
+      ],
+      [
+       5,
+       6
+      ]
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": [
+      [
+       1,
+       10
+      ],
+      [
+       2,
+       3
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       10
+      ]
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": [
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       2
+      ]
+     ],
+     "expected": [
+      [
+       2,
+       2
+      ]
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": [
+      [
+       -5,
+       -1
+      ],
+      [
+       -2,
+       3
+      ]
+     ],
+     "expected": [
+      [
+       -5,
+       3
+      ]
+     ]
+    },
+    {
+     "id": "valid-8",
+     "input": [
+      [
+       1,
+       2
+      ],
+      [
+       3,
+       4
+      ]
+     ],
+     "expected": [
+      [
+       1,
+       2
+      ],
+      [
+       3,
+       4
+      ]
+     ]
+    },
+    {
+     "id": "valid-9",
+     "input": [
+      [
+       1,
+       5
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       6,
+       8
+      ],
+      [
+       7,
+       9
+      ]
+     ],
+     "expected": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       5
+      ],
+      [
+       6,
+       9
+      ]
+     ]
+    },
+    {
+     "id": "valid-10",
+     "input": [
+      [
+       100000000000000000000,
+       100000000000000000005
+      ],
+      [
+       100000000000000000005,
+       100000000000000000009
+      ]
+     ],
+     "expected": [
+      [
+       100000000000000000000,
+       100000000000000000009
+      ]
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": [
+      1,
+      2
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": [
+      [
+       1
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": [
+      [
+       1,
+       2,
+       3
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": [
+      [
+       3,
+       1
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": [
+      [
+       1.0,
+       2
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": [
+      [
+       true,
+       2
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": [
+      [
+       "1",
+       2
+      ]
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": {
+      "a": 1
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": [
+      [
+       1,
+       2
+      ],
+      "x"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "rate_limit",
+   "api": "rate_limit(events)",
+   "output": "src/rate_limit.py",
+   "prompts": {
+    "en": "Implement rate_limit(events) in src/rate_limit.py. events is a list of dicts with exactly the keys t (nonnegative int seconds, bool invalid) and key (nonempty string); t must never decrease from one event to the next (equal is allowed). Per key, allow at most 3 events in any window of 10 seconds: an event at time t is allowed when fewer than 3 previously ALLOWED events with the same key have time greater than t-10 (so an event exactly 10 seconds after an allowed one no longer counts it). Rejected events do not count toward the limit. Return a list of bools, one per event in order. An empty list returns an empty list. Any other shape or value is invalid. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ rate_limit(events) في src/rate_limit.py. events قائمة قواميس مفاتيحها بالضبط t (عدد صحيح غير سالب بالثواني، والقيمة المنطقية غير صالحة) وkey (نص غير فارغ)؛ ويجب ألا يتناقص t من حدث إلى التالي (المساواة مسموحة). لكل key يُسمح بثلاثة أحداث على الأكثر في أي نافذة من 10 ثوانٍ: الحدث عند الزمن t مسموح إذا كان عدد الأحداث المسموحة سابقًا بنفس المفتاح وزمنها أكبر من t-10 أقل من 3 (فالحدث بعد 10 ثوانٍ بالضبط من حدث مسموح لا يحتسبه). الأحداث المرفوضة لا تُحتسب ضمن الحد. أرجع قائمة قيم منطقية، واحدة لكل حدث بالترتيب. القائمة الفارغة تُرجع قائمة فارغة. أي شكل أو قيمة أخرى غير صالحة. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": [],
+     "expected": []
+    },
+    {
+     "id": "valid-1",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      }
+     ],
+     "expected": [
+      true
+     ]
+    },
+    {
+     "id": "valid-2",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      false
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 1,
+       "key": "a"
+      },
+      {
+       "t": 2,
+       "key": "a"
+      },
+      {
+       "t": 3,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      false,
+      true
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 9,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 1,
+       "key": "b"
+      },
+      {
+       "t": 2,
+       "key": "a"
+      },
+      {
+       "t": 3,
+       "key": "a"
+      },
+      {
+       "t": 4,
+       "key": "a"
+      },
+      {
+       "t": 5,
+       "key": "b"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      true
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": [
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 0,
+       "key": "a"
+      },
+      {
+       "t": 5,
+       "key": "a"
+      },
+      {
+       "t": 9,
+       "key": "a"
+      },
+      {
+       "t": 10,
+       "key": "a"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      false,
+      false,
+      true
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": [
+      {
+       "t": 1000000000000,
+       "key": "k"
+      },
+      {
+       "t": 1000000000000,
+       "key": "k"
+      },
+      {
+       "t": 1000000000000,
+       "key": "k"
+      },
+      {
+       "t": 1000000000000,
+       "key": "k"
+      },
+      {
+       "t": 1000000000000,
+       "key": "k"
+      }
+     ],
+     "expected": [
+      true,
+      true,
+      true,
+      false,
+      false
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": {
+      "t": 0,
+      "key": "a"
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": [
+      {
+       "t": 0
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": [
+      {
+       "t": 0,
+       "key": "a",
+       "x": 1
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": [
+      {
+       "t": -1,
+       "key": "a"
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": [
+      {
+       "t": 1.0,
+       "key": "a"
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": [
+      {
+       "t": true,
+       "key": "a"
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": [
+      {
+       "t": 0,
+       "key": ""
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": [
+      {
+       "t": 0,
+       "key": 5
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": [
+      {
+       "t": 5,
+       "key": "a"
+      },
+      {
+       "t": 4,
+       "key": "a"
+      }
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": [
+      "x"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "semver_sort",
+   "api": "semver_sort(versions)",
+   "output": "src/semver_sort.py",
+   "prompts": {
+    "en": "Implement semver_sort(versions) in src/semver_sort.py. versions is a list of strings MAJOR.MINOR.PATCH with an optional -PRERELEASE suffix. MAJOR, MINOR, PATCH are ASCII digit strings without leading zeros (0 itself is fine). PRERELEASE is one or more dot-separated identifiers of ASCII letters, digits and hyphens; no identifier may be empty, and a numeric identifier (digits only) must not have leading zeros. Build metadata (+...), a \"v\" prefix, spaces or any other format are invalid. Return a new ascending list of the original strings using Semantic Versioning 2.0 precedence: compare MAJOR, MINOR, PATCH numerically; a version with a prerelease is lower than the same core without one; prerelease identifiers compare left to right, numeric ones numerically, alphanumeric ones in ASCII order, numeric lower than alphanumeric, and a shorter list lower than a longer list that shares its prefix. Equal versions keep their input order. An empty list returns an empty list; a non-list or non-string element is invalid. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ semver_sort(versions) في src/semver_sort.py. versions قائمة نصوص بالصيغة MAJOR.MINOR.PATCH مع لاحقة اختيارية -PRERELEASE. الأجزاء MAJOR وMINOR وPATCH سلاسل أرقام ASCII بلا أصفار بادئة (الصفر نفسه مقبول). PRERELEASE معرّفات مفصولة بنقطة (معرّف واحد على الأقل)، يتكوّن كل معرّف من حروف ASCII وأرقام وشرطات؛ ولا يجوز أن يكون أي معرّف فارغًا، والمعرّف الرقمي (أرقام فقط) بلا أصفار بادئة. بيانات البناء (+...) أو بادئة \"v\" أو المسافات أو أي صيغة أخرى غير صالحة. أرجع قائمة جديدة تصاعدية من النصوص الأصلية وفق أسبقية Semantic Versioning 2.0: قارن MAJOR وMINOR وPATCH عدديًا؛ النسخة ذات prerelease أدنى من النسخة نفسها بلا prerelease؛ تُقارن معرّفات prerelease من اليسار لليمين، الرقمية عدديًا وغير الرقمية بترتيب ASCII، والرقمي أدنى من غير الرقمي، والقائمة الأقصر أدنى من الأطول التي تبدأ بها. النسخ المتساوية تحتفظ بترتيب المدخل. القائمة الفارغة تُرجع قائمة فارغة؛ وغير القائمة أو العنصر غير النصي غير صالح. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": [],
+     "expected": []
+    },
+    {
+     "id": "valid-1",
+     "input": [
+      "1.0.0"
+     ],
+     "expected": [
+      "1.0.0"
+     ]
+    },
+    {
+     "id": "valid-2",
+     "input": [
+      "1.10.0",
+      "1.2.0",
+      "1.9.9"
+     ],
+     "expected": [
+      "1.2.0",
+      "1.9.9",
+      "1.10.0"
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": [
+      "1.0.0",
+      "1.0.0-alpha",
+      "1.0.0-alpha.1",
+      "1.0.0-alpha.beta",
+      "1.0.0-beta",
+      "1.0.0-beta.2",
+      "1.0.0-beta.11",
+      "1.0.0-rc.1"
+     ],
+     "expected": [
+      "1.0.0-alpha",
+      "1.0.0-alpha.1",
+      "1.0.0-alpha.beta",
+      "1.0.0-beta",
+      "1.0.0-beta.2",
+      "1.0.0-beta.11",
+      "1.0.0-rc.1",
+      "1.0.0"
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": [
+      "1.0.0-2",
+      "1.0.0-10",
+      "1.0.0-a",
+      "1.0.0-1"
+     ],
+     "expected": [
+      "1.0.0-1",
+      "1.0.0-2",
+      "1.0.0-10",
+      "1.0.0-a"
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": [
+      "2.0.0",
+      "1.0.0",
+      "10.0.0",
+      "0.0.1"
+     ],
+     "expected": [
+      "0.0.1",
+      "1.0.0",
+      "2.0.0",
+      "10.0.0"
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": [
+      "1.0.0-alpha-1",
+      "1.0.0-alpha"
+     ],
+     "expected": [
+      "1.0.0-alpha",
+      "1.0.0-alpha-1"
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": [
+      "1.0.0",
+      "1.0.0",
+      "0.9.0"
+     ],
+     "expected": [
+      "0.9.0",
+      "1.0.0",
+      "1.0.0"
+     ]
+    },
+    {
+     "id": "valid-8",
+     "input": [
+      "1.0.0-0",
+      "1.0.0-0.0"
+     ],
+     "expected": [
+      "1.0.0-0",
+      "1.0.0-0.0"
+     ]
+    },
+    {
+     "id": "valid-9",
+     "input": [
+      "99999999999999999999.0.0",
+      "1.0.0"
+     ],
+     "expected": [
+      "1.0.0",
+      "99999999999999999999.0.0"
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": "1.0.0",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": [
+      1
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": [
+      "v1.0.0"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": [
+      "1.0"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": [
+      "1.0.0.0"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": [
+      "01.0.0"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": [
+      "1.0.0-01"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": [
+      "1.0.0-"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": [
+      "1.0.0-a..b"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": [
+      "1.0.0+build"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-11",
+     "input": [
+      "1.0.0-a+b"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-12",
+     "input": [
+      "1.0.0 "
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-13",
+     "input": [
+      "1.-1.0"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-14",
+     "input": [
+      "١.٠.٠"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-15",
+     "input": [
+      "1.0.0-é"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "wrap_text",
+   "api": "wrap_text(spec)",
+   "output": "src/wrap_text.py",
+   "prompts": {
+    "en": "Implement wrap_text(spec) in src/wrap_text.py. spec is a dict with exactly the keys text (string) and width (int >= 1, bool invalid). Split text on any run of whitespace into words. A word longer than width is first cut into consecutive chunks of at most width characters (counted as Python str characters), and each chunk then behaves as its own word. Greedily pack words into lines joined by single spaces: put a word on the current line if the line stays at most width characters, otherwise start a new line. Return the list of lines; text with no words returns an empty list. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ wrap_text(spec) في src/wrap_text.py. spec قاموس مفاتيحه بالضبط text (نص) وwidth (عدد صحيح >= 1، والقيمة المنطقية غير صالحة). قسّم text عند أي تتابع من المسافات البيضاء إلى كلمات. الكلمة الأطول من width تُقطَّع أولًا إلى أجزاء متتالية طول كل منها width محرفًا على الأكثر (بعدد محارف str في بايثون)، ثم يُعامل كل جزء ككلمة مستقلة. عبّئ الكلمات في أسطر بجشع مع فاصل مسافة واحدة: ضع الكلمة في السطر الحالي إن بقي طوله <= width، وإلا ابدأ سطرًا جديدًا. أرجع قائمة الأسطر؛ والنص بلا كلمات يُرجع قائمة فارغة. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": {
+      "text": "",
+      "width": 5
+     },
+     "expected": []
+    },
+    {
+     "id": "valid-1",
+     "input": {
+      "text": "   \n\t ",
+      "width": 5
+     },
+     "expected": []
+    },
+    {
+     "id": "valid-2",
+     "input": {
+      "text": "hello world",
+      "width": 11
+     },
+     "expected": [
+      "hello world"
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": {
+      "text": "hello world",
+      "width": 10
+     },
+     "expected": [
+      "hello",
+      "world"
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": {
+      "text": "a bb ccc dddd",
+      "width": 4
+     },
+     "expected": [
+      "a bb",
+      "ccc",
+      "dddd"
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": {
+      "text": "abcdefghij",
+      "width": 3
+     },
+     "expected": [
+      "abc",
+      "def",
+      "ghi",
+      "j"
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": {
+      "text": "ab abcdefg x",
+      "width": 3
+     },
+     "expected": [
+      "ab",
+      "abc",
+      "def",
+      "g x"
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": {
+      "text": "  multiple   spaces\nand\tlines  ",
+      "width": 8
+     },
+     "expected": [
+      "multiple",
+      "spaces",
+      "and",
+      "lines"
+     ]
+    },
+    {
+     "id": "valid-8",
+     "input": {
+      "text": "مرحبا بكم في عالم البرمجة",
+      "width": 9
+     },
+     "expected": [
+      "مرحبا بكم",
+      "في عالم",
+      "البرمجة"
+     ]
+    },
+    {
+     "id": "valid-9",
+     "input": {
+      "text": "x",
+      "width": 1
+     },
+     "expected": [
+      "x"
+     ]
+    },
+    {
+     "id": "valid-10",
+     "input": {
+      "text": "a b c",
+      "width": 1
+     },
+     "expected": [
+      "a",
+      "b",
+      "c"
+     ]
+    },
+    {
+     "id": "valid-11",
+     "input": {
+      "text": "word",
+      "width": 1000000000
+     },
+     "expected": [
+      "word"
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": "text",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": {
+      "text": "a"
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": {
+      "width": 3
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": {
+      "text": "a",
+      "width": 0
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": {
+      "text": "a",
+      "width": -1
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": {
+      "text": "a",
+      "width": true
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": {
+      "text": "a",
+      "width": 2.0
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": {
+      "text": 5,
+      "width": 3
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": {
+      "text": "a",
+      "width": 3,
+      "extra": 1
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": [],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "allocate",
+   "api": "allocate(spec)",
+   "output": "src/allocate.py",
+   "prompts": {
+    "en": "Implement allocate(spec) in src/allocate.py. spec is a dict with exactly the keys total_cents (int >= 0) and weights (nonempty list of ints >= 0 whose sum is greater than 0). Bools are invalid everywhere. Split total_cents across the weights by the largest-remainder method using integers only: each share starts as total_cents*weight // sum(weights); the cents still unassigned go one each to the shares with the largest remainder total_cents*weight % sum(weights), ties going to the lower index. Return the list of shares in the order of the weights; the shares always sum to total_cents and a zero weight gets zero. Arbitrary-size ints must work. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ allocate(spec) في src/allocate.py. spec قاموس مفاتيحه بالضبط total_cents (عدد صحيح >= 0) وweights (قائمة غير فارغة من أعداد صحيحة >= 0 مجموعها أكبر من صفر). القيم المنطقية غير صالحة في كل مكان. وزّع total_cents على الأوزان بطريقة أكبر باقٍ وبالأعداد الصحيحة فقط: تبدأ كل حصة بالقيمة total_cents*weight // sum(weights)؛ والسنتات المتبقية دون توزيع تُوزَّع بواقع سنت واحد لكل حصة، بدءًا بالحصص ذات أكبر باقٍ total_cents*weight % sum(weights)، وعند تساوي الباقي يُفضَّل الفهرس الأصغر. أرجع قائمة الحصص بترتيب الأوزان؛ مجموع الحصص دائمًا total_cents والوزن الصفري يأخذ صفرًا. يجب أن تعمل الأعداد الصحيحة الكبيرة جدًا. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": {
+      "total_cents": 100,
+      "weights": [
+       1,
+       1,
+       1
+      ]
+     },
+     "expected": [
+      34,
+      33,
+      33
+     ]
+    },
+    {
+     "id": "valid-1",
+     "input": {
+      "total_cents": 100,
+      "weights": [
+       1
+      ]
+     },
+     "expected": [
+      100
+     ]
+    },
+    {
+     "id": "valid-2",
+     "input": {
+      "total_cents": 0,
+      "weights": [
+       1,
+       2
+      ]
+     },
+     "expected": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       0,
+       5,
+       0,
+       5
+      ]
+     },
+     "expected": [
+      0,
+      5,
+      0,
+      5
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": {
+      "total_cents": 1,
+      "weights": [
+       1,
+       1,
+       1
+      ]
+     },
+     "expected": [
+      1,
+      0,
+      0
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": {
+      "total_cents": 2,
+      "weights": [
+       1,
+       1,
+       1
+      ]
+     },
+     "expected": [
+      1,
+      1,
+      0
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": {
+      "total_cents": 100,
+      "weights": [
+       50,
+       30,
+       20
+      ]
+     },
+     "expected": [
+      50,
+      30,
+      20
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": {
+      "total_cents": 7,
+      "weights": [
+       3,
+       3,
+       1
+      ]
+     },
+     "expected": [
+      3,
+      3,
+      1
+     ]
+    },
+    {
+     "id": "valid-8",
+     "input": {
+      "total_cents": 1000000000000000000000000000000,
+      "weights": [
+       1,
+       2,
+       3
+      ]
+     },
+     "expected": [
+      166666666666666666666666666667,
+      333333333333333333333333333333,
+      500000000000000000000000000000
+     ]
+    },
+    {
+     "id": "valid-9",
+     "input": {
+      "total_cents": 5,
+      "weights": [
+       0,
+       0,
+       1
+      ]
+     },
+     "expected": [
+      0,
+      0,
+      5
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": [],
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": {
+      "total_cents": 10
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": {
+      "weights": [
+       1
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": {
+      "total_cents": -1,
+      "weights": [
+       1
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": {
+      "total_cents": 1.5,
+      "weights": [
+       1
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": {
+      "total_cents": true,
+      "weights": [
+       1
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": {
+      "total_cents": 10,
+      "weights": []
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       0,
+       0
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       1,
+       -1
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       1.0
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-11",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       true
+      ]
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-12",
+     "input": {
+      "total_cents": 10,
+      "weights": "12"
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-13",
+     "input": {
+      "total_cents": 10,
+      "weights": [
+       1
+      ],
+      "extra": 0
+     },
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  },
+  {
+   "id": "csv_row",
+   "api": "csv_row(line)",
+   "output": "src/csv_row.py",
+   "prompts": {
+    "en": "Implement csv_row(line) in src/csv_row.py. line is one CSV record as a string containing no newline characters (\\n or \\r). Fields are separated by commas. An unquoted field may contain anything except a double quote and a comma. A quoted field starts with a double quote and ends at the closing double quote, may contain commas, and represents a literal double quote as two consecutive double quotes; the closing quote must be followed by a comma or the end of the line. Return the list of field strings. The empty string is one empty field, and a trailing comma adds a final empty field. Spaces are data and are never trimmed. A stray quote inside an unquoted field, text after a closing quote, an unterminated quoted field, a newline character, or a non-string input is invalid. Every malformed input raises ValueError, never TypeError or KeyError. Never mutate the input. Standard library only.",
+    "ar": "نفّذ csv_row(line) في src/csv_row.py. line سجل CSV واحد على هيئة نص لا يحتوي محرف سطر جديد (\\n أو \\r). تُفصل الحقول بفواصل. الحقل غير المقتبس قد يحتوي أي شيء عدا علامة اقتباس مزدوجة وفاصلة. الحقل المقتبس يبدأ بعلامة اقتباس مزدوجة وينتهي عند علامة الاقتباس الختامية، وقد يحتوي فواصل، ويُعبَّر فيه عن علامة اقتباس حرفية بعلامتين متتاليتين؛ ويجب أن يتبع الاقتباس الختامي فاصلة أو نهاية السطر. أرجع قائمة نصوص الحقول. النص الفارغ حقل واحد فارغ، والفاصلة الأخيرة تضيف حقلًا فارغًا أخيرًا. المسافات بيانات ولا تُقصّ أبدًا. علامة اقتباس شاردة داخل حقل غير مقتبس، أو نص بعد اقتباس ختامي، أو حقل مقتبس غير منتهٍ، أو محرف سطر جديد، أو مدخل غير نصي كلها غير صالحة. أي مدخل غير صالح يرفع ValueError وليس TypeError أو KeyError. لا تعدّل المدخل. المكتبة القياسية فقط."
+   },
+   "cases": [
+    {
+     "id": "valid-0",
+     "input": "",
+     "expected": [
+      ""
+     ]
+    },
+    {
+     "id": "valid-1",
+     "input": "a",
+     "expected": [
+      "a"
+     ]
+    },
+    {
+     "id": "valid-2",
+     "input": "a,b,c",
+     "expected": [
+      "a",
+      "b",
+      "c"
+     ]
+    },
+    {
+     "id": "valid-3",
+     "input": "a,,c",
+     "expected": [
+      "a",
+      "",
+      "c"
+     ]
+    },
+    {
+     "id": "valid-4",
+     "input": ",",
+     "expected": [
+      "",
+      ""
+     ]
+    },
+    {
+     "id": "valid-5",
+     "input": "a,",
+     "expected": [
+      "a",
+      ""
+     ]
+    },
+    {
+     "id": "valid-6",
+     "input": "\"a\"",
+     "expected": [
+      "a"
+     ]
+    },
+    {
+     "id": "valid-7",
+     "input": "\"a,b\",c",
+     "expected": [
+      "a,b",
+      "c"
+     ]
+    },
+    {
+     "id": "valid-8",
+     "input": "\"say \"\"hi\"\"\",x",
+     "expected": [
+      "say \"hi\"",
+      "x"
+     ]
+    },
+    {
+     "id": "valid-9",
+     "input": "\"\"",
+     "expected": [
+      ""
+     ]
+    },
+    {
+     "id": "valid-10",
+     "input": "\"\",\"\"",
+     "expected": [
+      "",
+      ""
+     ]
+    },
+    {
+     "id": "valid-11",
+     "input": " a , b ",
+     "expected": [
+      " a ",
+      " b "
+     ]
+    },
+    {
+     "id": "valid-12",
+     "input": "\"  x  \"",
+     "expected": [
+      "  x  "
+     ]
+    },
+    {
+     "id": "valid-13",
+     "input": "\"مرحبا\",\"عالم\"",
+     "expected": [
+      "مرحبا",
+      "عالم"
+     ]
+    },
+    {
+     "id": "valid-14",
+     "input": "أ,ب",
+     "expected": [
+      "أ",
+      "ب"
+     ]
+    },
+    {
+     "id": "invalid-0",
+     "input": "\"a\"\"",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-1",
+     "input": "\"a",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-2",
+     "input": "a\"b",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-3",
+     "input": "\"a\"b",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-4",
+     "input": "\"a\"x,y",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-5",
+     "input": "a,\"b",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-6",
+     "input": "\"\"a\"",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-7",
+     "input": "a\nb",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-8",
+     "input": "a\rb",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-9",
+     "input": "a,\"b\nc\"",
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-10",
+     "input": null,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-11",
+     "input": 5,
+     "expected": {
+      "error": "ValueError"
+     }
+    },
+    {
+     "id": "invalid-12",
+     "input": [
+      "a"
+     ],
+     "expected": {
+      "error": "ValueError"
+     }
+    }
+   ]
+  }
+ ]
+}
