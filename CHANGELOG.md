@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.22 — 2026-11-09
+
+- Add `PROTOCOL_CONTRADICTION_ADJUDICATION.md`: ordered steps, closed verdict set and decision record for contradicting claims; advisory, no Guard yet.
+- Register it in the artifact index and the scientific squad catalog; record the skill-intake decision (no new third-party skill) in the vetting log.
+
 ## 0.9.21 — 2026-11-09
 
 - Add the comparative arms evaluation (`scripts/comparative_evaluation.py`, `scripts/comparative_stats.py`): plain versus Crewloom-role arms per host and model, graded by the held-out Docker grader, with task-level paired bootstrap intervals and an English-minus-Arabic gap. No live provider run is recorded yet.

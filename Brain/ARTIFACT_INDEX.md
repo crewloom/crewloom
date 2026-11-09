@@ -25,6 +25,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | post-push-ci-verification | any push, merge or release | all workflow runs for `HEAD` pass, checked with `gh` only | advisory | `AGENTS.md` § Non-negotiable 7; skill `crewloom-release-verifier` | active |
 | model-escalation | a task is submitted and more than one model could run it | verified result, or `escalate` returns `stop` | advisory; Guard planned | `PROTOCOL_MODEL_ESCALATION.md` | written, not wired into any run path |
 | skill-vetting | a third-party skill is proposed for `.agent/skills/` or `~/.agents/skills/` | verdict recorded in `SKILL_VETTING_LOG.md`; accepted skill has `SOURCE.md` whose manifest matches its files | `scripts/vet-skill.py` (scan) and `scripts/skill-pins.py check` (pin Guard), run by hand; not in CI; rest advisory | `PROTOCOL_SKILL_VETTING.md` | active (no skill has been fully vetted yet; 59 legacy skills are pinned, not approved) |
+| contradiction-adjudication | two or more claims, results, sources or model outputs contradict and a decision depends on which holds | decision record with a closed-set verdict, evidence class, confidence and the test that would change it, or `undecided` with the missing test | advisory; Guard planned | `PROTOCOL_CONTRADICTION_ADJUDICATION.md` | written, advisory |
 
 ## Contracts
 

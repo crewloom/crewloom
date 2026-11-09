@@ -179,6 +179,7 @@ flowchart TD
   - `literature-review`: المراجعة المنهجية للأوراق العلمية والأدبيات.
   - `peer-review`: صياغة مراجعات تحكيم منظمة ومقيدة بالأدلة.
   - `scientific-critical-thinking`: تقييم جودة الأدلة والتحيزات والعوامل المربكة.
+  - بروتوكول حسم التناقض: `PROTOCOL_CONTRADICTION_ADJUDICATION.md` (يستعمل المهارات أعلاه بالدور، ويستدعي `council` فقط عند تعارض الآراء).
 ---
 
 ### الفريق السابع: فريق هندسة الفيديو والمونتاج البرمجي (Media & Video Engineering Squad)
