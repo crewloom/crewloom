@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crewloom"
-version = "0.9.20"
+version = "0.9.21"
 description = "Repository-native specialist agent skills, working memory, bilingual context packs, and checks."
 readme = "README.md"
 license = "Apache-2.0"
