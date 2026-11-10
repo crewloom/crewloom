@@ -26,6 +26,20 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | model-escalation | a task is submitted and more than one model could run it | verified result, or `escalate` returns `stop` | advisory; Guard planned | `PROTOCOL_MODEL_ESCALATION.md` | written, not wired into any run path |
 | skill-vetting | a third-party skill is proposed for `.agent/skills/` or `~/.agents/skills/` | verdict recorded in `SKILL_VETTING_LOG.md`; accepted skill has `SOURCE.md` whose manifest matches its files | `scripts/vet-skill.py` (scan) and `scripts/skill-pins.py check` (pin Guard), run by hand; not in CI; rest advisory | `PROTOCOL_SKILL_VETTING.md` | active (no skill has been fully vetted yet; 59 legacy skills are pinned, not approved) |
 | contradiction-adjudication | two or more claims, results, sources or model outputs contradict and a decision depends on which holds | decision record with a closed-set verdict, evidence class, confidence and the test that would change it, or `undecided` with the missing test | advisory; Guard planned | `PROTOCOL_CONTRADICTION_ADJUDICATION.md` | written, advisory |
+| strategic-decision | structured 8-phase process for any organisation-level decision (strategy, architecture, product, finance, people); mandatory council session at phase 3; produces a signed Decision Record | advisory; Owner sovereign sign-off enforced by convention; Guard planned | `PROTOCOL_STRATEGIC_DECISION.md` | active, advisory |
+| sovereign-patent-invention | any technical breakthrough proposed for patent protection vs academic paper; professional prior art search (USPTO/EPO/WIPO/arXiv); TRIZ contradiction; Claude Code 5.2 red-team; dual-language drafting (.en + .ar); enablement audit | approved Dual-Language Patent Dossier, passed verify_patent_protocol.py, SHA-256 priority timestamp, Owner sign-off | `core/scripts/verify_patent_protocol.py`, Owner review | `PROTOCOL_PATENT_INVENTION.md` | active |
+
+## Decision Records
+
+| date | title | file | status | decided_by |
+|---|---|---|---|---|
+| — | (Confidential invention records reside strictly in `.crewloom/private/research/`) | — | private | The Owner |
+
+## Standards & Manuals
+
+| name | purpose | file | status |
+|---|---|---|---|
+| patent-acceptance-criteria | Statutory, academic & technical standards for patent eligibility (35 U.S.C. §§ 101, 102, 103, 112, Wands factors, TRIZ, 100-pt rubric) | [`PATENT_ACCEPTANCE_CRITERIA_AND_ACADEMIC_STANDARDS.md`](PATENT_ACCEPTANCE_CRITERIA_AND_ACADEMIC_STANDARDS.md) | active |
 
 ## Contracts
 

@@ -35,24 +35,24 @@ def audit_document(file_path: str, *, structure_only: bool = False) -> int:
     failures = 0
     warnings = 0
 
-    # 1. Sovereign Ownership & Inventor Check
+    # 1. Human Inventorship & Assignee Attribution Check (matches single or co-inventors per Pannu factors)
     inventor_patterns = [
-        r"INVENTOR.*:\s*.*(?:The Owner|المالك)",
+        r"(?:INVENTOR|INVENTORS|المخترع|المخترعون).*?:\s*\S+",
         r"(?:Sovereign|Exclusive)\s+Owner",
         r"CREWLOOM.*SOVEREIGN"
     ]
     if any(re.search(p, content, re.IGNORECASE) for p in inventor_patterns):
-        print_ok("Inventor attribution text present; ownership is not verified.")
+        print_ok("Inventor/Assignee attribution field present (conception provenance must be verified manually).")
     else:
-        print_err("Rule Violation: Sovereign Inventor not attributed to 'The Owner'.")
+        print_err("Missing statutory human inventor attribution field (35 U.S.C. § 100(f)).")
         failures += 1
 
     # 2. Structural Patent Sections
     required_sections = [
-        ("Abstract", r"(?:##\s*1\.\s*ABSTRACT|ABSTRACT\s*\(ملخص)"),
-        ("Prior Art / Background", r"(?:##\s*2\.\s*BACKGROUND|PRIOR\s+ART)"),
-        ("Detailed Description", r"(?:##\s*3\.\s*DETAILED|DETAILED\s+TECHNICAL)"),
-        ("Claims", r"(?:##\s*4\.\s*CLAIMS|CLAIMS\s*\(عناصر)"),
+        ("Abstract", r"(?:##\s*1\.\s*(?:ABSTRACT|ملخص)|ABSTRACT\s*\(ملخص)"),
+        ("Prior Art / Background", r"(?:##\s*2\.\s*(?:BACKGROUND|الخلفية|خلفية)|PRIOR\s+ART|التقنيات\s+السابقة)"),
+        ("Detailed Description", r"(?:##\s*3\.\s*(?:DETAILED|الوصف.*?التفصيلي)|DETAILED\s+TECHNICAL)"),
+        ("Claims", r"(?:##\s*4\.\s*(?:CLAIMS|عناصر\s+الحماية)|CLAIMS\s*\(عناصر)"),
     ]
     for name, pattern in required_sections:
         if re.search(pattern, content, re.IGNORECASE):
@@ -62,25 +62,38 @@ def audit_document(file_path: str, *, structure_only: bool = False) -> int:
             failures += 1
 
     # 3. Patent Claims Syntax Validation
-    # Independent claim must use "comprising"
-    independent_claim = re.search(r"Independent\s+(?:System\s+)?Claim\s+1.*?(?=Claim\s+2|\Z)", content, re.DOTALL | re.IGNORECASE)
-    if independent_claim:
-        claim_text = independent_claim.group(0)
+    # Independent claim must use "comprising" or "يشتمل على / تشتمل على"
+    independent_claim_en = re.search(r"Independent\s+(?:System\s+)?Claim\s+1.*?(?=Claim\s+2|\Z)", content, re.DOTALL | re.IGNORECASE)
+    independent_claim_ar = re.search(r"(?:عنصر\s+الحماية\s+(?:المستقل\s+)?الأول|العنصر\s+المستقل\s+1).*?(?=عنصر\s+الحماية\s+(?:الثاني|2)|العنصر\s+2|\Z)", content, re.DOTALL | re.IGNORECASE)
+
+    if independent_claim_en:
+        claim_text = independent_claim_en.group(0)
         if "comprising" in claim_text.lower():
             print_ok("Independent Claim 1 contains the transitional phrase 'comprising'; legal validity is not assessed.")
         else:
             print_err("Independent Claim 1 is missing the transitional phrase 'comprising'.")
             failures += 1
+    elif independent_claim_ar:
+        claim_text = independent_claim_ar.group(0)
+        ar_transitional = ["يشتمل على", "تشتمل على", "يتضمن", "تتضمن"]
+        if any(term in claim_text for term in ar_transitional):
+            print_ok("عنصر الحماية المستقل الأول يحتوي على الصيغة الانتقالية القانونية ('يشتمل على / تشتمل على').")
+        else:
+            print_err("عنصر الحماية المستقل الأول يفتقر للصيغة الانتقالية القانونية ('يشتمل على / تشتمل على').")
+            failures += 1
     else:
         print_err("Missing Independent Claim 1 specification.")
         failures += 1
 
-    # Check for dependent claims
-    dependent_claims = re.findall(r"\*{0,2}Claim\s+[2-9]\d*.*?:", content, re.IGNORECASE)
-    if len(dependent_claims) >= 3:
-        print_ok(f"Sufficient dependent claims detected ({len(dependent_claims)} dependent claims).")
+    # Check for dependent claims (English or Arabic)
+    dependent_claims_en = re.findall(r"\*{0,2}Claim\s+[2-9]\d*.*?:", content, re.IGNORECASE)
+    dependent_claims_ar = re.findall(r"\*{0,2}(?:عنصر\s+الحماية|العنصر)\s+(?:الثاني|الثالث|الرابع|الخامس|السادس|السابع|الثامن|التاسع|العاشر|[2-9]\d*).*?:", content, re.IGNORECASE)
+    total_dependent = len(dependent_claims_en) + len(dependent_claims_ar)
+
+    if total_dependent >= 3:
+        print_ok(f"Sufficient dependent claims detected ({total_dependent} dependent claims).")
     else:
-        print_warn(f"Fewer than 3 dependent claims detected (found {len(dependent_claims)}). Recommended: ≥ 3.")
+        print_warn(f"Fewer than 3 dependent claims detected (found {total_dependent}). Recommended: ≥ 3.")
         warnings += 1
 
     # 4. Mathematical / Algorithmic Rigor Check
@@ -99,7 +112,7 @@ def audit_document(file_path: str, *, structure_only: bool = False) -> int:
         failures += 1
 
     # 5. Comparative Benchmarks Table
-    table_pattern = r"\|.*?Metric.*?\|.*?Baseline.*?\|"
+    table_pattern = r"\|.*?(?:Metric|المعيار|المؤشر).*?\|.*?(?:Baseline|خط\s*الأساس|الأنظمة\s*التقليدية|القيم\s*المرجعية).*?\|"
     if re.search(table_pattern, content, re.IGNORECASE):
         print_ok("Benchmark table heading present; measurements are not verified.")
     else:
