@@ -143,3 +143,6 @@ Keep personal preferences as scoped private input data instead of editing distri
 - 2026-10-16 | Keep the manually installed browser companion in a stable reviewed directory so reloads retain its Chrome ID; immutable toolkit releases remain separate. Upgrade2.3.1 keeps the existing permissions and explicit enable boundary.
 
 - 2026-10-17 | Use equivalent language/direction/error acceptance for every localized change. Keep application labels and third-party diagnostics intact; a translation count or role-guide translation cannot demonstrate bilingual runtime quality.
+
+### 2026-11-12 — Task capsule as a prompt prefix: measured, rejected as built
+Graph-located code windows (Graphify 0.9.102 locations + source windows, about 8k tokens) prepended to the task made `claude-sonnet-5-5` solve 8 of 20 frozen `agent/` commits versus 12 with free reading, at 25% more cost (blind Opus judge on diffs; one run, n = 20). The cause was anchoring: the agent edited what the capsule showed and stopped searching. Retrieval recall did not predict task outcome. Untested variants: capsule as an on-demand tool, dependency-closure bodies, weaker or local models. Evidence and scripts are kept in the operator workspace (`crewloom/docs/research/code-context-bench/`), not in this repository.
