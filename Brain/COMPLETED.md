@@ -1,5 +1,16 @@
 # Completed work
 
+### 2026-11-12 — Browser workspace and manual handoff
+
+- A full browsing surface and the side panel share the chat's live browser session. The address bar can pass only an HTTP(S) destination to the default browser for manual browsing.
+- Bilingual browser-preview checks cover full width, side-by-side view, return to chat and independent navigation. Challenge frequency on live sites was not measured.
+
+### 2026-11-12 — Agent context economy
+
+- Measure the outbound request after history selection. Deduplicate eligible older assistant text locally while preserving the saved transcript, user messages and attachments.
+- Personal-memory extraction starts with memory cues in the latest user message. Routine task traffic no longer schedules a periodic extraction.
+- A bilingual browser fixture with one large duplicate used about 47% fewer outbound JSON bytes with compaction enabled. Each run made one mocked model request. Provider account quota requires a separate measurement.
+
 ### 2026-11-03 — Desktop MCP: Rust client wired into the chat loop
 - Artifact: `agent/apps/crewloom-desktop/src-tauri/src/mcp.rs`, `src-tauri/src/mcp_tool.rs`, `src-tauri/src/tool_authority.rs`, `src-tauri/src/orchestrator.rs`, `src/components/settings/toolsCatalog.ts`, `agent/packages/crewloom/ARCHITECTURE.md` (section "Desktop MCP client"); agent commit 41c498d849, release `crewloom-v0.12.1`.
 - Impact: The desktop app can use MCP servers. The model gets one `mcp` tool (`list_servers`, `list_tools`, `call`) over stdio servers from `~/.crewloom/mcp.json` (the `.mcp.json` format), gated by an explicit Tools grant in build or auto mode and off by default. Secret-looking variables are dropped from a server's environment and its stderr is reported on failure. Not done: a settings screen for servers, resources and prompts, remote servers (use a stdio bridge such as `mcp-remote`), and sandboxing.
@@ -485,3 +496,8 @@ Production compiler input checks now reject accidental inclusion of workspace te
 ### 2026-11-05 — Browser error-state persistence regression
 
 Lifecycle checks now distinguish transient internal network-error pages from failed storage writes while retaining previously restorable URLs. The network error remains visible in the browser view; a separate quota-rejection test confirms real save failures remain visible.
+
+### 2026-11-15 — Text-memory acceptance test: first pre-registration closed with Rule 5, second pre-registration binding
+- Artifact: `pulse/docs/TEXT_MEMORY_PREREGISTRATION.md` (results appended), raw outputs `pulse/docs/benchmarks/text_memory_results.json` and `text_memory_coding_results.json`, second pre-registration `pulse/docs/TEXT_MEMORY_GATE_PREREGISTRATION.md` (binding), generator `pulse/scripts/lm_eval/text_memory_facts_v3.py`, frozen dataset `pulse/data/lm_eval/text_memory/facts_v3.json` (sha256 `4e62d9e82e068944bc8f63c4967b2fe1ce79eb40341406e186edc062315a02b3`).
+- Evidence (test, size 60, single run): inject-everything exact 95.0% but false injection 100%, update 40%, 1458 memory tokens; BM25 top-5 exact 83.8%, false injection 17.5%; BM25+bge-m3 exact 90.6%, recall@5 91.1%, false injection 17.5%, update 80%, 55 tokens. No arm lower than no-memory on the 66-task coding check. Rule 5 fired: neither retrieval arm met the thresholds. 25 unit tests pass.
+- Status: The second pre-registration is approved and binding: 6 dev stores per size (12 and 60), 3% pooled / 8% worst held-out calibration limits, Arabic templates reviewed and approved, item 6 dropped, size 200 out of scope. Fact set frozen into `facts_v3.json`. Nothing has been evaluated against test yet.
