@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.23 — 2026-11-12
+
+- Record the task-capsule bench in the ideas vault: graph-located code windows given up front solved 8 of 20 frozen tasks versus 12 with free reading, at 25% more cost; rejected as built, other variants untested.
+- Record the CodeGraph v1.6.2 vetting (ADAPT, sandboxed partial trial) in the skill vetting log, re-adding a row that was lost before commit.
+
 ## 0.9.22 — 2026-11-09
 
 - Add `PROTOCOL_CONTRADICTION_ADJUDICATION.md`: ordered steps, closed verdict set and decision record for contradicting claims; advisory, no Guard yet.
