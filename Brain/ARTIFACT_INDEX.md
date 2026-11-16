@@ -40,6 +40,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | name | purpose | file | status |
 |---|---|---|---|
 | patent-acceptance-criteria | Statutory, academic & technical standards for patent eligibility (35 U.S.C. §§ 101, 102, 103, 112, Wands factors, TRIZ, 100-pt rubric) | [`PATENT_ACCEPTANCE_CRITERIA_AND_ACADEMIC_STANDARDS.md`](PATENT_ACCEPTANCE_CRITERIA_AND_ACADEMIC_STANDARDS.md) | active |
+| system-philosophy | Master doctrine for control theory, artifact taxonomy, stateful protocols, sandboxed evals, neuromorphic memory, and Trinity architecture | [`SYSTEM_PHILOSOPHY.ar.md`](SYSTEM_PHILOSOPHY.ar.md) | active |
 
 ## Contracts
 
