@@ -531,16 +531,26 @@ function onInspectorMouseMove(e) {
 
 let currentCursor = { x: 0, y: 0 };
 let agentCursorElement = null;
+let agentBadgeElement = null;
 
-function renderAgentCursor(x, y) {
+function renderAgentCursor(x, y, badgeText = null) {
   currentCursor = { x, y };
   if (!agentCursorElement) {
     agentCursorElement = document.createElement('div');
     agentCursorElement.className = 'crewloom-agent-cursor';
+    agentBadgeElement = document.createElement('span');
+    agentBadgeElement.className = 'crewloom-agent-badge';
+    agentCursorElement.appendChild(agentBadgeElement);
     document.body.appendChild(agentCursorElement);
   }
   agentCursorElement.style.left = `${x}px`;
   agentCursorElement.style.top = `${y}px`;
+  if (badgeText && agentBadgeElement) {
+    agentBadgeElement.textContent = badgeText;
+    agentBadgeElement.style.display = 'inline-block';
+  } else if (agentBadgeElement) {
+    agentBadgeElement.style.display = 'none';
+  }
 }
 
 function resolvePointElement(x, y) {

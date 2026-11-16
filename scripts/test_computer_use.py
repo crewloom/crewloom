@@ -177,5 +177,47 @@ class ComputerUseEngineTest(unittest.TestCase):
         self.assertIn("Crewloom", content_res["content"])
 
 
+class ClaudeComputerUseAgentTest(unittest.TestCase):
+    """Test autonomous Claude Computer Use agent loop."""
+
+    def setUp(self):
+        self.agent = cu.ClaudeComputerUseAgent()
+
+    def test_tool_declaration_shape(self):
+        tool_decl = self.agent.build_tool_declaration()
+        self.assertEqual(tool_decl["name"], "computer")
+        self.assertEqual(tool_decl["type"], "computer_20241022")
+
+    def test_execute_turn_screenshot(self):
+        tool_use = {
+            "id": "toolu_shot_1",
+            "name": "computer",
+            "input": {"action": "screenshot"},
+        }
+        res = self.agent.execute_turn(tool_use)
+        self.assertEqual(res["type"], "tool_result")
+        self.assertEqual(res["tool_use_id"], "toolu_shot_1")
+        self.assertEqual(res["content"][0]["type"], "image")
+        self.assertEqual(res["content"][0]["source"]["type"], "base64")
+
+    def test_execute_turn_action(self):
+        tool_use = {
+            "id": "toolu_act_1",
+            "name": "computer",
+            "input": {"action": "mouse_move", "coordinate": [200, 300]},
+        }
+        res = self.agent.execute_turn(tool_use)
+        self.assertEqual(res["type"], "tool_result")
+        self.assertIn("mouse_move", res["content"])
+
+    def test_full_agent_run_offline(self):
+        run_res = self.agent.run("Research Crewloom features")
+        self.assertTrue(run_res["ok"])
+        self.assertEqual(run_res["turns"], 7)
+        self.assertEqual(run_res["mode"], "deterministic-offline")
+        self.assertGreaterEqual(len(run_res["history"]), 7)
+
+
 if __name__ == "__main__":
     unittest.main()
+

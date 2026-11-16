@@ -11,6 +11,7 @@ dist/
 node_modules/
 .next/
 scripts/*.egg-info/
+scripts/cyber_ghost_overlay_bin
 
 /build/
 *.egg-info/

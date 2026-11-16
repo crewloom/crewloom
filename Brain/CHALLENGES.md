@@ -483,3 +483,6 @@ A failed local-service navigation can expose an internal browser error-page URL.
 
 ### 2026-11-15 — A retrieval gate tuned on one dev store did not generalise
 A score gate (BM25 and dense cosine thresholds) was tuned on a single dev store per size and showed 0% to 3.85% false injection; on the held-out test it was 17.5% for both retrieval arms. One store gives a very wide interval, so the tuning number was not evidence. Calibrate gates on several stores with leave-one-store-out and report the worst held-out rate before spending a test split. Never relax thresholds after a result: the response was a new, dated pre-registration. Also note that "inject every fact" has 100% false injection by construction, so a high exact-answer score for it does not mean it is acceptable.
+
+### 2026-11-15 — HRPE stability bound came from the clamp, not the update rule
+The spec argued `ρ ≤ λρ + η‖Ψ‖² < 1`, which holds only if `η_max‖Ψ‖² < 1−λ_max` (never stated). Pre-registered test Q1 (30 seeds, 1000 steps, exact eigenvalues each step, real `HolographicMemoryBankMLX`): with the spectral clamp 0/30 violations (peak ρ 0.9207); without it 30/30 violations from step 524–525 (peak ρ about 12). Fix: claim 1 and §3 must describe the explicit clamp. Open: whether the clamp's global rescale harms recall (Q2/Q4 untested). Details are in the private patent research folder.
