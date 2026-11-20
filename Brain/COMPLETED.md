@@ -1,5 +1,11 @@
 # Completed work
 
+### 2026-11-17 — Confidence gate for the local model (pulse)
+
+- Artifact: `pulse/scripts/lm_eval/confidence_gate.py`, `run_confidence_gate.py`, `tests/test_confidence_gate.py`, `pulse/docs/CONFIDENCE_GATE.md`. The local model answers only when its answer passes its own written check; otherwise it escalates.
+- Evidence: 461 unseen MBPP tasks, one seed. Answered 34.5%, with 96.2% hidden-test accuracy (95% CI 92.0 to 98.3), against 58.1% answering everything. Public benchmark, English only, Arabic unmeasured.
+- Status: not wired into the desktop app. The sandbox is not a security boundary and the model's own checks are often wrong, so coverage is low.
+
 ### 2026-11-12 — Browser workspace and manual handoff
 
 - A full browsing surface and the side panel share the chat's live browser session. The address bar can pass only an HTTP(S) destination to the default browser for manual browsing.
