@@ -1,5 +1,11 @@
 # Completed work
 
+### 2026-11-21 — Native NVIDIA SkillEvaluator Tier 1 core, smart hooks, and Tier 3 runtime lift
+
+- Artifact: `agent/packages/crewloom/contracts/src/skill-quality.ts`, `skill-security-scan.ts`, `skill-harness-check.ts`, `skill-evaluation.ts`, `skills/src/skill-reader.ts`, `skill-lift-runner.ts`, `skill-evaluation-ledger.ts`, `skill-evaluate-tool.ts`, NOTICE. Pure TypeScript port of Tier 1 quality scoring (4 dimensions: Correctness 35%, Discoverability 25%, Reliability 25%, Efficiency 15%, 70/100 gate), security scanning (PII & Unicode smuggling detection), multi-harness rules (Claude Code, Codex, Copilot CLI, Hermes, OpenClaw, OpenCode), automatic hooks with content-hash caching, loader gate, agent self-fix diagnostics loop, and Tier 3 native skill lift on the agent runtime without Docker, pip, or Python.
+- Evidence: 23 contracts specs, 7 skills specs, 352 unit & integration tests pass cleanly; strict typecheck passes; loader composition, content-hash cache, and HMR disposal verified.
+- Status: Native Tier 1 and Tier 3 lift fully operational without external dependencies. CLI wrapper remains available as an optional deep adapter path.
+
 ### 2026-11-21 — SkillEvaluator gate in the agent skills package
 
 - Artifact: `agent/packages/crewloom/skills/src/skill-evaluator-runner.ts`, `skill-evaluate-tool.ts`, `skill-evaluation-ledger.ts`, `contracts/src/skill-evaluation.ts`, `skills/tests/skill-evaluate.spec.ts`. Tier 1 (static) and Tier 3 (live) evaluation, a `skill_evaluate` tool, and a loader that refuses a skill whose last evaluation failed. Also fixed strict-optional typing and test casts in `contracts/src/quota-ledger.ts`.

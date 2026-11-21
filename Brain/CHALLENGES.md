@@ -1,5 +1,11 @@
 # Challenges
 
+### 2026-11-21 — Native pure TypeScript port of NVIDIA SkillEvaluator Tier 1 & smart hooks
+- Cause: NVIDIA SkillEvaluator is a 7,000+ line Python CLI requiring pip, Python 3.10+, and Docker for Tier 3. Running an external Python CLI in the core agent loop introduces startup latency, environment dependencies, and fragile subprocess IPC.
+- Solution: Transferred core deterministic Tier 1 logic into pure TypeScript in `@crewloom/contracts` (Quality scoring with exact dimensions/deductions, PII/Unicode smuggling detection, and 6-agent harness profiles), combined with content-hash caching, loader gate, structured self-fix feedback loop, and Tier 3 native runtime lift without Docker. The CLI wrapper is retained as an optional deep adapter path.
+- Evidence: 23 contracts specs, 7 skills specs, 352 unit & integration tests pass with zero external runtime dependencies.
+- Status: Closed. Native Tier 1 and Tier 3 lift operational.
+
 ### 2026-11-21 — SkillEvaluator Tier 3 exits 0 on a FAIL verdict
 - Cause: per the CLI docs, Tier 3 returns exit code 0 on a FAIL verdict unless `--block-on-agent-eval` is passed, so a naive exit-code gate would report a pass.
 - Solution: `buildEvaluatorArgs` always adds `--block-on-agent-eval` with Tier 3, and a Tier 3 run with no readable JSON report is an `error`, never a pass.
