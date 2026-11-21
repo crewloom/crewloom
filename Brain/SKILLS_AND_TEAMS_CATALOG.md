@@ -213,6 +213,8 @@ flowchart TD
 * **حزمة المهارات المعتمدة:**
   * Cloudflare: `agents-sdk`, `durable-objects`, `workers-best-practices`, `workers-profiling`, `wrangler`, `web-perf`, `nextjs-on-cloudflare`, `cloudflare-email-service`.
   * Google: `agent-platform-eval-flywheel`, `agent-platform-skill-registry`, `agent-platform-prompt-management`, `agent-platform-rag-engine-management`, `google-cloud-solution-multi-agent-security`, `google-cloud-waf-security`, `apigee-agent-gateway-governance`, `retrieving-developer-knowledge`, `finding-google-skills`, `migrate-to-rust`.
+  * Google Data Agent Kit (DAK): `accidental-data-loss-prevention`, `bigquery-data-transfer-service`, `building-data-apps`, `cloud-databases-onboarding`, `dak-setup`, `data-autocleaning`, `dataform-bigquery`, `dbt-bigquery`, `discover-assets`, `enforcing-resource-attribution`, `gcp-data-pipelines`, `gcp-dataflow`, `gcp-pipeline-orchestration`, `gcp-pipeline-resource-provisioning`, `gcp-spark`, `gcp-spark-observability`, `gcp-spark-troubleshooting`, `managing-python-dependencies`, `ml-best-practices`, `notebook-guidance`, `resolving-mcp-region-configs`, `schema-mapping`.
+  * Google Tools & SDKs: `google-antigravity-sdk`, `android-cli`, `compose-preview`, `device-hub`, `chrome-devtools`, `a11y-debugging`, `cookie-debugging`, `debug-optimize-lcp`, `memory-leak-debugging`, `troubleshooting`, `chrome-extensions`, `modern-web-guidance`.
   * Anthropic: `doc-coauthoring`, `docx`, `pdf`, `pptx`, `xlsx`, `web-artifacts-builder`.
   * مجلس القرار: `council` (استخدم `--triad` أو `--duo` يومياً؛ `--full` يشغّل 18 وكيلاً وهو مكلف).
 * **ملاحظة:** كلها من النوع Skill في `ARTIFACT_TAXONOMY.md`؛ تُحمَّل بالكشف التدريجي ولا تُحقن كاملة في الـ prompt.

@@ -19,6 +19,35 @@
 - **20 أداة Python** للفحوص والسياق وقياس الموارد والتوقيت والإنفاق.
 - خمس ملفات ذاكرة لكل دور، وفحوص قبل الـcommit وفي GitHub Actions.
 
+## منظومة المهارات السحابية المعتمدة (Google · Cloudflare · Anthropic · Vercel)
+
+يحكم Crewloom سجلاً رسمياً يضم **أكثر من 80 مهارة معتمدة ومؤمنة** عبر كبرى المنظومات السحابية للذكاء الاصطناعي، مدعومة بمصفوفة تقييم ثلاثية المستويات ومحرك تحديث تلقائي آمن (`scripts/skills-scout.py`):
+
+- **منظومة Google Cloud & AI Platform (41 مهارة):** حزمة Data Agent Kit كاملة (DAK: BigQuery, Spark, Dataproc, Dataflow, Dataform, dbt)، وأدوات Agent Platform (حلقة التقييم المستمر، سجل المهارات، حوكمة البوابات، RAG)، وأمان الوكلاء وModel Armor، إضافة إلى مهارات Android CLI وChrome DevTools وAntigravity SDK.
+- **منظومة Cloudflare Edge (8 مهارات):** حزمة Agents SDK، وأفضل ممارسات Workers، وDurable Objects، وWrangler، وتدقيق الأداء الويب (Web Perf)، وخدمة البريد السحابي.
+- **منظومة Anthropic & Vercel (7 مهارات):** المعالجة الدقيقة للمستندات (`docx`, `pdf`, `pptx`, `xlsx`)، والتأليف المشترك، وهندسة واجهات React وNext.js الفائقة.
+- **أدوار Crewloom التخصصية (47 دوراً):** فرق عمل متكاملة متعددة الوكلاء، وضمانات عدم التدمير (Zero-Destruction)، وذاكرة سياقية هجينة.
+
+### أوامر استكشاف وتقييم وتحديث المهارات (CLI)
+
+```bash
+# استكشاف جميع المهارات المعتمدة لمنظومة معينة (مثل Google أو Cloudflare)
+python3 -I scripts/skills-scout.py scout google
+
+# تقييم شامل لجميع المهارات عبر مصفوفة الفحص الساكن والبصمة التجميعية المشفرة
+python3 -I scripts/skills-scout.py evaluate all
+
+# مراقبة مستودعات المهارات المعتمدة لكشف أي تحديثات جديدة أو انحراف في الملفات
+python3 -I scripts/skills-scout.py check-updates all
+
+# تحديث آمن وتلقائي لأي مهارة معتمدة مع إعادة الفحص والتثبيت في سجل التدقيق
+python3 -I scripts/skills-scout.py update <skill_name>
+
+# التحقق من سلامة البصمات ومزامنة الروابط عبر بيئات Claude وCodex وAntigravity
+python3 -I scripts/skill-pins.py check
+./scripts/skills-sync.sh link
+```
+
 ## البدء السريع والعرض التفاعلي في 20 ثانية
 
 شغّل سكريبت التهيئة الفوري أو جرّب العرض التفاعلي الموجّه:

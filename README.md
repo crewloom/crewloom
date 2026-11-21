@@ -19,6 +19,36 @@ Managed workflows add project and checkout identities, frozen context, isolated 
 
 The optional [project task MCP bridge](documentation/MCP_BRIDGE.md) gives Cursor, Windsurf, Codex, and other MCP hosts read-only project context, workflow packets, and verified configuration templates (see [examples/mcp/README.md](examples/mcp/README.md)).
 
+## Accredited Agent Skills Ecosystem (Google · Cloudflare · Anthropic · Vercel)
+
+Crewloom governs an authoritative registry of **80+ accredited skills** across major cloud AI ecosystems, backed by a deterministic 3-tier vetting matrix and automated upstream synchronization (`scripts/skills-scout.py`):
+
+- **Google Cloud & AI Platform (41 Skills):** Full Data Agent Kit (DAK: BigQuery, Spark, Dataproc, Dataflow, Dataform, dbt), Agent Platform (Eval Flywheel, Skill Registry, Prompt Management, RAG Engine), Cloud Security & Model Armor, Android CLI, Chrome DevTools, and Antigravity SDK.
+- **Cloudflare Edge (8 Skills):** Agents SDK, Workers Best Practices, Durable Objects, Cloudflare Email Service, Next.js on Cloudflare, Workers Profiling, and Wrangler.
+- **Anthropic Office Suite & Artifacts (6 Skills):** High-precision document authoring (`docx`, `pdf`, `pptx`, `xlsx`), `doc-coauthoring`, and `web-artifacts-builder`.
+- **Vercel Web Patterns:** Next.js architecture, React 19 composition patterns, and View Transitions.
+- **Crewloom Core (47 Specialist Roles):** Autonomous multi-agent squads, Zero-Destruction execution guards, and vector-backed role memory.
+
+### Skills Governance & Upstream Sync CLI
+
+```bash
+# Scout all accredited skills across ecosystems (Google, Cloudflare, Anthropic)
+python3 -I scripts/skills-scout.py scout google
+
+# Evaluate skills through the 3-Tier Quality & Security Matrix (AST Vet + Manifest Integrity)
+python3 -I scripts/skills-scout.py evaluate all
+
+# Monitor upstream repositories for updates, new releases, or manifest drift
+python3 -I scripts/skills-scout.py check-updates all
+
+# Safely update an accredited skill with automated re-vetting and ledger logging
+python3 -I scripts/skills-scout.py update <skill_name>
+
+# Verify pin integrity and link skills across all agent IDEs (Claude, Codex, Antigravity)
+python3 -I scripts/skill-pins.py check
+./scripts/skills-sync.sh link
+```
+
 ## Quickstart in 20 seconds
 
 Run the zero-friction onboarding script or test the interactive walkthrough:
