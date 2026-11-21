@@ -1,5 +1,11 @@
 # Completed work
 
+### 2026-11-21 — SkillEvaluator gate in the agent skills package
+
+- Artifact: `agent/packages/crewloom/skills/src/skill-evaluator-runner.ts`, `skill-evaluate-tool.ts`, `skill-evaluation-ledger.ts`, `contracts/src/skill-evaluation.ts`, `skills/tests/skill-evaluate.spec.ts`. Tier 1 (static) and Tier 3 (live) evaluation, a `skill_evaluate` tool, and a loader that refuses a skill whose last evaluation failed. Also fixed strict-optional typing and test casts in `contracts/src/quota-ledger.ts`.
+- Evidence: 7 spec files, 39 tests pass (skills and contracts); typecheck clean. Tests use a fake `skillevaluator` binary.
+- Status: not run against the real CLI. Report fields and Tier 3 flags are unverified. Repo-wide lint still has errors in files this change did not touch.
+
 ### 2026-11-17 — Confidence gate for the local model (pulse)
 
 - Artifact: `pulse/scripts/lm_eval/confidence_gate.py`, `run_confidence_gate.py`, `tests/test_confidence_gate.py`, `pulse/docs/CONFIDENCE_GATE.md`. The local model answers only when its answer passes its own written check; otherwise it escalates.

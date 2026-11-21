@@ -1,5 +1,11 @@
 # Challenges
 
+### 2026-11-21 — SkillEvaluator Tier 3 exits 0 on a FAIL verdict
+- Cause: per the CLI docs, Tier 3 returns exit code 0 on a FAIL verdict unless `--block-on-agent-eval` is passed, so a naive exit-code gate would report a pass.
+- Solution: `buildEvaluatorArgs` always adds `--block-on-agent-eval` with Tier 3, and a Tier 3 run with no readable JSON report is an `error`, never a pass.
+- Evidence: runner and `skill-evaluate.spec.ts` cover both paths with a fake CLI only.
+- Status: Open for verification. The real report shape and flags need one live run (Docker plus the operator's `NVIDIA_API_KEY`).
+
 ### 2026-11-03 — The Crewloom preset and the desktop MCP client had no caller
 - Cause: `@crewloom/preset-enterprise` is not imported by any app, and `mcp.rs` was declared in `lib.rs` but never called. A plan to "wire upstream packages into the preset" would have changed nothing a user runs; the desktop runtime is Rust (`providers/chat.rs`, `orchestrator.rs`).
 - Solution: before wiring a capability, find the runtime that actually runs it (`grep` for importers or callers). The desktop MCP owner is now `mcp.rs` through `mcp_tool.rs`; upstream `dsh-mcp-client` stays CLI-only.
