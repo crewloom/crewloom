@@ -3,6 +3,7 @@
 ## 0.9.24 — 2026-11-21
 
 - Record the workspace layout change in `Brain/COMPLETED.md`: project registry in `.crewloom/`, side projects in `labs/`, generated output in `artifacts/`, worktrees in `.crewloom/work/worktrees/`, with the open items.
+- Fix a broken link in `Brain/SYSTEM_PHILOSOPHY.ar.md` (the Constitution lives at the workspace root, outside this repo).
 
 ## 0.9.23 — 2026-11-12
 

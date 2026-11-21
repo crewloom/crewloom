@@ -3,7 +3,7 @@
 
 > **الجهة المصدرة:** مجلس معمارية النظم وحوكمة الذكاء الاصطناعي (Crewloom Systems Architecture & Governance Council)  
 > **الحالة الدستورية:** مرجع فلسفي ومعماري أسمى (Canonical Philosophical Authority)  
-> **المرجعية الدستورية:** نابع ومفسر لبنود [`CONSTITUTION.md`](CONSTITUTION.md) و [`ARTIFACT_TAXONOMY.ar.md`](ARTIFACT_TAXONOMY.ar.md)  
+> **المرجعية الدستورية:** نابع ومفسر لبنود `CONSTITUTION.md` (جذر مساحة العمل) و [`ARTIFACT_TAXONOMY.ar.md`](ARTIFACT_TAXONOMY.ar.md)  
 > **النطاق الإداري والتنفيذي:** كامل مسار العمل `/Volumes/data/projects/crewloom/` وكافة الوكلاء الأذكياء والمهندسين.
 
 ---
