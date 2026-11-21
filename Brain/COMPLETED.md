@@ -1,5 +1,11 @@
 # Completed work
 
+### 2026-11-21 — Workspace layout and project registry
+
+- Artifact: `.crewloom/registry/projects.json`, `.crewloom/bin/find.mjs`, `.crewloom/bin/check-layout.mjs`, `.crewloom/README.md` (workspace root, not a git repo). Side projects moved to `labs/`, output and backups to `artifacts/`, all git worktrees to `.crewloom/work/worktrees/` through `git worktree move`.
+- Evidence: git status was identical before and after each worktree move; diff and untracked-file backups are in `.crewloom/archive/backups/`; `check-layout.mjs` reports 0 errors and 1 warning (`agent-rel`, a standalone clone, not a worktree).
+- Status: other tools' folders (`.agent`, `.agents`, `.claude`, `.github`, `.cursor`, `.windsurf`) were left untouched on purpose. `data/` and `models/` at the root are not yet assigned to a project. `agent-wt-green` and `agent-release-0396` look like duplicates of `agent-scroll` and are kept until the owner approves deletion. `.claude/launch.json` still names `agent-wt-perm` and `agent-wt-ui`, which no longer exist. The root `.crewloom` files are not versioned yet.
+
 ### 2026-11-21 — Native NVIDIA SkillEvaluator Tier 1 core, smart hooks, and Tier 3 runtime lift
 
 - Artifact: `agent/packages/crewloom/contracts/src/skill-quality.ts`, `skill-security-scan.ts`, `skill-harness-check.ts`, `skill-evaluation.ts`, `skills/src/skill-reader.ts`, `skill-lift-runner.ts`, `skill-evaluation-ledger.ts`, `skill-evaluate-tool.ts`, NOTICE. Pure TypeScript port of Tier 1 quality scoring (4 dimensions: Correctness 35%, Discoverability 25%, Reliability 25%, Efficiency 15%, 70/100 gate), security scanning (PII & Unicode smuggling detection), multi-harness rules (Claude Code, Codex, Copilot CLI, Hermes, OpenClaw, OpenCode), automatic hooks with content-hash caching, loader gate, agent self-fix diagnostics loop, and Tier 3 native skill lift on the agent runtime without Docker, pip, or Python.

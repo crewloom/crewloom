@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.24 — 2026-11-21
+
+- Record the workspace layout change in `Brain/COMPLETED.md`: project registry in `.crewloom/`, side projects in `labs/`, generated output in `artifacts/`, worktrees in `.crewloom/work/worktrees/`, with the open items.
+
 ## 0.9.23 — 2026-11-12
 
 - Record the task-capsule bench in the ideas vault: graph-located code windows given up front solved 8 of 20 frozen tasks versus 12 with free reading, at 25% more cost; rejected as built, other variants untested.
