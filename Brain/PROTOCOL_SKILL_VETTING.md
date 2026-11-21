@@ -97,6 +97,62 @@ The 12 REJECTs and why (none is judged malicious here; each needs reading and a 
 
 Against the evasion list from the council review (process substitution, continued-line pipes, quote-split paths, `Path.home()` joins, fetch-and-follow prose, synonym injection, decode-to-python, `exec(r.text)`, Arabic injection, fullwidth letters, soft hyphen), none of the 9 I tried against the earlier scanner reached HIGH (one reached MEDIUM), and the current scanner reaches HIGH on all 13 in the test corpus. That corpus was written by the same author as the rules, so it measures regression, not recall against an unknown attacker.
 
+## Accredited Ecosystems & Upstream Update Protocol (Stage E)
+
+Accredited skills from premier AI ecosystems (Google, Cloudflare, Anthropic, Vercel) follow a continuous tracking, rigorous multi-tier evaluation, and safe update protocol orchestrated via `scripts/skills-scout.py`.
+
+### 1. Recognized Accredited Ecosystems
+
+| Ecosystem | Official Providers & Upstream Sources | Scope & Standard Libraries | Accreditation Tier |
+|---|---|---|---|
+| **Google** | `google-gemini/gemini-agent-platform-skills`, Data Agent Kit (`data-agent-kit-plugin`), Antigravity SDK, Android CLI, Chrome DevTools | Agent Platform (Flywheel, Skill Registry, Prompt Management, RAG), Cloud WAF & Solution Security, BigQuery/Spark/Dataflow pipelines | **Accredited Tier 1** |
+| **Cloudflare** | `cloudflare/agents`, `cloudflare/skills`, `cloudflare/workers-sdk` | Agents SDK, Workers Best Practices, Durable Objects, Cloudflare Email, Wrangler, Web Perf | **Accredited Tier 1** |
+| **Anthropic** | `anthropics/skills`, Claude Code synced catalogs | Document processors (`docx`, `pdf`, `pptx`, `xlsx`), `doc-coauthoring`, `web-artifacts-builder` | **Accredited Tier 1** |
+| **Vercel** | `vercel-labs/agent-skills` | Next.js architecture, React 19 composition patterns, View Transitions | **Accredited Tier 1** |
+| **Crewloom** | First-Party (`crewloom-*`, `pulse-hrpe-dev`) | Pulse Engine, Memory Guard, Release Verifier, Explain | **First-Party Authoritative** |
+
+### 2. Multi-Tier Evaluation Matrix
+
+Every candidate or updated skill is evaluated through a 3-tier quality and safety matrix:
+
+1. **Tier 1: Static AST & Pattern Vetting (`scripts/vet-skill.py`)**
+   - Scans code and markdown for prohibited patterns: remote execution pipes (`curl | sh`), decode-exec, privilege escalation (`sudo`), credential harvesting (`~/.ssh`, `OPENAI_API_KEY`), prompt injection in English and Arabic, hidden zero-width unicode, and executable binaries.
+   - Non-malicious documentation matches require an explicit, cryptographic waiver in `SOURCE.md`: `waiver: <rel_path> | <file_sha256> | <reason>`.
+2. **Tier 2: Aggregate Digest Integrity & Pinning (`scripts/skill-pins.py` & `skills-lock.json`)**
+   - Computes deterministic SHA256 digest over the entire file tree (excluding `SOURCE.md` and `.DS_Store`).
+   - Verifies zero file drift between local disk, `SOURCE.md`, and `skills-lock.json`.
+3. **Tier 3: Runtime Contract Verification & Behavioral Evaluation (`SkillEvaluator`)**
+   - NVIDIA SkillEvaluator / contracts runner tests behavioral performance and tool-guard boundaries.
+   - Quality scoring (0-100) incorporates security clearance, token budget (target <= 5,000 tokens), reference completeness, and provenance.
+
+### 3. Upstream Auto-Update Protocol
+
+When upstream repositories publish improvements or security patches:
+
+```mermaid
+flowchart TD
+    Upstream[Upstream Provider Release / Commit] --> Monitor["scripts/skills-scout.py check-updates"]
+    Monitor --> Drift{Drift Detected?}
+    Drift -- No --> Pinned[Up-to-Date / Pass]
+    Drift -- Yes --> Stage[Fetch Candidate to Sandbox]
+    Stage --> Vet["scripts/vet-skill.py --json"]
+    Vet --> Eval{Any Unwaived High?}
+    Eval -- Yes --> Quarantine[Quarantine Update & Notify Operator]
+    Eval -- No --> Rehash[Compute New Manifest SHA256]
+    Rehash --> UpdateSource[Update SOURCE.md commit + manifest + date]
+    UpdateSource --> UpdateLock[Update skills-lock.json]
+    UpdateLock --> SyncLinks["scripts/skills-sync.sh link"]
+    SyncLinks --> Ledger[Log into .agent/skills/.update-ledger.json]
+    Ledger --> Ready[Production Ready & Green]
+```
+
+- **CLI Operations:**
+  - `python3 -I scripts/skills-scout.py scout [provider]` - Discover all skills across project and provider plugins.
+  - `python3 -I scripts/skills-scout.py evaluate [skill|all]` - Run full evaluation matrix and quality scores.
+  - `python3 -I scripts/skills-scout.py check-updates [skill|all]` - Check for upstream drift or new releases.
+  - `python3 -I scripts/skills-scout.py update <skill|all>` - Safely vet, update manifests, and re-sync across all agent tools.
+  - `python3 -I scripts/skills-scout.py accredit <skill|all>` - Authoritatively pin accredited skills.
+
 ## Limits
 
 - False positives (mentions in documentation) and false negatives (anything outside the rules, and semantic manipulation).
