@@ -22,7 +22,7 @@ Source-derived reference; current public scope and tool support are defined in t
 [تعدين شكاوى العملاء: تقييمات Google Maps و Trustpilot لعملاء المنافسين]
                                  │
                                  ↓
-[صياغة العرض المضاد لCrewloom: The Rumuze Counter-Offer Blueprint]
+[صياغة العرض المضاد لCrewloom: The Crewloom Counter-Offer Blueprint]
 ```
 
 ---
@@ -36,6 +36,6 @@ Source-derived reference; current public scope and tool support are defined in t
 للعميل أو قرار تسعير. أي ادعاء ربحية فعلي لازم يتأسس على دليل صرف/تحويل/هامش حقيقي،
 مش على مدة العرض وحدها (راجع `anti_ai_randomness_guardrails.md` (project-supplied: `anti_ai_randomness_guardrails.md`)).
 
-## 🛡️ 2. مبادئ التفوق التنافسي لرموز:
+## 🛡️ 2. مبادئ التفوق التنافسي لـ Crewloom:
 1. لا ندخل في حرب أسعار خاسرة على الإطلاق (Never compete on bottom-barrel pricing).
 2. نتفوق دائماً في: **السرعة المحددة (6 أسابيع)**، **جودة الكود (Clean Architecture)**، و **الأتمتة المدمجة**.
