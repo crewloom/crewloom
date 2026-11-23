@@ -21,7 +21,7 @@
 - المستبعد: `screenshot-to-code` (اتجاه معاكس + تكلفة) — مسجل سبباً لا تجاهلاً.
 
 ## دليل التجربة الحية (Trial — منفذ فعلاً قبل الاعتماد)
-- **الأمر:** `capture_views.py --url http://localhost:3005/ar/comparison --out /tmp/shot` على قالب `rumuze-mvp-boilerplate`.
+- **الأمر:** `capture_views.py --url http://localhost:3005/ar/comparison --out /tmp/shot` على قالب `mvp-boilerplate`.
 - **المخرج الفعلي:** 3 لقطات (1440/768/390) + `report.json` (overflow=0 على المقاسين + عدّ `<bdi>`).
 - **النتيجة:** اكتشاف حقيقي (جدول 385px مسحوق على 390) → إصلاح (كروت مكدسة) → إعادة قياس (كروت ظاهرة/جدول مخفي على 390، والعكس على 1440) — الحلقة الكاملة خضراء بتاريخ 2026-09-24/25.
 - **القيود:** Playwright مثبّت system-wide (`--break-system-packages`) لا `.venv` — موثق في قسم المتطلبات.
