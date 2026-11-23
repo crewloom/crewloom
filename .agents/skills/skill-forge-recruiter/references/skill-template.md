@@ -1,4 +1,4 @@
-# قالب مهارة رموز المعتمد (Rumuze Skill Template)
+# قالب المهارة المعتمد (Skill Template)
 
 ```markdown
 ---

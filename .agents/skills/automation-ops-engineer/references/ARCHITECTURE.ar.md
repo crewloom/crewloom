@@ -9,7 +9,7 @@ Source-derived reference; current public scope and tool support are defined in t
   → [check_workflow_contract.py = PASS] → [Post-Flight: COMPLETED + TODO]
 ```
 
-- الملكية: `02_Marketing` (التسويق والنمو)، تنفيذ IT-مساند. الأصول: `02_Marketing/Automation-n8n/workflows/` + `docker-compose.yml` (حاوية `rumuze_n8n`).
+- الملكية: `02_Marketing` (التسويق والنمو)، تنفيذ IT-مساند. الأصول: `02_Marketing/Automation-n8n/workflows/` + `docker-compose.yml` (حاوية `n8n`).
 - الحارس: `scripts/check_workflow_contract.py` — بوابة كل إصدار/استيراد قبل أي commit.
 
 ## جدول الفصل عن الأقران (يمنع تداخل الزنادات)

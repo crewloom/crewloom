@@ -41,7 +41,7 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
 
 ## 🛠️ إجراء التنفيذ (خطوات مرقمة بمعايير قبول)
 
-1. **الاستهداف:** حدد القطاع/الحجم المطابق لعملاء رموز الحاليين (SaaS، لوجستيات،
+1. **الاستهداف:** حدد القطاع/الحجم المطابق لعملاء Crewloom الحاليين (SaaS، لوجستيات،
    B2B services) — لا استهداف عشوائي بلا معيار.
    - القبول: قائمة بريدها استهداف محدد (industry + company size)، ليست عامة.
 2. **التأهيل (BANT):** طبّق المعايير الأربعة من `Lead_Qualification_Framework.md` (project-supplied: `Lead_Qualification_Framework.md`)

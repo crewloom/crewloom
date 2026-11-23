@@ -10,7 +10,7 @@ Source-derived reference; current public scope and tool support are defined in t
   → [تسجيل: README + MASTER_BRAIN + COMPLETED] → [موظف عامل]
 ```
 
-معيار المهارة = قالب [`references/rumuze-skill-template.md`](rumuze-skill-template.md)
+معيار المهارة = قالب [`references/skill-template.md`](skill-template.md)
 + حوكمة `AGENTS.md` (لا حشو، لا أرقام مخترعة، كود executable فقط).
 ملكية التوظيف: `05_Admin/HR` — والمهارة نفسها موظف تاسع في الأسطول.
 
