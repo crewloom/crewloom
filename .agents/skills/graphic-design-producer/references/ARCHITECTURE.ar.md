@@ -5,7 +5,7 @@ Source-derived reference; current public scope and tool support are defined in t
 # 🏛️ معمارية مهارة إنتاج الجرافيك (Graphic Design Producer Architecture)
 
 ```
-[طلب أصل بصري] → تحديد المصدر (هوية رموز / هوية عميل)
+[طلب أصل بصري] → تحديد المصدر (هوية Crewloom / هوية عميل)
       │
       ├── أصل جديد (بنر/كاروسيل/موك أب) ──→ design-tokens.json أو أصول العميل الموثقة
       │        → بناء SVG → تحقق بصري في المتصفح → تسليم
@@ -17,7 +17,7 @@ Source-derived reference; current public scope and tool support are defined in t
 ```
 
 ## مصادر الحقيقة الوحيدة (Single Sources of Truth)
-- ألوان/خطوط هوية رموز: `03_Design/Branding/design-tokens.json` (project-supplied: `design-tokens.json`).
+- ألوان/خطوط هوية Crewloom: `03_Design/Branding/design-tokens.json` (project-supplied: `design-tokens.json`).
 - مقاسات المنصات وأنماط القوالب: `03_Design/Graphics/Design_System_Templates.md` (project-supplied: `Design_System_Templates.md`).
 - ألوان/خطوط هوية عميل: فقط الأصول الفعلية الموجودة في مجلد العميل داخل `04_Clients/Active/` (project-supplied: `Active`) — لا افتراض، لا استنتاج من الذاكرة.
 
