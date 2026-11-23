@@ -951,7 +951,7 @@
     "scripts/test_production_acceptance_boundaries.py": "0bf825e9104b4caba384ece1ebccc22ba24f7a3f57db3a2fd65901bd0e98d97e",
     "scripts/test_program_ledger.py": "9e4d5c8023614831d4090b71c52ac3a211218d20d6ad4edf0e8cf0174751bf21",
     "scripts/test_program_ledger_paths.py": "4baa1454706a9859b4d0bc0bd56e8f92e298339d0fc22c7dfbcac6b9f6d6fdab",
-    "scripts/test_project_binding.py": "f3c3a6f33aec21a58821acd5a6d1d4ccf8b980273c52925bd5e6f3590b905b19",
+    "scripts/test_project_binding.py": "c5b18d35ada73e21683bfa3af48ee2d816364f0cccfdef3f350361e4d667b24b",
     "scripts/test_project_catalog.py": "e7457f2e0f056e1d7cabac1f111676257136f842087206574d9e69d1cd043d1d",
     "scripts/test_project_lessons.py": "528459b785f954fce2342ea05a02bd851775ad503e41db0d8cc01c707e67aa0f",
     "scripts/test_project_lifecycle.py": "854abb2810c7907ce84b169b09cba0c20291a3159bcecc583e3e030c76feaeec",
