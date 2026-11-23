@@ -1,53 +1,27 @@
 <p align="center"><img src="assets/crewloom-banner.svg" alt="Crewloom: Give agent work a role, memory, and evidence." width="100%" /></p>
 
 <p align="center">
-<a href="https://github.com/elbayoumi/crewloom/actions/workflows/ci.yml"><img src="https://github.com/elbayoumi/crewloom/actions/workflows/ci.yml/badge.svg" alt="Repository checks" /></a>
-<a href="https://github.com/elbayoumi/crewloom/releases/latest"><img src="https://img.shields.io/github/v/release/elbayoumi/crewloom?color=2ea44f&label=release" alt="Latest Release" /></a>
+<a href="https://github.com/crewloom/crewloom/actions/workflows/ci.yml"><img src="https://github.com/crewloom/crewloom/actions/workflows/ci.yml/badge.svg" alt="Repository checks" /></a>
+<a href="https://github.com/crewloom/crewloom/releases/latest"><img src="https://img.shields.io/github/v/release/crewloom/crewloom?color=2ea44f&label=release" alt="Latest Release" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="Apache-2.0" /></a>
 <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB" alt="Python 3.9 or later" />
 <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Protocol-purple" alt="Model Context Protocol" /></a>
-<a href="https://github.com/elbayoumi/crewloom/stargazers"><img src="https://img.shields.io/github/stars/elbayoumi/crewloom?style=social" alt="GitHub stars" /></a>
+<a href="https://github.com/crewloom/crewloom/stargazers"><img src="https://img.shields.io/github/stars/crewloom/crewloom?style=social" alt="GitHub stars" /></a>
 </p>
 
 <p align="center"><a href="README.ar.md">العربية</a> · <a href="documentation/SKILLS.md">47 Roles</a> · <a href="documentation/TOOLS.md">Tool Catalog</a> · <a href="examples/README.md">Run Examples</a> · <a href="dashboard/README.md">Live Dashboard</a> · <a href="CONTRIBUTING.md">Contribute</a></p>
 
 Crewloom is a repository-native toolkit for specialist AI agent work. Choose a role, give it your project inputs, keep working memory, and check the result with local tools. Use your existing agent host and model.
 
-The toolkit brings together **47 English role guides**, **156 detailed reference documents**, **20 catalogued Python tools**, and **five memory templates per role**. English is the primary entry point; detailed source playbooks include Arabic. Context packs and task instructions support English or Arabic. See [language support and paired acceptance](documentation/LANGUAGES.md) for UI behavior and runtime boundaries.
+The toolkit brings together **47 English role guides**, **169 reference Markdown files (including language variants)**, **24 registered tools**, and **five memory templates per role**. English is the primary entry point; detailed source playbooks include Arabic. Context packs and task instructions support English or Arabic. See [language support and paired acceptance](documentation/LANGUAGES.md) for UI behavior and runtime boundaries.
 
 Managed workflows add project and checkout identities, frozen context, isolated Docker acceptance, credential-scoped review, and concurrent task worktrees. [Native lifecycle setup](documentation/HOST_LIFECYCLE.md) connects supported host callbacks; [agency readiness](documentation/READINESS.md) reports client evidence without modifying client projects. See [enforcement boundaries](documentation/ENFORCEMENT.md) for what each execution path actually covers.
 
 The optional [project task MCP bridge](documentation/MCP_BRIDGE.md) gives Cursor, Windsurf, Codex, and other MCP hosts read-only project context, workflow packets, and verified configuration templates (see [examples/mcp/README.md](examples/mcp/README.md)).
 
-## Accredited Agent Skills Ecosystem (Google · Cloudflare · Anthropic · Vercel)
+## Roles and external skills
 
-Crewloom governs an authoritative registry of **80+ accredited skills** across major cloud AI ecosystems, backed by a deterministic 3-tier vetting matrix and automated upstream synchronization (`scripts/skills-scout.py`):
-
-- **Google Cloud & AI Platform (41 Skills):** Full Data Agent Kit (DAK: BigQuery, Spark, Dataproc, Dataflow, Dataform, dbt), Agent Platform (Eval Flywheel, Skill Registry, Prompt Management, RAG Engine), Cloud Security & Model Armor, Android CLI, Chrome DevTools, and Antigravity SDK.
-- **Cloudflare Edge (8 Skills):** Agents SDK, Workers Best Practices, Durable Objects, Cloudflare Email Service, Next.js on Cloudflare, Workers Profiling, and Wrangler.
-- **Anthropic Office Suite & Artifacts (6 Skills):** High-precision document authoring (`docx`, `pdf`, `pptx`, `xlsx`), `doc-coauthoring`, and `web-artifacts-builder`.
-- **Vercel Web Patterns:** Next.js architecture, React 19 composition patterns, and View Transitions.
-- **Crewloom Core (47 Specialist Roles):** Autonomous multi-agent squads, Zero-Destruction execution guards, and vector-backed role memory.
-
-### Skills Governance & Upstream Sync CLI
-
-```bash
-# Scout all accredited skills across ecosystems (Google, Cloudflare, Anthropic)
-python3 -I scripts/skills-scout.py scout google
-
-# Evaluate skills through the 3-Tier Quality & Security Matrix (AST Vet + Manifest Integrity)
-python3 -I scripts/skills-scout.py evaluate all
-
-# Monitor upstream repositories for updates, new releases, or manifest drift
-python3 -I scripts/skills-scout.py check-updates all
-
-# Safely update an accredited skill with automated re-vetting and ledger logging
-python3 -I scripts/skills-scout.py update <skill_name>
-
-# Verify pin integrity and link skills across all agent IDEs (Claude, Codex, Antigravity)
-python3 -I scripts/skill-pins.py check
-./scripts/skills-sync.sh link
-```
+The shipped role inventory contains 47 role guides. External skills are separate project inputs, not additional shipped roles or vendor accreditation. This checkout does not ship the previously advertised skills-scout.py, skill-pins.py or skills-sync.sh commands. Do not use those commands until an implementation is provided and tested.
 
 ## Quickstart in 20 seconds
 
@@ -124,18 +98,13 @@ flowchart TD
 
 ## Framework comparison
 
-| Dimension | Crewloom | CrewAI | AutoGen (AG2) | LangGraph |
-| :--- | :--- | :--- | :--- | :--- |
-| **Architecture** | **Repository-native toolkit**; standard library Python 3.9+; brings 47 roles to existing hosts. | Standalone framework; heavy dependencies (Pydantic, LiteLLM); role-playing simulation. | Multi-agent conversation runtime; message-passing loops; code-extraction execution. | Graph-based state machine library; deeply coupled to LangChain ecosystem. |
-| **Memory & Vector Recall** | **3-tier structured memory** (`Brain/`, role brains, project context); hash-anchored code ranges; evidence-gated lessons. | ChromaDB vector store + SQLite; generic chunk search without line-hash verification. | Conversational chat history buffer; optional external RAG plugins; no repository brain. | State channel checkpointers (Memory/Postgres); vector search deferred to external stores. |
-| **Isolation & Security** | **Docker sandbox (`--network none`)**; read-only snapshots; transactional publication with rollback journals. | Host OS execution by default; optional Docker without strict network or file isolation. | Optional Docker code executor; network enabled by default; no transactional rollback. | No built-in sandbox; executes directly on host or requires manual third-party sandbox setup. |
-| **Orchestration** | **Deterministic DAG workflows**; concurrent Git worktrees; credential-reviewed `--ff-only` integration. | Sequential / hierarchical delegation; prone to unbounded agent chatter and loops. | Conversational group chats; prone to repetitive chatter and missed termination conditions. | Explicit stateful graphs with cycles and conditional edges; boilerplate-intensive. |
-| **Developer Experience** | **Zero friction**: 1-line quickstart (`quickstart.sh`), instant 20-second offline demo (`crewloom demo`), zero API keys needed. | High setup friction; large dependency tree; mandatory paid API key for hello-world. | Requires virtualenv, `OAI_CONFIG_LIST` configuration, and active LLM credentials. | Requires multi-package installation, model credentials, and complex graph wiring. |
-| **AI IDE & MCP** | **Native stdio MCP bridge** with fine-grained security flags for Cursor, Windsurf, and Codex. | No repository MCP server; relies on standalone Python execution scripts. | Client-side tool consumer only; does not expose repo context or task packets to IDEs. | Client-side tool consumer; lacks repository-native MCP server for AI IDEs. |
-| **Local AI Sovereignty** | **100% local and offline**; native loopback gateways for Ollama & vLLM; zero telemetry; local dashboard. | Pushes toward CrewAI Enterprise / cloud monitoring. | Standalone library; optional cloud extensions. | Strongly coupled with LangSmith cloud monitoring and LangGraph Cloud. |
-| **Framework Interop** | **Universal Zero-Trust Sandbox**; drop-in standard-library adapters for CrewAI, AutoGen, and LangGraph (`adapters/interop/`). | Siloed execution; no drop-in sandboxing export. | Siloed execution; external code executor requires complex configuration. | Node-based; requires custom sandbox engineering. |
+Crewloom is a repository-native role toolkit with a scoped managed executor, not a replacement for every agent framework. Comparison depends on version and configuration. No comparative reliability or speed benchmark is established here.
 
-See the [Local AI Sovereignty Guide](documentation/LOCAL_AI_SOVEREIGNTY.md) and [Cross-Framework Interoperability Guide](documentation/INTEROP.md) for architecture details.
+- CrewAI supports local Ollama models; a paid API key is not universally required. [Official configuration](https://docs.crewai.com/v1.11.0/en/learn/llm-connections).
+- LangGraph can run standalone without LangChain or a cloud service. [Official overview](https://docs.langchain.com/oss/python/langgraph/overview).
+- Microsoft AutoGen and AG2 are separate projects and must be evaluated separately.
+- Crewloom controls apply to managed paths only. See [enforcement boundaries](documentation/ENFORCEMENT.md).
+
 
 ## Execute a software workflow
 
@@ -167,7 +136,7 @@ Use the [software task plan](workflows/software-feature.json) for agent-produced
 Requires Git and Python 3.9+. The Python core uses the standard library; isolated workflows additionally require Docker.
 
 ```bash
-git clone https://github.com/elbayoumi/crewloom.git
+git clone https://github.com/crewloom/crewloom.git
 cd crewloom
 python3 scripts/crewloom.py tools
 python3 scripts/crewloom.py run workflow-contract -- examples/workflows/valid.json
@@ -218,7 +187,7 @@ See [evidence from real projects](documentation/EVIDENCE.md), including a false 
 For contributing or preparing a release, use the [verification checklist](documentation/RELEASE.md).
 
 The [scientific manuscript gate](documentation/SCIENTIFIC_VERIFICATION.md) distinguishes structure checks from evidence review and blocks publication approval while scientific verification is unavailable. [دليل التحقق العلمي بالعربية](documentation/SCIENTIFIC_VERIFICATION.ar.md).
-The current package metadata is `0.8.0`; check the repository's release tags for what has been published.
+The current package metadata is `0.9.24`; check the repository's release tags for what has been published.
 
 Follow the [workflow recipes](documentation/WORKFLOWS.md) for role order, inputs, and acceptance evidence. Roles guide your agent; specialist platforms and project assets remain project inputs.
 

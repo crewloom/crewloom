@@ -1,5 +1,7 @@
 # Executable tool catalog
 
+There are 24 registered tools in the reviewed 0.9.24 checkout. The CLI list, not every Python module in this document, defines `run` dispatch.
+
 Run `python3 scripts/crewloom.py tools` to list these tools. `run` dispatches only registered paths; arguments after `--` go to the selected tool. Core tools use the Python standard library.
 
 | Tool | Purpose | Arguments |
@@ -27,18 +29,17 @@ Run `python3 scripts/crewloom.py tools` to list these tools. `run` dispatches on
 
 For exact JSON contracts inspect the tool docstring and validation function. The source is linked directly above so the input contract is reviewable.
 
+| Tool | Purpose | Direct command |
+|---|---|---|
 | [workflow](../scripts/workflow.py) | Isolated software workflows and role handoff | `python3 scripts/crewloom.py workflow doctor` |
 
 Workflow execution requires Docker and a locally available image. See [execution](EXECUTION.md). Feature evaluation has a separate [benchmark contract](../examples/evaluation/unicode-slug/README.md).
 
+| Tool | Purpose | Direct command |
+|---|---|---|
 | [project-context](../scripts/project_binding.py) | Portable project identity, local checkout binding, lifecycle entry and finalization | `python3 scripts/crewloom.py project status --project /path/to/project --project-id id` |
-| [context-generations](../scripts/project_context.py) | Frozen per-task context with hash-validated code ranges | `python3 scripts/crewloom.py project enter --project /path/to/project --project-id id --task-id task --role context-guardian` |
 | [project-lessons](../scripts/project_lessons.py) | Evidence-linked lessons; promotion needs executor evidence | `python3 scripts/crewloom.py lesson list --project /path/to/project` |
-| [navigation-index](../scripts/repo_map.py) | Versioned project symbol index with verified reuse | `python3 scripts/crewloom.py map --project /path/to/git-project --query login` |
-| [syntax-resolution](../scripts/js_syntax.py) | Real JS/TS syntax trees and bounded project-local module resolution used by the navigation index | `python3 -c "import js_syntax; print(js_syntax.available())"` |
 | [context-pilot](../scripts/context_pilot.py) | Reproducible cold/warm pilot and context byte comparison | `python3 scripts/context_pilot.py --out /tmp/pilot.json` |
-| [reviewer-credentials](../scripts/reviewer_credentials.py) | Credential-verified reviewer identities with signed, scoped, revocable approvals | `python3 scripts/crewloom.py reviewer status --project /path/to/project` |
-| [resource-resolver](../scripts/crewloom_resources.py) | Resolves roles, documentation and dashboard sources in a checkout or an installed distribution | `python3 scripts/crewloom.py list` |
 | [agency-readiness](../scripts/agency_readiness.py) | Read-only evidence and rollout readiness for one explicitly registered project | `python3 scripts/agency_readiness.py --project-id sample-client --project-root /path/to/project --agency-root /path/to/agency --registry .agents/project-control/registry.json` |
 | [computer-use](../scripts/computer_use.py) | Claude-compatible Computer Use Tool engine supporting mouse, keyboard, scrolling, screenshots, and Chrome Tab Groups background browsing | `python3 scripts/crewloom.py run computer-use -- --schema` |
 
@@ -67,3 +68,15 @@ expands variables. Paths remain project-relative. Context report defaults use `c
 `context-pilot.json` within the selected project. Project lifecycle, lesson and agency-readiness
 tools require explicit identities/external roots via their documented CLI; the dashboard labels
 these tools CLI-only and refuses execution rather than presenting incompatible Run defaults.
+
+## Supporting modules and direct CLI entrypoints
+
+These modules are not registered names accepted by `crewloom run`. Follow each documented direct command instead.
+
+| Module | Purpose | Direct command |
+|---|---|---|
+| [context-generations](../scripts/project_context.py) | Frozen per-task context with hash-validated code ranges | `python3 scripts/crewloom.py project enter --project /path/to/project --project-id id --task-id task --role context-guardian` |
+| [navigation-index](../scripts/repo_map.py) | Versioned project symbol index with verified reuse | `python3 scripts/crewloom.py map --project /path/to/git-project --query login` |
+| [syntax-resolution](../scripts/js_syntax.py) | Real JS/TS syntax trees and bounded project-local module resolution used by the navigation index | `python3 -c "import js_syntax; print(js_syntax.available())"` |
+| [reviewer-credentials](../scripts/reviewer_credentials.py) | Credential-verified reviewer identities with signed, scoped, revocable approvals | `python3 scripts/crewloom.py reviewer status --project /path/to/project` |
+| [resource-resolver](../scripts/crewloom_resources.py) | Resolves roles, documentation and dashboard sources in a checkout or an installed distribution | `python3 scripts/crewloom.py list` |

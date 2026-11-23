@@ -3,50 +3,25 @@
 <p align="center"><img src="assets/crewloom-banner.svg" alt="Crewloom: أدوار، ذاكرة، وأدلة لوكلاء الذكاء الاصطناعي" width="100%" /></p>
 
 <p align="center">
-<a href="https://github.com/elbayoumi/crewloom/actions/workflows/ci.yml"><img src="https://github.com/elbayoumi/crewloom/actions/workflows/ci.yml/badge.svg" alt="Repository checks" /></a>
-<a href="https://github.com/elbayoumi/crewloom/releases/latest"><img src="https://img.shields.io/github/v/release/elbayoumi/crewloom?color=2ea44f&label=release" alt="Latest Release" /></a>
+<a href="https://github.com/crewloom/crewloom/actions/workflows/ci.yml"><img src="https://github.com/crewloom/crewloom/actions/workflows/ci.yml/badge.svg" alt="Repository checks" /></a>
+<a href="https://github.com/crewloom/crewloom/releases/latest"><img src="https://img.shields.io/github/v/release/crewloom/crewloom?color=2ea44f&label=release" alt="Latest Release" /></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="Apache-2.0" /></a>
 <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB" alt="Python 3.9 or later" />
 <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Protocol-purple" alt="Model Context Protocol" /></a>
-<a href="https://github.com/elbayoumi/crewloom/stargazers"><img src="https://img.shields.io/github/stars/elbayoumi/crewloom?style=social" alt="GitHub stars" /></a>
+<a href="https://github.com/crewloom/crewloom/stargazers"><img src="https://img.shields.io/github/stars/crewloom/crewloom?style=social" alt="GitHub stars" /></a>
 </p>
 
 <p align="center"><a href="README.md">English</a> · <a href="documentation/SKILLS.md">47 دوراً</a> · <a href="documentation/TOOLS.md">دليل الأدوات</a> · <a href="examples/README.md">أمثلة التشغيل</a> · <a href="dashboard/README.md">لوحة التحكم الحية</a> · <a href="CONTRIBUTING.md">المساهمة</a></p>
 
 أدوات وإجراءات لتنظيم شغل وكلاء الذكاء الاصطناعي داخل الريبو: تختار الدور، توفر بيانات المشروع، تحفظ الذاكرة، وتفحص المخرجات.
 
-- **47 دليل دور بالإنجليزية** و**156 مراجع تفصيلية** تتضمن إجراءات المصدر بالعربية.
-- **20 أداة Python** للفحوص والسياق وقياس الموارد والتوقيت والإنفاق.
+- **47 دليل دور بالإنجليزية** و**169 ملف Markdown مرجعي (بما فيها النسخ اللغوية)** تتضمن إجراءات المصدر بالعربية.
+- **24 أداة مسجلة** للفحوص والسياق وقياس الموارد والتوقيت والإنفاق.
 - خمس ملفات ذاكرة لكل دور، وفحوص قبل الـcommit وفي GitHub Actions.
 
-## منظومة المهارات السحابية المعتمدة (Google · Cloudflare · Anthropic · Vercel)
+## الأدوار والمهارات الخارجية
 
-يحكم Crewloom سجلاً رسمياً يضم **أكثر من 80 مهارة معتمدة ومؤمنة** عبر كبرى المنظومات السحابية للذكاء الاصطناعي، مدعومة بمصفوفة تقييم ثلاثية المستويات ومحرك تحديث تلقائي آمن (`scripts/skills-scout.py`):
-
-- **منظومة Google Cloud & AI Platform (41 مهارة):** حزمة Data Agent Kit كاملة (DAK: BigQuery, Spark, Dataproc, Dataflow, Dataform, dbt)، وأدوات Agent Platform (حلقة التقييم المستمر، سجل المهارات، حوكمة البوابات، RAG)، وأمان الوكلاء وModel Armor، إضافة إلى مهارات Android CLI وChrome DevTools وAntigravity SDK.
-- **منظومة Cloudflare Edge (8 مهارات):** حزمة Agents SDK، وأفضل ممارسات Workers، وDurable Objects، وWrangler، وتدقيق الأداء الويب (Web Perf)، وخدمة البريد السحابي.
-- **منظومة Anthropic & Vercel (7 مهارات):** المعالجة الدقيقة للمستندات (`docx`, `pdf`, `pptx`, `xlsx`)، والتأليف المشترك، وهندسة واجهات React وNext.js الفائقة.
-- **أدوار Crewloom التخصصية (47 دوراً):** فرق عمل متكاملة متعددة الوكلاء، وضمانات عدم التدمير (Zero-Destruction)، وذاكرة سياقية هجينة.
-
-### أوامر استكشاف وتقييم وتحديث المهارات (CLI)
-
-```bash
-# استكشاف جميع المهارات المعتمدة لمنظومة معينة (مثل Google أو Cloudflare)
-python3 -I scripts/skills-scout.py scout google
-
-# تقييم شامل لجميع المهارات عبر مصفوفة الفحص الساكن والبصمة التجميعية المشفرة
-python3 -I scripts/skills-scout.py evaluate all
-
-# مراقبة مستودعات المهارات المعتمدة لكشف أي تحديثات جديدة أو انحراف في الملفات
-python3 -I scripts/skills-scout.py check-updates all
-
-# تحديث آمن وتلقائي لأي مهارة معتمدة مع إعادة الفحص والتثبيت في سجل التدقيق
-python3 -I scripts/skills-scout.py update <skill_name>
-
-# التحقق من سلامة البصمات ومزامنة الروابط عبر بيئات Claude وCodex وAntigravity
-python3 -I scripts/skill-pins.py check
-./scripts/skills-sync.sh link
-```
+المتاح 47 دليل دور. المهارات الخارجية مدخلات منفصلة للمشروع، وليست أدواراً مشحونة إضافية أو اعتماداً من الشركات. الأوامر skills-scout.py وskill-pins.py وskills-sync.sh المذكورة سابقاً غير موجودة في هذا المستودع؛ لا تستخدمها قبل توفير التنفيذ واختباره.
 
 ## البدء السريع والعرض التفاعلي في 20 ثانية
 
@@ -121,27 +96,22 @@ flowchart TD
     Journal -.-> Dashboard
 ```
 
-## مقارنة أطر عمل الوكلاء
+## مقارنة الأطر
 
-| البُعد / الخاصية | Crewloom | CrewAI | AutoGen (AG2) | LangGraph |
-| :--- | :--- | :--- | :--- | :--- |
-| **المعمارية الأساسية** | **أدوات داخل المستودع مباشرة**؛ مكتبة بايثون القياسية (Python 3.9+)؛ تزوّد بيئات العمل الحالية بـ 47 دوراً تخصصياً. | إطار عمل تطبيقي مستقل؛ حزم ثقيلة (Pydantic, LiteLLM)؛ محاكاة أدوار فرق العمل. | بيئة محادثات متعددة الوكلاء؛ حلقات تبادل رسائل؛ استخراج الشيفرة وتشغيلها. | مكتبة آلات حالة رسومية؛ ارتباط وثيق بمنظومة LangChain. |
-| **تدرج الذاكرة والاسترجاع** | **ذاكرة هرمية ذات 3 طبقات** (`Brain/`، ذاكرة الأدوار، سياق المشروع المجمّد)؛ بصمات `sha256` للأسطر؛ دروس مُرقّاة بالأدلة فقط. | قاعدة متجهات (ChromaDB) وSQLite؛ بحث أجزاء نصية دون التحقق من بصمات أسطر الكود. | سجل رسائل المحادثة النصي؛ ملحقات RAG خارجية اختيارية؛ غياب هيكل الذاكرة المدمج. | نقاط تفتيش للحالة (Checkpointers)؛ تفويض استرجاع المتجهات لمكتبات خارجية. |
-| **عزل التنفيذ والأمان** | **عزل كامل داخل Docker (`--network none`)**؛ لقطات مدخلات للقراءة فقط؛ نشر معاملات دوري مع سجل تراجع واسترداد. | تنفيذ مباشر على نظام التشغيل المضيف؛ عزل Docker اختياري دون حظر صارم للشبكة أو سجل ملفات. | منفّذ Docker اختياري مع اتصال شبكي نشط افتراضياً؛ غياب سجل استرداد المعاملات. | غياب بيئة العزل المدمجة؛ تنفيذ مباشر على المضيف أو تفويض لمزودي بيئات خارجية. |
-| **هندسة التنسيق والتحكم** | **مسارات عمل حتمية (DAG)**؛ أشجار عمل Git متزامنة؛ دمج تكاملي بمراجعة موثقة وتقدم سريع (`--ff-only`). | تدفق تسلسلي أو هرمي؛ عرضة لحلقات المحادثة غير المنتهية وتكرار التوجيهات وهدر التوكنز. | محادثات جماعية حرة (GroupChat)؛ حساسية لانقطاع شروط التوقف واستمرار الحوار. | رسوم بيانية موجهة ذات حالات؛ دعم الحلقات المنضبطة والمقاطعة البشرية؛ كود ربط مكثف. |
-| **تجربة التطوير المحلي** | **انعدام الاحتكاك**: سكريبت `quickstart.sh` فوري، وعرض تفاعلي في 20 ثانية (`crewloom demo`) دون مفاتيح API. | احتكاك تثبيت عالٍ؛ حزم ضخمة؛ اشتراط مفاتيح API مدفوعة لتشغيل أول مثال تجريبي. | يتطلب إعداد بيئة افتراضية وضبط `OAI_CONFIG_LIST` ومفاتيح مزودي الخدمة. | يتطلب تثبيت حزم متعددة ومفاتيح نماذج وربط العقد البرمجية يدوياً. |
-| **التكامل مع بيئات IDE وMCP** | **خادم MCP مدمج عبر `stdio`** مع صلاحيات أمان دقيقة مخصصة لـ Cursor وWindsurf وCodex. | يفتقر لخادم MCP مدمج؛ يعتمد على تشغيل سكربتات خارجية. | يعمل كعميل لأدوات MCP فقط؛ لا يقدّم سياق المستودع أو حزم المهام للـ IDEs. | يعمل كعميل استدعاء أدوات فقط؛ يفتقر إلى جسر مهام مستودع موجه للبيئات البرمجية. |
-| **الاعتمادية والسيادة المحلية** | **100% محلي وبلا اتصال**؛ بوابات loopback أصلية لـ Ollama وvLLM؛ دون تتبع سحابي؛ لوحة تحكم محلية فورية. | توجيه متكرر نحو منصة CrewAI Enterprise السحابية. | مكتبة مستقلة مع ملحقات اختيارية. | ارتباط تجاري قوي بمنصة LangSmith السحابية للمراقبة والتقييم. |
-| **التوافق والتكامل المتبادل** | **بيئة عزل قياسية بدون ثغرات**؛ محولات جاهزة لـ CrewAI وAutoGen وLangGraph (`adapters/interop/`). | تنفيذ معزول عن باقي الأطر؛ غياب محولات التصدير. | بيئة مغلقة؛ يتطلب إعداد منفذ كود خارجي مخصص. | نمط عقد مخصص؛ يتطلب هندسة عزل يدوية كاملة. |
+Crewloom أدوات أدوار داخل المستودع مع تنفيذ مُدار محدود النطاق، وليس بديلاً لكل الأطر. تعتمد المقارنة على الإصدار والإعداد، ولا توجد هنا دراسة مقارنة تثبت تفوق السرعة أو الاعتمادية.
 
-راجع [دليل السيادة البرمجية والتشغيل المحلي](documentation/LOCAL_AI_SOVEREIGNTY.md) و[دليل التكامل بين أطر العمل](documentation/INTEROP.md) للتفاصيل المعمارية.
+- يدعم CrewAI نماذج Ollama المحلية، ولا يشترط دائماً مفتاح API مدفوعاً. [التوثيق الرسمي](https://docs.crewai.com/v1.11.0/en/learn/llm-connections).
+- يعمل LangGraph مستقلاً دون اشتراط LangChain أو خدمة سحابية. [التوثيق الرسمي](https://docs.langchain.com/oss/python/langgraph/overview).
+- Microsoft AutoGen وAG2 مشروعان منفصلان، ويجب تقييم كل منهما على حدة.
+- تقتصر ضوابط Crewloom على المسارات المُدارة. راجع [حدود التنفيذ](documentation/ENFORCEMENT.md).
+
 
 ## ابدأ عمليًا
 
 تحتاج Git وPython 3.9 أو أحدث.
 
 ```bash
-git clone https://github.com/elbayoumi/crewloom.git
+git clone https://github.com/crewloom/crewloom.git
 cd crewloom
 python3 scripts/crewloom.py tools
 python3 scripts/crewloom.py run workflow-contract -- examples/workflows/valid.json
@@ -176,7 +146,7 @@ crewloom dashboard
 
 الجسر الاختياري [Project Task MCP](documentation/MCP_BRIDGE.md) يربط الأدوات بمشروع ومهمة محددين؛ يحتاج Python 3.11+ وتثبيت `python -m pip install '.[mcp]'`. قوالب التهيئة المختبرة متوفرة لـ [Cursor](examples/mcp/cursor.json) و [Windsurf](examples/mcp/windsurf.json) (انظر [دليل إعداد MCP](examples/mcp/README.md)). القراءة هي الوضع الافتراضي، واستيراد الملفات والتحقق يحتاجان تفعيلًا صريحًا. [إضافة المتصفح](documentation/CHROME_EXTENSION_SIDE_PANEL.md) أدوات يدوية، و[قبول سطح المكتب](documentation/NATIVE_DESKTOP.md) محدود بتطبيق الاختبار المصرّح به.
 
-إصدار المصدر الحالي `0.8.0`؛ راجع وسوم الإصدارات في المستودع لمعرفة ما نُشر فعلاً. [قائمة التحقق للإصدار](documentation/RELEASE.md) تفصل اختبارات الكود عن أدلة جودة الأدوار وعن النشر الفعلي.
+إصدار المصدر الحالي `0.9.24`؛ راجع وسوم الإصدارات في المستودع لمعرفة ما نُشر فعلاً. [قائمة التحقق للإصدار](documentation/RELEASE.md) تفصل اختبارات الكود عن أدلة جودة الأدوار وعن النشر الفعلي.
 
 ## مسار برمجي قابل للتشغيل
 

@@ -1,19 +1,19 @@
 # Local AI Sovereignty Guide
 
-Crewloom provides **complete data and computation sovereignty**, allowing you to execute multi-agent software engineering workflows 100% offline with zero data leaving your machine or private VPC.
+Local operation is configuration-dependent. Use only locally installed models and disable remote providers and integrations for an offline deployment. Verify network behavior and data retention for that deployment; this guide is not a privacy or compliance guarantee.
 
 ---
 
 ## Why Local AI Sovereignty Matters
 
-Enterprise software engineering requires strict control over intellectual property and confidential data. Cloud-based LLM APIs present fundamental risks:
+Enterprise software engineering requires strict control over intellectual property and confidential data. Review cloud-based LLM APIs for these deployment-dependent risks:
 
-1. **Code Exfiltration**: Proprietary source code and architecture documents are sent over public networks to third-party model providers.
+1. **Code Exfiltration**: Requests may send source code and architecture details to configured third-party providers.
 2. **Telemetry & Log Retention**: Model vendors may log prompts, system instructions, and completion history for training or moderation.
-3. **Regulatory Non-Compliance**: GDPR, HIPAA, SOC 2, and defense regulations often forbid transmitting unencrypted source code outside designated geographic or organizational boundaries.
+3. **Compliance review**: Applicable contracts, laws and security controls depend on the deployment and data involved. This guide does not establish compliance.
 4. **API Outages & Vendor Lock-In**: Cloud outages halt developer velocity, and sudden pricing or model deprecations disrupt workflows.
 
-With Crewloom's **native loopback provider gateway**, you can run all 44 specialist agent roles entirely on local open-weights models using **Ollama** or **vLLM** with zero external pip dependencies.
+With Crewloom's **native loopback provider gateway**, you can run all 47 specialist agent roles entirely on local open-weights models using **Ollama** or **vLLM** with zero external pip dependencies.
 
 ---
 
@@ -28,18 +28,18 @@ With Crewloom's **native loopback provider gateway**, you can run all 44 special
 
 ## Recommended Open-Weights Models
 
-Crewloom has been benchmarked and verified with the following open-weights models:
+The following models are configuration suggestions, not a claim that every combination has been benchmarked. Record the model revision, hardware, prompts and results before making performance claims:
 
 ### 1. Code Generation & Architecture
-- **Qwen 2.5 Coder (32B / 14B / 7B)**: Exceptional Python, TypeScript, and Go code generation; adheres strictly to multi-step execution plans.
-- **DeepSeek Coder V2 (Lite / 236B)**: Superior algorithmic reasoning, repository map comprehension, and unit test synthesis.
+- **Qwen 2.5 Coder (32B / 14B / 7B)**: Candidate coding models.
+- **DeepSeek Coder V2 (Lite / 236B)**: Candidate coding models.
 
 ### 2. Deep Reasoning & Contract Verification
 - **DeepSeek R1**: Chain-of-thought verification for safety audits, formal contracts, and complex edge-case exploration.
 
 ### 3. General Orchestration & Review
-- **Llama 3.3 (70B Instruct)**: High instruction fidelity for role routing, workflow milestone tracking, and bilingual Arabic/English documentation.
-- **Mistral Small 24B**: Balanced footprint and fast inference for low-latency developer loops.
+- **Llama 3.3 (70B Instruct)**: Candidate instruction model.
+- **Mistral Small 24B**: Candidate instruction model.
 
 ---
 
@@ -87,7 +87,7 @@ python3 scripts/crewloom.py workflow doctor
 python3 scripts/crewloom.py workflow run --project ./my-app --plan workflows/my-plan.json
 ```
 
-All 44 agent roles, memory queries, and contract verifications will execute against your local Ollama instance with zero outbound internet traffic.
+This config selects local Ollama generation. The 47 role guides do not themselves enforce network isolation. Verify the complete workflow, tools and integrations before claiming offline operation.
 
 ---
 
@@ -146,7 +146,7 @@ Crewloom's provider gateway validates local endpoints to prevent Server-Side Req
 
 ## Offline Verification Checklist
 
-To prove complete offline sovereignty:
+To test an intended offline deployment:
 
 ```bash
 # 1. Unplug Ethernet or disconnect Wi-Fi
@@ -160,4 +160,4 @@ netstat -an | grep ESTABLISHED
 ss -tunap | grep ESTABLISHED
 ```
 
-You have complete independence: no tokens counted by third parties, no credit card billing, and 100% intellectual property containment.
+These checks are a starting point, not proof of complete data containment. Capture traffic, inspect dependencies and review logs and retention for the whole deployment.
