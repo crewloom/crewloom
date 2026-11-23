@@ -2,7 +2,7 @@
   "schema_version": 1,
   "project_id": "crewloom-public",
   "tooling": {
-    "vendor": "Rumuze",
+    "vendor": "Crewloom",
     "tool": "Crewloom",
     "role": "tooling",
     "owns_client_code": false

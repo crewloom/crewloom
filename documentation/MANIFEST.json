@@ -648,7 +648,7 @@
     "documentation/PROFESSIONAL_REVIEW.md": "9f80b082dfdbc584e2536df5bf93ce8155a8d44d4516b664b7ba4ede7dfc42ad",
     "documentation/PROJECTS.md": "ddf85464c1f0dde2f317ff83da31624d3f2373f8609f054bf56a7d9456d08668",
     "documentation/PROJECT_CATALOG.md": "b8cb58e00a6df6c322f2a82dec51475cf12cf5650aa37bde019e91d156aaea22",
-    "documentation/PROJECT_CONTEXT.md": "56fd4e4bad71651d165523b25ef2a3d164940dff338738535934ddf1a3368762",
+    "documentation/PROJECT_CONTEXT.md": "a3b75e7aebfd4ed6ef2b3ad198b7b79f02af6beb6527a55947e1a15e2283bb84",
     "documentation/PROJECT_INPUTS.md": "c12193b3459bbb3b816d8c5f56f98220c0bc070ee44ec5894b322900ba042218",
     "documentation/PROVENANCE.json": "d1f3f51d75b9c0db71ad408a5401d36b77ab281a2ebec2dab9533b82ed6a5393",
     "documentation/READINESS.md": "184bb98d3961966bd2579e9f39c20d3e9f09d8af2cabf99b876af73d1c534e32",
@@ -793,11 +793,11 @@
     "examples/evaluation/project-context-20261003/check.py": "d11e9ccd518cfd41367f1b440524fb8b6b758f7b257bf3c1483a7fabba2b2a8e",
     "examples/evaluation/project-context-20261003/crewloom-en/ACCEPTANCE.md": "aea79b55475d1456eabcfcd81956f05e6499ac671f79eb68b3aa5b7b5f96b17b",
     "examples/evaluation/project-context-20261003/crewloom-en/acceptance.json": "dc8f675737958fc6e770790023786fcc5c69f25107837b47cf495affd6f333cf",
-    "examples/evaluation/project-context-20261003/crewloom-en/project-config.json": "9bcb5b4b7de5d20021e2e873bed073a7cb9094414ea364226b1682acdc883825",
+    "examples/evaluation/project-context-20261003/crewloom-en/project-config.json": "887c3479a6fb88a1757c81a42856041a51c77690055a76196db33adef3c308fb",
     "examples/evaluation/project-context-20261003/crewloom-en/workflow.json": "41c59c250ba71b88ed016b497659ca7df60fd48f0ec69a81c570c391f2c560ef",
     "examples/evaluation/project-context-20261003/paperclip-ar/ACCEPTANCE.md": "aea79b55475d1456eabcfcd81956f05e6499ac671f79eb68b3aa5b7b5f96b17b",
     "examples/evaluation/project-context-20261003/paperclip-ar/acceptance.json": "16e84d7a074461557a25adcc996ecf90c561a3f2d05cfafde26fed7c63271b97",
-    "examples/evaluation/project-context-20261003/paperclip-ar/project-config.json": "25685b0b31989b6c474a742f54f6906b04eee1f99a9fbd9711c6f69568298947",
+    "examples/evaluation/project-context-20261003/paperclip-ar/project-config.json": "ed48ed47e97721837ea08c2e614bd421fb862255c694a44e68a1f116a79aaf1c",
     "examples/evaluation/project-context-20261003/paperclip-ar/workflow.json": "b0c743b17f4abca9ace49581a23ebe71606ddc4e390e14e5275ba362046e9d44",
     "examples/evaluation/project-context-20261003/results.json": "ca1fb138126e1e8bef1f1e2cf125530dca5369627a70ff72db5a34a44401d3c8",
     "examples/evaluation/unicode-slug/HOST_TRIALS.md": "69c66e17b75afbc0cb10515b13ab84857df3a7db19b19dc18357f41efe5fff0f",
@@ -875,7 +875,7 @@
     "scripts/package_browser.py": "dfc6077a451319ebb96aee5c2d355267acfaeef4cb76ed697f8f89d2a845b99e",
     "scripts/privacy.py": "36a0937f7c5b064e9a43ee82561c2b011428cb849891a9309d7e2a6fcc59d69e",
     "scripts/program_ledger.py": "20901576a41faeb13e9ac0e09207abfef85b033628b4f6733a571ba1fa491ff7",
-    "scripts/project_binding.py": "e2cf7d48653a6f7a9d077665288aa6fbba87f1e63e64b72be62b8bf4a25bd82f",
+    "scripts/project_binding.py": "2d405a29c3f922a29bb1e25f1f0beab9d0fcb7ad902e05a85f3d1503ecfac564",
     "scripts/project_context.py": "70eb3d470bdb45e1dc0098ed65f9dc3d86bf68614dfa10ba5b60c95737f3ec19",
     "scripts/project_lessons.py": "1db4c914ddcedb5d3e0741c0e2744a014de0ea024de52893225d324141c6a0b6",
     "scripts/provider_gateway.py": "43162276648c4dc683b6d01031dc3bb0dfd8d45f1ad6a8a50e2c1063e585036c",
@@ -951,7 +951,7 @@
     "scripts/test_production_acceptance_boundaries.py": "0bf825e9104b4caba384ece1ebccc22ba24f7a3f57db3a2fd65901bd0e98d97e",
     "scripts/test_program_ledger.py": "9e4d5c8023614831d4090b71c52ac3a211218d20d6ad4edf0e8cf0174751bf21",
     "scripts/test_program_ledger_paths.py": "4baa1454706a9859b4d0bc0bd56e8f92e298339d0fc22c7dfbcac6b9f6d6fdab",
-    "scripts/test_project_binding.py": "08b42c388bb66d096001f128c701ad6a74a94729a6a744677f95f507ffef6e2d",
+    "scripts/test_project_binding.py": "c5b18d35ada73e21683bfa3af48ee2d816364f0cccfdef3f350361e4d667b24b",
     "scripts/test_project_catalog.py": "e7457f2e0f056e1d7cabac1f111676257136f842087206574d9e69d1cd043d1d",
     "scripts/test_project_lessons.py": "528459b785f954fce2342ea05a02bd851775ad503e41db0d8cc01c707e67aa0f",
     "scripts/test_project_lifecycle.py": "854abb2810c7907ce84b169b09cba0c20291a3159bcecc583e3e030c76feaeec",
@@ -1000,4 +1000,4 @@
     "workflows/software-feature.json": "e6481e1532deae7a10204ebbb7ef58c94ccc7244202e1aef838ddb8f273ec290",
     "workflows/system-design.json": "5c31f8d74031baf9b7e078113f2127290171a2dbff836d47b5094b4964334117"
   }
-}
+  }

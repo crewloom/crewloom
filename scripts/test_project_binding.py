@@ -110,7 +110,7 @@ class ProjectBindingTests(unittest.TestCase):
     def test_portable_configuration_declares_tooling_not_client_ownership(self):
         self.enter()
         config = json.loads((self.root / pb.CONFIG_NAME).read_text())
-        self.assertEqual(config['tooling'], {'vendor': 'Rumuze', 'tool': 'Crewloom', 'role': 'tooling',
+        self.assertEqual(config['tooling'], {'vendor': 'Crewloom', 'tool': 'Crewloom', 'role': 'tooling',
                                              'owns_client_code': False})
         text = (self.root / pb.CONFIG_NAME).read_text()
         self.assertNotIn(str(self.root), text)
