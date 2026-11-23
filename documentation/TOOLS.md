@@ -29,10 +29,14 @@ Run `python3 scripts/crewloom.py tools` to list these tools. `run` dispatches on
 
 For exact JSON contracts inspect the tool docstring and validation function. The source is linked directly above so the input contract is reviewable.
 
+| Tool | Purpose | Direct command |
+|---|---|---|
 | [workflow](../scripts/workflow.py) | Isolated software workflows and role handoff | `python3 scripts/crewloom.py workflow doctor` |
 
 Workflow execution requires Docker and a locally available image. See [execution](EXECUTION.md). Feature evaluation has a separate [benchmark contract](../examples/evaluation/unicode-slug/README.md).
 
+| Tool | Purpose | Direct command |
+|---|---|---|
 | [project-context](../scripts/project_binding.py) | Portable project identity, local checkout binding, lifecycle entry and finalization | `python3 scripts/crewloom.py project status --project /path/to/project --project-id id` |
 | [project-lessons](../scripts/project_lessons.py) | Evidence-linked lessons; promotion needs executor evidence | `python3 scripts/crewloom.py lesson list --project /path/to/project` |
 | [context-pilot](../scripts/context_pilot.py) | Reproducible cold/warm pilot and context byte comparison | `python3 scripts/context_pilot.py --out /tmp/pilot.json` |
