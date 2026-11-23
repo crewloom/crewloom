@@ -233,9 +233,9 @@ Crewloom does not include a hosted orchestration server or a model provider. It 
 
 Start with [Getting started](documentation/GETTING_STARTED.md), [Architecture](documentation/ARCHITECTURE.md), [Workflow recipes](documentation/WORKFLOWS.md), and [OpenCode/local models](documentation/LOCAL_MODELS.md). Read [Contributing](CONTRIBUTING.md), [Security](SECURITY.md), and [the changelog](CHANGELOG.md) before proposing changes.
 
-Derived from RUMUZE Agency's first-party procedures, with clean public memory and filtered operational references. Client records, private infrastructure, and internal history are excluded. See [provenance](documentation/PROVENANCE.json).
+Built from first-party procedures, with clean public memory and filtered operational references. Client records, private infrastructure, and internal history are excluded. See [provenance](documentation/PROVENANCE.json).
 
-[Apache-2.0](LICENSE) · Copyright 2026 RUMUZE Agency · [Attribution](NOTICE).
+[Apache-2.0](LICENSE) · Copyright 2026 Crewloom (https://github.com/crewloom) · [Attribution](NOTICE).
 
 Project selection and isolation: [project guide](documentation/PROJECTS.md).
 
