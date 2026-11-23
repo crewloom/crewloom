@@ -1,6 +1,6 @@
 # Evidence log: tools run on real projects
 
-Dated records of Crewloom tools run against real codebases, with commands, raw results, and what was and was not verified. Project names are internal RUMUZE products; no client code is included.
+Dated records of Crewloom tools run against real codebases, with commands, raw results, and what was and was not verified. Project names are internal products; no client code is included.
 
 ## 2026-10-01 — Frontend checks on three Next.js projects
 
@@ -14,7 +14,7 @@ python3 scripts/crewloom.py run grid-safety -- --project-dir {dir} --json
 | Project | Files scanned | `ui-hints` | `grid-safety` |
 | --- | --- | --- | --- |
 | code-vault | 19 | 0 hints, exit 2 (rendered review required) | **2 flagged**, exit 1 |
-| rumuze-mvp-boilerplate | 19 | 0 hints, exit 2 | pass |
+| mvp-boilerplate | 19 | 0 hints, exit 2 | pass |
 | restaurant-cafe-base | 46 | 0 hints, exit 2 | pass |
 
 `ui-hints` exits 2 by design: a static scan cannot accept a layout, so it asks for rendered review instead of claiming a pass.
