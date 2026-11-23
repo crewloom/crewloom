@@ -19,7 +19,7 @@ Two identities are always required. A remote URL, a folder name or the last chat
 `crewloom.project.json` contains no absolute machine paths, credentials or client history. Its attribution block describes tooling, never ownership of client code:
 
 ```json
-"tooling": {"vendor": "Rumuze", "tool": "Crewloom", "role": "tooling", "owns_client_code": false}
+"tooling": {"vendor": "Crewloom", "tool": "Crewloom", "role": "tooling", "owns_client_code": false}
 ```
 
 Existing customer instructions and installed role memory are never rewritten. `AGENTS.md` or `CLAUDE.md` is only touched when `host_adapter.enabled` is true, and then only between managed markers that this repository replaces idempotently. The managed block is written before the context is frozen, so the generation hashes the final instructions file; the customer text around the markers is preserved byte-for-byte. Each command in the block is one runnable shell line, with the exit evidence given as a shell-quoted JSON argument.
