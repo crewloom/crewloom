@@ -1,8 +1,8 @@
 Crewloom
-Copyright 2026 RUMUZE Agency.
+Copyright 2026 Crewloom (https://github.com/crewloom).
 
 Licensed under Apache-2.0. Public role guides and core Python tools are derived
-from the RUMUZE workspace. No client records or operational history are included.
+from the original workspace. No client records or operational history are included.
 
 This product includes software derived from NVIDIA SkillEvaluator
 (Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES) under the Apache License, Version 2.0.
