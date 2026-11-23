@@ -57,4 +57,4 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
 أخرج التقرير للعميل في 3 أقسام:
 - **المشاكل الحرجة التي تفقدك مبيعات فوراً (Red Flags).**
 - **التحسينات السريعة في 48 ساعة (Quick Wins).**
-- **الحل الجذري المقترح من Crewloom (The Rumuze Blueprint).**
+- **الحل الجذري المقترح من Crewloom (The Crewloom Blueprint).**
