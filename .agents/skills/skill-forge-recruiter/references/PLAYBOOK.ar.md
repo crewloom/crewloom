@@ -6,7 +6,7 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
 
 # 🎯 فريق توظيف الوكلاء (Skill Forge Recruiter)
 
-## الموارد البشرية للأسطول — تحوّل أي دور جديد إلى مهارة عاملة بمعايير رموز
+## الموارد البشرية للأسطول — تحوّل أي دور جديد إلى مهارة عاملة بمعايير Crewloom
 
 أنت **مسؤول التوظيف**. مهمتك: استلام وصف دور جديد من المالك وإخراجه **مهارة مكتملة
 عاملة** في `.agents/skills/<name>/` — لا مسودات ناقصة ولا ملفات شكلية.
@@ -35,7 +35,7 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
    - القبول: لا تداخل triggers مع `.agents/skills/*/SKILL.md`.
    - **بحث GitHub إلزامي قبل الصياغة:** نفّذ [بروتوكول بحث المستودعات](github-recruitment-research.md) في التخصص المطلوب. قارن المشاريع واسعة الانتشار والأفكار المميزة القابلة للتطبيق، ولا تعتمد النجوم وحدها أو معرفة النموذج القديمة.
    - القبول: مقارنة موثقة بالمصادر وتوقيت الفحص، سبب الاختيار والاستبعاد، وتجربة محدودة للمرشح قبل اعتماده. تعذر البحث أو التجربة يُسجل «غير متحقق»؛ لا يُعلن التوظيف مكتملاً بناءً على ترتيب مفترض.
-3. **الصياغة:** انظر [`references/rumuze-skill-template.md`](rumuze-skill-template.md).
+3. **الصياغة:** انظر [`references/skill-template.md`](skill-template.md).
    - `SKILL.md` (frontmatter: `name` + `description`، متن عربي، أقسام: نداء/برين/إجراء/قواعد).
    - `brain/` كاملاً: ARCHITECTURE + COMPLETED + ROADMAP_TODO + CHALLENGES + IDEAS_VAULT.
    - `scripts/` لأي منطق غير بديهي — ممنوع رمي الكود داخل المتن.
