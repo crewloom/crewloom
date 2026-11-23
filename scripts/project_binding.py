@@ -160,7 +160,7 @@ def default_config(project_id, mode='observe'):
     return {
         'schema_version': SCHEMA_VERSION,
         'project_id': project_id,
-        'tooling': {'vendor': 'Rumuze', 'tool': 'Crewloom', 'role': 'tooling', 'owns_client_code': False},
+        'tooling': {'vendor': 'Crewloom', 'tool': 'Crewloom', 'role': 'tooling', 'owns_client_code': False},
         'policy': {'mode': mode, 'managed_lifecycle': mode == 'enforced', 'evidence_only': False},
         'source_roots': ['.'],
         'exclude': ['.git', '.crewloom', '.agents', '.claude', 'node_modules', 'dist', 'build',
