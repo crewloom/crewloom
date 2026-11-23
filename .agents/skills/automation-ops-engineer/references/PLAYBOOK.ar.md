@@ -8,7 +8,7 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
 
 ## الذراع التشغيلية لورك فلوز n8n — بملكية قسم التسويق والنمو (02_Marketing)، تنفيذ IT-مساند
 
-تشغّل ورك فلوز n8n الحية للوكالة (`02_Marketing/Automation-n8n/workflows/`: محرك `omnichannel_content_engine.json` بـ 17 عقدة، ومصنع `linkedin_content_factory.json` بـ 12 عقدة — أنواع العقد الحقيقية: `scheduleTrigger`، `manualTrigger`، `googleSheets`، `openAi`، `linkedIn`، `slack`، `telegram`، `httpRequest`، `if`، `code`، `buffer`) فوق حاوية `rumuze_n8n` من `docker-compose.yml`. لا تضع استراتيجية حملات، ولا تلمس جهاز المالك.
+تشغّل ورك فلوز n8n الحية للوكالة (`02_Marketing/Automation-n8n/workflows/`: محرك `omnichannel_content_engine.json` بـ 17 عقدة، ومصنع `linkedin_content_factory.json` بـ 12 عقدة — أنواع العقد الحقيقية: `scheduleTrigger`، `manualTrigger`، `googleSheets`، `openAi`، `linkedIn`، `slack`، `telegram`، `httpRequest`، `if`، `code`، `buffer`) فوق حاوية `n8n` من `docker-compose.yml`. لا تضع استراتيجية حملات، ولا تلمس جهاز المالك.
 
 ---
 
@@ -28,7 +28,7 @@ This source-derived reference preserves the fuller Arabic specialist procedures.
 
 ## 🛠️ إجراء التنفيذ
 
-1. **فحص الصحة:** تحقق من حاوية `rumuze_n8n` (`docker compose ps` في `02_Marketing/Automation-n8n/`) واستجابة `http://localhost:5678`، ثم راجع آخر التنفيذات لكل ورك فلو وسجّل (ناجح/فاشل/معطل).
+1. **فحص الصحة:** تحقق من حاوية `n8n` (`docker compose ps` في `02_Marketing/Automation-n8n/`) واستجابة `http://localhost:5678`، ثم راجع آخر التنفيذات لكل ورك فلو وسجّل (ناجح/فاشل/معطل).
    - *معيار القبول:* تقرير صحة لكل ورك فلو: الاسم + الحالة + عدد الفاشل الأخير.
 2. **فرز الفشل وإعادة التشغيل:** حدد العقدة الفاشلة ونوعها (`openAi`/`googleSheets`/`linkedIn`/`httpRequest`/...)، وصنّف السبب (بيانات دخل سيئة أم ورك فلو مكسور أم اعتماد منتهٍ)، ثم أعد التشغيل بعد الإصلاح.
    - *معيار القبول:* فرز موثق + دليل إعادة تشغيل (معرف التنفيذ الناجح بعد الإصلاح).
