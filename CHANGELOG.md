@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.9.25 — 2026-11-25
+
+- Register the first-party `crewloom-flutter-architecture` skill (feature-first Flutter layers, size limits, RTL, verification gates) in `Brain/SKILLS_AND_TEAMS_CATALOG.md`.
+- Refresh the manifest hash for the catalog so `check_repository.py` passes.
+
 ## 0.9.24 — 2026-11-21
 
 - Record the workspace layout change in `Brain/COMPLETED.md`: project registry in `.crewloom/`, side projects in `labs/`, generated output in `artifacts/`, worktrees in `.crewloom/work/worktrees/`, with the open items.
