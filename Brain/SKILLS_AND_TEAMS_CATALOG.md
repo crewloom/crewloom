@@ -42,6 +42,7 @@
 | **`vercel-react-view-transitions`** | `vercel-labs/agent-skills` | ~35k+ | انتقالات الصفحات والعناصر عبر View Transition API في React و Next.js. |
 | **`distributed-systems-architecture`** | Local | معيار هندسي | نمذجة C4 وحدود DDD وأنماط الأنظمة الموزعة المرنة (Outbox، Circuit Breaker، Idempotency). |
 | **`crewloom-ai-pulse`** | Local (Crewloom) | خاص بالمشروع | مواصفات محرك القرارات المحلي Pulse وبث `.crw` المشفر والـ sidecar. |
+| **`crewloom-flutter-architecture`** | Local (Crewloom) | خاص بالمشروع | تنظيم مشاريع Flutter: طبقات حسب الفيتشر، حدود الحجم، RTL، وبوابات التحقق. |
 | **`peer-review`** | Local | معيار علمي | صياغة مراجعات تحكيم علمي منظمة ومقيدة بالأدلة. |
 | **`scientific-critical-thinking`** | Local | معيار علمي | تقييم جودة الأدلة والتحيزات والعوامل المربكة في الادعاءات العلمية. |
 | **`agents-sdk`** | `cloudflare/skills` | Cloudflare | بناء وتصحيح ومراجعة وكلاء Cloudflare Agents SDK (حالة دائمة، WebSockets، أدوات). |
