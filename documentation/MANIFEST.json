@@ -1,5 +1,5 @@
 {
-  "package_version": "0.9.24",
+  "package_version": "0.9.25",
   "scope": "Reviewed release candidate source; runtime/build directories and this manifest excluded; publication requires final checks and merge",
   "files": {
     ".agents/CODE_REGISTRY.md": "6b2d6d02b20af6037ed987371c1bdc859a302a1443f6189fe4e06024c4059b61",
@@ -532,7 +532,7 @@
     "Brain/computer-use-program/spikes/android-virtual-display.md": "b82b6746a74ab80091b30b5a60f79f1d9a149ce255b0babb384fc51bb242890b",
     "Brain/computer-use-program/spikes/macos.md": "1ff9d32001a4f440b76de6e52aa9da49ef762d9ca354807217d21214aa6f39cd",
     "Brain/computer-use-program/spikes/windows-adapter-audit.md": "3072bb9f13b3495f9ade23ab1f000dfe7cb93160d8f36b5325485bd7c387b86d",
-    "CHANGELOG.md": "340d921552358584484e22161eebb416a32822783c8b8f23fa8c2cea4b27fa05",
+    "CHANGELOG.md": "957affbcb6bedfb22a9e064107c810246195cd2ded274abb92bbc13cd4653c94",
     "CONTRIBUTING.md": "6237e5a0f8eed5addda8220f179a5fec831a45d6b950e7fab10669ed28dd59f9",
     "LICENSE": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
     "MANIFEST.in": "350519cb71b6be3b612f01c9c484208182772c2897b65568099bf41cffbab1df",
@@ -850,7 +850,7 @@
     "extensions/chrome/sidepanel.css": "0474a1795b1164c07dd9871d54c62fa6bfbbbae0f3b130c3bcf33f8cac9794ca",
     "extensions/chrome/sidepanel.html": "9b149cabbe7ee84751cb18478668720eb315d4bcb09dc02307a4ab583ecb6181",
     "extensions/chrome/sidepanel.js": "70ece745679c39b04fbfbe5685015e1502228476bc2a2bd39425b17efb31f0eb",
-    "pyproject.toml": "bb5a01045b2cb3fba77b47326033431a89780562d4dbcffecf6d91349fd80bc2",
+    "pyproject.toml": "c3e0a547d8e15e9472bd3a9c6d31f0244bb35809611c60d8d46ada21e8f34901",
     "quickstart.sh": "6af8ab4bf9a5688bff5e05d3362331890df049793d78fde641bc002b4b4bc423",
     "scripts/agency_readiness.py": "b059432724a7f9d2fe1744393a0e11d7d9ec89a8542f05b27c72670e92813331",
     "scripts/bilingual_evaluation.py": "a0378921f849c1cf270de5b0899e146e49629251ac91a985bc0a66647c224693",
@@ -1000,4 +1000,4 @@
     "workflows/software-feature.json": "e6481e1532deae7a10204ebbb7ef58c94ccc7244202e1aef838ddb8f273ec290",
     "workflows/system-design.json": "5c31f8d74031baf9b7e078113f2127290171a2dbff836d47b5094b4964334117"
   }
-  }
+}
