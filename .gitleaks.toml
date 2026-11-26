@@ -1,0 +1,20 @@
+title = "crewloom core"
+
+[extend]
+useDefault = true
+
+# Triaged 2026-11-22 (13 findings, all generic-api-key, none real secrets):
+#  - documentation/MANIFEST.json maps file paths to SHA-256 digests; paths such as
+#    "dashboard/lib/auth.ts" trip the entropy rule. Only exact 64-hex digest lines are exempt.
+#  - dashboard/.next/ is gitignored Next.js build output holding per-build local preview keys.
+[[allowlists]]
+description = "SHA-256 digests in the documentation manifest"
+targetRules = ["generic-api-key"]
+paths = ['''documentation/MANIFEST\.json$''']
+regexTarget = "line"
+regexes = ['''"[0-9a-f]{64}"''']
+
+[[allowlists]]
+description = "Generated Next.js build output (gitignored)"
+targetRules = ["generic-api-key"]
+paths = ['''dashboard/\.next/''']

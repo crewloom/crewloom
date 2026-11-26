@@ -7,6 +7,7 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | name | purpose | enforced_by | owner | status |
 |---|---|---|---|---|
 | constitution | Immutable invariants and order of precedence | human review; Art. III.3 tests | `CONSTITUTION.md` | active |
+| metasystem-governance | Single state machine, authority intersection, deterministic evidence, proportional ceremony | human review, CI | `METASYSTEM_GOVERNANCE_CONSTITUTION.ar.md` | active |
 
 ## Rules
 
@@ -24,7 +25,9 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | release | any verified modification completes | tag exists locally and on remote; GitHub Release published; CI green | `scripts/release.sh` (steps 3-4); rest advisory | `AGENTS.md` § Mandatory Release Protocol | active |
 | post-push-ci-verification | any push, merge or release | all workflow runs for `HEAD` pass, checked with `gh` only | advisory | `AGENTS.md` § Non-negotiable 7; skill `crewloom-release-verifier` | active |
 | model-escalation | a task is submitted and more than one model could run it | verified result, or `escalate` returns `stop` | advisory; Guard planned | `PROTOCOL_MODEL_ESCALATION.md` | written, not wired into any run path |
+| execution-pipeline | the agent is asked to build, change, fix, refactor or migrate any software | every promise has a passing test with sabotage-red evidence, pinned tests still green, profile gates and holdout checks pass, report generated | partial: `scripts/exec-gates.mjs` (with `--tier` and `--write-evidence`), Promise Ledger Stop hook, architecture check, the task gate (`task-gate.sh` blocks code edits without an open task) and the release evidence check in `scripts/release.sh` run in Claude Code only; skills `crewloom-execution-pipeline`, `crewloom-pin-before-change`, `crewloom-adversarial-verify` are advisory; holdout verifier, diff-scope check, report generator, seeded-fault benchmark planned | `PROTOCOL_EXECUTION_PIPELINE.md` | written, advisory, not measured |
 | skill-vetting | a third-party skill is proposed for `.agent/skills/` or `~/.agents/skills/` | verdict recorded in `SKILL_VETTING_LOG.md`; accepted skill has `SOURCE.md` whose manifest matches its files | `scripts/vet-skill.py` (scan) and `scripts/skill-pins.py check` (pin Guard), run by hand; not in CI; rest advisory | `PROTOCOL_SKILL_VETTING.md` | active (no skill has been fully vetted yet; 59 legacy skills are pinned, not approved) |
+| open-source-vetting | any proposal to add, vendor, or update any third-party open-source component (native sidecars, runtime executables, AI models, vendored libraries or source trees, agent skills, MCP providers, system gateways or daemons) | component is completely self-contained (zero host toolchain required), registered in `docs/OPEN_SOURCE_STACK.md` with its component type, and tracked via `scripts/check-oss-updates.mjs` across all four required types (Sidecars, Models, Libraries, Skills) | `scripts/check-oss-updates.mjs` (single-click upstream scout); `agent/apps/crewloom-desktop/tests/browser-packaging.test.mjs` (packaging); `.agent/rules/open-source-governance.md` (policy) | `PROTOCOL_OPEN_SOURCE_VETTING.md` | active |
 | contradiction-adjudication | two or more claims, results, sources or model outputs contradict and a decision depends on which holds | decision record with a closed-set verdict, evidence class, confidence and the test that would change it, or `undecided` with the missing test | advisory; Guard planned | `PROTOCOL_CONTRADICTION_ADJUDICATION.md` | written, advisory |
 | strategic-decision | structured 8-phase process for any organisation-level decision (strategy, architecture, product, finance, people); mandatory council session at phase 3; produces a signed Decision Record | advisory; Owner sovereign sign-off enforced by convention; Guard planned | `PROTOCOL_STRATEGIC_DECISION.md` | active, advisory |
 | sovereign-patent-invention | any technical breakthrough proposed for patent protection vs academic paper; professional prior art search (USPTO/EPO/WIPO/arXiv); TRIZ contradiction; Claude Code 5.2 red-team; dual-language drafting (.en + .ar); enablement audit | approved Dual-Language Patent Dossier, passed verify_patent_protocol.py, SHA-256 priority timestamp, Owner sign-off | `core/scripts/verify_patent_protocol.py`, Owner review | `PROTOCOL_PATENT_INVENTION.md` | active |
@@ -33,6 +36,8 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 
 | date | title | file | status | decided_by |
 |---|---|---|---|---|
+| 2026-11-21 | sovereign-project-hub-and-unified-extension-fabric | `decisions/2026-11-21-sovereign-project-hub-and-unified-extension-fabric.md` | active | Council of Knowledge & The Owner |
+| 2026-11-22 | governance-metasystem-and-unified-state-machine | `decisions/2026-11-22-governance-metasystem-and-unified-state-machine.md` | active | Council of Science & The Owner |
 | — | (Confidential invention records reside strictly in `.crewloom/private/research/`) | — | private | The Owner |
 
 ## Standards & Manuals
@@ -69,6 +74,9 @@ Registry of governed artifacts, typed per [`ARTIFACT_TAXONOMY.md`](ARTIFACT_TAXO
 | bridge-prompt-guards | checks before a prompt is submitted | `bridge/src/control-room/submit/guards.ts` | active (path per `AGENTS.md`, not re-verified) |
 | vet-skill | static scan of a skill folder, fail-closed: exit 0 no known pattern, 1 REVIEW, 2 REJECT or scan error | `scripts/vet-skill.py`, tests in `scripts/tests/test_vet_skill.py` | active (regex-based; no known pattern is not safe) |
 | skill-pins | a vetted skill matches its `SOURCE.md` manifest; legacy skills match `.agent/skills/.legacy-baseline.json` | `scripts/skill-pins.py`, tests in `scripts/tests/test_skill_pins.py` | active; not wired into CI |
+| risk-tier | computes a change's risk tier (1-3) from paths and text, never chosen by the model | `scripts/risk-tier.mjs`, tests in `scripts/tests/risk-tier.test.mjs`; rules in `decisions/2026-11-22-enforced-production-gates.md` | active (path and keyword heuristics, not measured) |
+| task-gate | blocks Edit/Write/MultiEdit on code without an open, fresh (24h) task whose tier covers the file's computed tier | `.crewloom/hooks/task-gate.sh` (adapter `.claude/hooks/task-gate.sh`), `scripts/task-open.mjs`, tests in `scripts/tests/task-gate.test.mjs` | active in Claude Code only; Bash writes bypass it |
+| release-evidence | a release needs fresh (2h) passing gate evidence; tier 3 counts NOT-RUN as FAIL | `scripts/evidence.mjs`, `scripts/exec-gates.mjs --write-evidence`, `require_evidence` in `scripts/release.sh`; tests `scripts/tests/evidence.test.mjs`, `test_release_evidence.py` | active; `RELEASE_EVIDENCE=warn` is adoption-only; security gate needs gitleaks, other scanners not installed |
 
 ## Known misclassifications (to resolve)
 

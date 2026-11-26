@@ -18,6 +18,7 @@
   ],
   "files": [
     ".gitignore",
+    ".gitleaks.toml",
     "AGENTS.md",
     "CHANGELOG.md",
     "CONTRIBUTING.md",

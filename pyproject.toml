@@ -83,3 +83,9 @@ py-modules = ["crewloom", "crewloom_resources", "workflow", "evaluate_feature", 
   "adapters/**/*.png",
   "adapters/codex/plugin/.codex-plugin/*.json",
 ]
+
+# Core's own tests live in scripts/. examples/ holds sample projects with their own tests that
+# import their own `src` package and cannot be collected from here (gate baseline was red).
+[tool.pytest.ini_options]
+testpaths = ["scripts"]
+norecursedirs = ["examples", "dashboard", "node_modules", ".git"]
